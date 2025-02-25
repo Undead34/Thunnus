@@ -1,0 +1,42 @@
+---
+import ReactLayout from "./DashboardLayout";
+import "./src/styles/global.css";
+
+// Obtén la ruta actual
+const currentPath = Astro.url.pathname;
+const pathSegments = currentPath.split("/").filter(Boolean);
+
+// Genera los items del Breadcrumb
+const breadcrumbItems = pathSegments.map((segment, index) => {
+  const href = "/" + pathSegments.slice(0, index + 1).join("/");
+  return {
+    label: segment.charAt(0).toUpperCase() + segment.slice(1),
+    href: index < pathSegments.length - 1 ? href : undefined,
+  };
+});
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Astro Basics</title>
+  </head>
+  <body>
+    <ReactLayout client:load breadcrumbItems={breadcrumbItems}>
+      <slot />
+    </ReactLayout>
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>

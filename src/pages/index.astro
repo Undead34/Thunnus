@@ -1,11 +1,187 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from "@/layouts/Layout.astro";
+import GoogleSvg from "@/assets/google.svg";
 ---
 
 <Layout>
-	<Welcome />
+  <main class="w-full h-full">
+    <div class="container">
+      <div class=""></div>
+      <div class="zIgDIc">
+        <div class="Wf6lSd">
+          <img src={GoogleSvg.src} alt="">
+        </div>
+        <div class="ObDc3 ZYOIke">
+          <h1 class="vAV9bf" data-a11y-title-piece="" id="headingText">
+            <span>Inicia sesión</span>
+          </h1>
+          <div class="gNJDp" data-a11y-title-piece="" id="headingSubtext">
+            <span>Utiliza tu cuenta de Google</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 </Layout>
+
+<style>
+  main {
+    background: var(--gm3-sys-color-surface-container, #f0f4f9);
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    padding: 48px 0;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .container {
+    --wf-gutw-hlf: calc((var(--c-gutw, 48px)) / 2);
+    --wf-gutw-hlf-bp2: calc((var(--c-gutw, 76px)) / 2);
+    --wf-brsz: calc(var(--c-brsz, 48px) + 24px);
+    --wf-ps-t: calc(var(--c-ps-t, 24px) + var(--wf-brsz, 72px));
+    --wf-ps-t-bp2: calc(var(--c-ps-t, 24px) + var(--wf-brsz, 72px));
+    --wf-ps-t-bp5: calc(var(--c-ps-t, 36px) + var(--wf-brsz, 72px));
+    --wf-ps-t-bp3-l: calc(var(--c-ps-t, 36px) + var(--wf-brsz, 72px));
+    background-color: var(--gm3-sys-color-surface-container-lowest, #fff);
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    position: relative;
+
+    border-radius: 28px;
+    min-height: 384px;
+    padding-bottom: var(--c-ps-t, 36px);
+    padding-top: var(--wf-ps-t-bp3-l, 108px);
+
+    margin-left: 200px;
+    margin-right: 200px;
+    padding-left: var(--c-ps-s, 36px);
+    padding-right: var(--c-ps-e, 36px);
+    width: auto;
+  }
+</style>
+
+<script>
+  import { Temporal } from "temporal-polyfill";
+
+  interface Event {
+    type: any;
+    timestamp: Date;
+  }
+
+  interface SessionData {
+    sessionId: string;
+    userId: null;
+    startTime: Temporal.Instant;
+    endTime: Temporal.Instant;
+    duration: number | Date;
+    events: Event[];
+    deviceInfo: {
+      userAgent: string;
+      screenResolution: string;
+      language: string;
+    };
+    locationInfo: null;
+  }
+
+  // Configuración inicial
+  let sessionData: SessionData = {
+    sessionId: generateUniqueId(),
+    userId: null,
+    startTime: Temporal.Now.instant(),
+    endTime: Temporal.Now.instant(),
+    duration: 0,
+    events: [],
+    deviceInfo: getDeviceInfo(),
+    locationInfo: null,
+  };
+
+  // Función para generar un ID único
+  function generateUniqueId() {
+    return "id-" + Math.random().toString(36).substr(2, 9);
+  }
+
+  // Obtener información del dispositivo
+  function getDeviceInfo() {
+    return {
+      userAgent: navigator.userAgent,
+      screenResolution: `${window.screen.width}x${window.screen.height}`,
+      language: navigator.language,
+    };
+  }
+
+  // Registrar evento genérico
+  function trackEvent(type: string, data = {}) {
+    const event = {
+      type,
+      timestamp: new Date(),
+      ...data,
+    };
+    sessionData.events.push(event);
+  }
+
+  // --- Capturar Eventos Específicos ---
+
+  // 1. Clicks en cualquier elemento
+  document.addEventListener("click", (e) => {
+    let target = e.target as HTMLElement | null;
+    if (!target || !(target instanceof HTMLElement)) return;
+
+    let id = target.id;
+    let className = target.className;
+    let tagName = target.tagName;
+    let text = target.textContent?.trim().substring(0, 50);
+
+    trackEvent("CLICK", {
+      target: {
+        id,
+        className,
+        tagName,
+        text,
+      },
+    });
+  });
+
+  // 2. Movimientos del mouse (con throttling para no saturar)
+  let mouseMoveTimeout: NodeJS.Timeout;
+
+  document.addEventListener("mousemove", (e) => {
+    clearTimeout(mouseMoveTimeout);
+    mouseMoveTimeout = setTimeout(() => {
+      trackEvent("MOUSE_MOVE", {
+        x: e.clientX,
+        y: e.clientY,
+      });
+    }, 100);
+  });
+
+  // 3. Tiempo en la página
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      sessionData.endTime = Temporal.Now.instant();
+      sessionData.duration =
+        sessionData.endTime.epochSeconds - sessionData.startTime.epochSeconds;
+      sendDataToFirebase();
+    }
+  });
+
+  // 5. Scroll de la página
+  let scrollTimeout: NodeJS.Timeout;
+  window.addEventListener("scroll", () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      trackEvent("SCROLL", {
+        position: window.scrollY,
+      });
+    }, 500);
+  });
+
+  // --- Enviar datos a Firebase ---
+  async function sendDataToFirebase() {
+    console.log(sessionData.duration);
+  }
+</script>
