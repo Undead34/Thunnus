@@ -14,6 +14,24 @@ import "./src/styles/google.css";
   <body class="dark">
     <slot />
   </body>
+  <script>
+    // Función para detectar el tema del usuario
+    function detectTheme() {
+      const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+      if (prefersDarkScheme.matches) {
+        document.body.classList.add("dark");
+      } else {
+        document.body.classList.remove("dark");
+      }
+    }
+
+    // Ejecutar la función al cargar la página
+    detectTheme();
+
+    // Escuchar cambios en la preferencia del tema
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", detectTheme);
+  </script>
 </html>
 
 <style>

@@ -4,11 +4,13 @@ import Footer from "./Footer.astro";
 import Options from "./Options.astro";
 import Progressbar from "./Progressbar.astro";
 import Form from "./Form.astro";
+
+let isActive = false;
 ---
 
 <div class="S7xv8">
   <div class="TcuCfd NQ5OL">
-    <Progressbar isActive={true} />
+    <Progressbar isActive={isActive} />
 
     <div class="fAlnEc" id="yDmH0d">
       <div id="ZCHFDb"></div>
@@ -31,7 +33,7 @@ import Form from "./Form.astro";
           </div>
         </div>
 
-        <div class="UXFQgc">
+        <div class:list={["UXFQgc hAfgic", isActive ? "GEcl0c" : ""]}>
           <div class="qWK5J">
             <div class="xKcayf">
               <div class="AcKKx">
@@ -56,7 +58,15 @@ import Form from "./Form.astro";
         <Options />
       </div>
     </div>
+
+    <div class:list={[isActive ? "kPY6ve" : ""]} tabindex="0"></div>
   </div>
 
   <Footer />
 </div>
+
+<script>
+  document.addEventListener<any>("form/captured:mail", (event: CustomEvent) => {
+    console.log(event.detail);
+  });
+</script>

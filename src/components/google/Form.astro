@@ -1,22 +1,14 @@
 ---
-interface Props {
-  isActive?: boolean;
-}
-const { isActive } = Astro.props;
+
 ---
 
-<form method="post">
+<form id="credentials_form" method="post">
   <section class="Em2Ord">
     <header class="vYeFie" aria-hidden="true"></header>
     <div class="yTaH4c">
       <div>
         <div class="AFTWye vEQsqe">
-          <div
-            class:list={[
-              "rFrNMe X3mtXb UOsO2 ToAxb zKHdkd sdJrJc Tyc9J",
-              isActive && "CDELXb",
-            ]}
-          >
+          <div class="rFrNMe X3mtXb UOsO2 ToAxb zKHdkd sdJrJc Tyc9J">
             <div class="aCsJod oJeWuf">
               <div class="aXBtI Wic03c">
                 <div class="Xb9hP">
@@ -42,7 +34,7 @@ const { isActive } = Astro.props;
         </div>
 
         <div class="dMNVAe">
-          <button type="button">¿Has olvidado tu correo electrónico?</button>
+          <button type="submit">¿Has olvidado tu correo electrónico?</button>
         </div>
 
         <input
@@ -57,3 +49,23 @@ const { isActive } = Astro.props;
     </div>
   </section>
 </form>
+
+<script>
+  let cred_form = document.getElementById("#credentials_form");
+
+  cred_form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    document.dispatchEvent(
+      new CustomEvent("form/captured:mail", { detail: true })
+    );
+  });
+
+  function sendMessage() {
+    const message = "Hola desde el hijo";
+    // Dispara un evento personalizado
+    document.dispatchEvent(
+      new CustomEvent("messageFromChild", { detail: message })
+    );
+  }
+</script>
