@@ -4,13 +4,11 @@ import Footer from "./Footer.astro";
 import Options from "./Options.astro";
 import Progressbar from "./Progressbar.astro";
 import Form from "./Form.astro";
-
-let isActive = false;
 ---
 
 <div class="S7xv8">
   <div class="TcuCfd NQ5OL">
-    <Progressbar isActive={isActive} />
+    <Progressbar isActive={false} />
 
     <div class="fAlnEc" id="yDmH0d">
       <div id="ZCHFDb"></div>
@@ -33,7 +31,7 @@ let isActive = false;
           </div>
         </div>
 
-        <div class:list={["UXFQgc hAfgic", isActive ? "GEcl0c" : ""]}>
+        <div id="form-container" class="UXFQgc hAfgic">
           <div class="qWK5J">
             <div class="xKcayf">
               <div class="AcKKx">
@@ -59,14 +57,30 @@ let isActive = false;
       </div>
     </div>
 
-    <div class:list={[isActive ? "kPY6ve" : ""]} tabindex="0"></div>
+    <div id="background-loading" tabindex="0"></div>
   </div>
 
   <Footer />
 </div>
 
 <script>
+  let formContainer = document.getElementById("form-container");
+  let backgroundLoading = document.getElementById("background-loading");
+  let progressbar = document.getElementById("progressbar");
+
+  // Añadir esto en tu script
   document.addEventListener<any>("form/captured:mail", (event: CustomEvent) => {
-    console.log(event.detail);
+    updateUIState(event.detail);
   });
+
+  const updateUIState = (active: boolean) => {
+    // Actualizar clases condicionales
+    backgroundLoading?.classList.toggle("kPY6ve", active);
+    progressbar?.classList.toggle("qdulke", !active);
+    progressbar?.classList.toggle("jK7moc", !active);
+
+    setInterval(() => {
+      formContainer?.classList.toggle("GEcl0c", active);
+    }, 300);
+  };
 </script>

