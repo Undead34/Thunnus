@@ -7,6 +7,8 @@ import tailwindcss from "@tailwindcss/vite";
 
 import react from "@astrojs/react";
 
+import purgecss from "astro-purgecss";
+
 // https://astro.build/config
 export default defineConfig({
   output: "server",
@@ -19,5 +21,9 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
-  integrations: [react()],
+  integrations: [react(), purgecss({
+    content: [
+      './src/**/*.{astro,js,jsx,ts,tsx,vue,svelte}'
+    ]
+  })],
 });
