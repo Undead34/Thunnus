@@ -1,0 +1,77 @@
+---
+import { app } from "@/firebase/server";
+import { getAuth } from "firebase-admin/auth";
+
+import Layout from "@/layouts/Dashboard.astro";
+
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+
+const auth = getAuth(app);
+
+/* Check current session */
+if (!Astro.cookies.has("__session")) {
+  return Astro.redirect("/signin");
+}
+
+const sessionCookie = Astro.cookies.get("__session")?.value || "N/A";
+const decodedCookie = await auth.verifySessionCookie(sessionCookie);
+const user = await auth.getUser(decodedCookie.uid);
+
+if (!user) {
+  return Astro.redirect("/signin");
+}
+---
+
+<Layout title="Campaigns">
+  <div class="grid gap-6">
+    <Card>
+      <CardHeader>
+        <CardTitle>Project Name</CardTitle>
+        <CardDescription
+          >Used to identify your project in the dashboard.</CardDescription
+        >
+      </CardHeader>
+      <CardContent>
+        <form>
+          <Textarea placeholder="Type your message here." />
+        </form>
+      </CardContent>
+      <CardFooter className="border-t p-6">
+        <Button>Save</Button>
+      </CardFooter>
+    </Card>
+    <Card>
+      <CardHeader>
+        <CardTitle>Root Directory</CardTitle>
+        <CardDescription
+          >The directory within your project, in which your code is located.</CardDescription
+        >
+      </CardHeader>
+      <CardContent>
+        <form class="flex flex-col gap-4">
+          <Input placeholder="Project Name" defaultValue="/web" />
+          <div class="flex items-center space-x-2">
+            <Checkbox id="include" defaultChecked />
+            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Include files from outside of the Root Directory
+            </label>
+          </div>
+        </form>
+      </CardContent>
+      <CardFooter className="border-t p-6">
+        <Button>Save</Button>
+      </CardFooter>
+    </Card>
+  </div>
+</Layout>

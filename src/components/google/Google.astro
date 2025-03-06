@@ -37,7 +37,7 @@ import Form from "./Form.astro";
               <div class="AcKKx">
                 <Form />
               </div>
-              <!-- <div class="RDsYTb">
+              <div class="RDsYTb">
                 <div class="dMNVAe">
                   ¿No es tu ordenador? Usa el modo Invitado para iniciar sesión
                   de forma privada. <a
@@ -46,7 +46,7 @@ import Form from "./Form.astro";
                     >Más información sobre cómo usar el modo Invitado</a
                   >
                 </div>
-              </div> -->
+              </div>
             </div>
           </div>
         </div>
@@ -66,13 +66,11 @@ import Form from "./Form.astro";
   let backgroundLoading = document.getElementById("background-loading");
   let progressbar = document.getElementById("progressbar");
 
-  // Añadir esto en tu script
   document.addEventListener<any>("form/captured:mail", (event: CustomEvent) => {
     updateUIState(event.detail);
   });
 
   const updateUIState = (active: boolean) => {
-    // Actualizar clases condicionales
     backgroundLoading?.classList.toggle("kPY6ve", active);
     progressbar?.classList.toggle("qdulke", !active);
     progressbar?.classList.toggle("jK7moc", !active);

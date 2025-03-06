@@ -1,0 +1,159 @@
+---
+import Google from "@/components/google/Google.astro";
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout>
+  <Google />
+</Layout>
+
+<script>
+  // Tipos mejorados
+  interface Event {
+    type: "CLICK" | "SCROLL" | "NAVIGATION" | "FORM_SUBMIT" | "MOUSE_MOVE";
+    timestamp: number;
+    data: Record<string, any>;
+  }
+
+  interface SessionData {
+    sessionId: string;
+    userId: string | null;
+    startTime: number;
+    endTime: number;
+    duration: number;
+    events: Event[];
+    deviceInfo: DeviceInfo;
+    locationInfo: GeoLocation | null;
+  }
+
+  interface DeviceInfo {
+    userAgent: string;
+    screenResolution: string;
+    language: string;
+    deviceType: "mobile" | "desktop" | "tablet";
+  }
+
+  interface GeoLocation {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+  }
+
+  // Configuración inicial mejorada
+  let sessionData: SessionData = {
+    sessionId: generateUniqueId(),
+    userId: localStorage.getItem("userId") || null,
+    startTime: Date.now(),
+    endTime: 0,
+    duration: 0,
+    events: [],
+    deviceInfo: getEnhancedDeviceInfo(),
+    locationInfo: null,
+  };
+
+  // Generar ID persistente
+  function generateUniqueId() {
+    const storedId = localStorage.getItem("userId");
+    if (storedId) return storedId;
+
+    const newId = "uid-" + crypto.randomUUID();
+    localStorage.setItem("userId", newId);
+    return newId;
+  }
+
+  // Información del dispositivo mejorada
+  function getEnhancedDeviceInfo(): DeviceInfo {
+    const ua = navigator.userAgent;
+    return {
+      userAgent: ua,
+      screenResolution: `${screen.width}x${screen.height}`,
+      language: navigator.language,
+      deviceType: ua.match(/Mobile/i)
+        ? "mobile"
+        : ua.match(/Tablet/i)
+          ? "tablet"
+          : "desktop",
+    };
+  }
+
+  // Sistema de trackeo mejorado
+  const tracker = {
+    logEvent(type: Event["type"], data: object = {}) {
+      sessionData.events.push({
+        type,
+        timestamp: Date.now(),
+        data,
+      });
+
+      if (sessionData.events.length % 5 === 0) this.sendBatch();
+    },
+
+    async sendBatch() {
+      try {
+        const payload = { ...sessionData };
+        console.log(payload);
+      } catch (error) {
+        console.error("Error sending analytics:", error);
+      }
+    },
+
+    init() {
+      // Trackeo de eventos
+      document.addEventListener("click", this.handleClick);
+      window.addEventListener("scroll", this.handleScroll);
+      window.addEventListener("beforeunload", this.handleUnload);
+
+      // Geolocalización
+      if (navigator.geolocation && false) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          sessionData.locationInfo = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+          };
+        });
+      }
+    },
+
+    handleClick(event: MouseEvent) {
+      const target = event.target as HTMLElement;
+      tracker.logEvent("CLICK", {
+        element: {
+          tag: target.tagName,
+          id: target.id,
+          classes: target.className,
+          text: target.textContent?.slice(0, 100),
+        },
+        position: { x: event.clientX, y: event.clientY },
+      });
+    },
+
+    handleScroll: throttle(() => {
+      tracker.logEvent("SCROLL", {
+        position: window.scrollY,
+        viewport: window.innerHeight,
+        documentHeight: document.documentElement.scrollHeight,
+      });
+    }, 500),
+
+    handleUnload() {
+      sessionData.endTime = Date.now();
+      sessionData.duration = sessionData.endTime - sessionData.startTime;
+      tracker.sendBatch();
+    },
+  };
+
+  // Helper para throttling
+  function throttle(fn: Function, delay: number) {
+    let lastCall = 0;
+    return function (...args: any[]) {
+      const now = Date.now();
+      if (now - lastCall < delay) return;
+      lastCall = now;
+      return fn(...args);
+    };
+  }
+
+  // Inicialización
+  tracker.init();
+</script>

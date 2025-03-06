@@ -39,7 +39,7 @@ const data = {
       items: [
         {
           title: "Active Campaigns",
-          url: "/campaigns/active",
+          url: "/campaigns",
           badge: 3,
         },
         {
@@ -61,10 +61,12 @@ const data = {
         {
           title: "Email Templates",
           url: "/templates/emails",
+          disabled: true,
         },
         {
           title: "Landing Pages",
           url: "/templates/pages",
+          disabled: true,
         },
         {
           title: "Attachments",
@@ -81,6 +83,7 @@ const data = {
         {
           title: "Campaign Results",
           url: "/analytics/campaigns",
+          disabled: true,
         },
         {
           title: "User Activity",
@@ -108,6 +111,7 @@ const data = {
         {
           title: "SMTP Settings",
           url: "/settings/smtp",
+          disabled: true,
         },
         {
           title: "User Management",

@@ -1,0 +1,537 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-ms-eerie-black: #1b1b1b;
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 300;
+  font-stretch: normal;
+  src: url(https://fonts.gstatic.com/s/opensans/v40/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsiH0B4gaVc.ttf)
+    format("truetype");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: normal;
+  src: url(https://fonts.gstatic.com/s/opensans/v40/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4gaVc.ttf)
+    format("truetype");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: normal;
+  src: url(https://fonts.gstatic.com/s/opensans/v40/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsgH1x4gaVc.ttf)
+    format("truetype");
+}
+
+@font-face {
+  font-family: "Open Sans Condensed";
+  font-style: normal;
+  font-weight: 300;
+  src: url(https://fonts.gstatic.com/s/opensanscondensed/v23/z7NFdQDnbTkabZAIOl9il_O6KJj73e7Ff1GhDuXMQg.ttf)
+    format("truetype");
+}
+
+@font-face {
+  font-family: "Open Sans Condensed";
+  font-style: normal;
+  font-weight: 700;
+  src: url(https://fonts.gstatic.com/s/opensanscondensed/v23/z7NFdQDnbTkabZAIOl9il_O6KJj73e7Ff0GmDuXMQg.ttf)
+    format("truetype");
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "open sans", helvetica, arial, sans;
+  background: url(http://farm8.staticflickr.com/7064/6858179818_5d652f531c_h.jpg)
+    no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.log-form {
+  width: 40%;
+  min-width: 320px;
+  max-width: 475px;
+  background: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 40em) {
+  .log-form {
+    width: 95%;
+    position: relative;
+    margin: 2.5% auto 0 auto;
+    left: 0%;
+    -webkit-transform: translate(0%, 0%);
+    -moz-transform: translate(0%, 0%);
+    -o-transform: translate(0%, 0%);
+    -ms-transform: translate(0%, 0%);
+    transform: translate(0%, 0%);
+  }
+}
+
+.log-form form {
+  display: block;
+  width: 100%;
+  padding: 2em;
+}
+
+.log-form h2 {
+  color: #5d5d5d;
+  font-family: "open sans condensed";
+  font-size: 1.35em;
+  display: block;
+  background: #2a2a2a;
+  width: 100%;
+  text-transform: uppercase;
+  padding: 0.75em 1em 0.75em 1.5em;
+  box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.05);
+  border: 1px solid #1d1d1d;
+  margin: 0;
+  font-weight: 200;
+}
+
+.log-form input {
+  display: block;
+  margin: auto auto;
+  width: 100%;
+  margin-bottom: 2em;
+  padding: 0.5em 0;
+  border: none;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 1.25em;
+  color: #757575;
+}
+
+.log-form input:focus {
+  outline: none;
+}
+
+.log-form .btn {
+  display: inline-block;
+  background: #1fb5bf;
+  border: 1px solid #1ba0a9;
+  padding: 0.5em 2em;
+  color: white;
+  margin-right: 0.5em;
+  box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.2);
+}
+
+.log-form .btn:hover {
+  background: #23cad5;
+}
+
+.log-form .btn:active {
+  background: #1fb5bf;
+  box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.log-form .btn:focus {
+  outline: none;
+}
+
+.log-form .forgot {
+  color: #33d3de;
+  line-height: 0.5em;
+  position: relative;
+  top: 2.5em;
+  text-decoration: none;
+  font-size: 0.75em;
+  margin: 0;
+  padding: 0;
+  float: right;
+}
+
+.log-form .forgot:hover {
+  color: #1ba0a9;
+}
+
+.error {
+  color: #d83300;
+  font-size: 11px;
+}
+
+body {
+  font-family: "Segoe UI Webfont", -apple-system, "Helvetica Neue",
+    "Lucida Grande", "Roboto", "Ebrima", "Nirmala UI", "Gadugi",
+    "Segoe Xbox Symbol", "Segoe UI Symbol", "Meiryo UI", "Khmer UI", "Tunga",
+    "Lao UI", "Raavi", "Iskoola Pota", "Latha", "Leelawadee",
+    "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic",
+    "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue",
+    "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti",
+    "Mongolian Baiti", "MV Boli", "Myanmar Text", "Cambria Math";
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 400;
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
+  padding-bottom: 0.227px;
+  padding-top: 0.227px;
+  color: #000;
+}
+
+#lightbox {
+  position: relative;
+  max-width: 440px;
+  width: calc(100% - 40px);
+  padding: 44px;
+  margin-bottom: 28px;
+  background-color: #fff;
+  -webkit-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  min-width: 320px;
+  min-height: 338px;
+  overflow: hidden;
+}
+
+#credbox {
+  position: relative;
+  max-width: 440px;
+  width: calc(100% - 40px);
+  padding: 44px;
+  margin-bottom: 28px;
+  line-height: 16px;
+  min-width: 320px;
+  overflow: hidden;
+  padding: 0;
+  background-color: #fff;
+  -webkit-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.segoe-ui {
+  font-family: "Segoe UI", "Helvetica Neue", "Lucida Grande", Roboto, Ebrima,
+    "Nirmala UI", Gadugi, "Segoe Xbox Symbol", "Segoe UI Symbol", "Meiryo UI",
+    "Khmer UI", Tunga, "Lao UI", Raavi, "Iskoola Pota", Latha, Leelawadee,
+    "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic",
+    "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue",
+    "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti",
+    "Mongolian Baiti", "MV Boli", "Myanmar Text", "Cambria Math";
+}
+
+.title {
+  margin-bottom: 20px;
+  margin-top: 20px;
+  margin-bottom: 1.25rem;
+  margin-top: 1.25rem;
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 300;
+  line-height: 1.75rem;
+  padding-bottom: 2.3632px;
+  padding-top: 2.3632px;
+  color: #1b1b1b;
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding: 0;
+  margin-top: 16px;
+  margin-bottom: 12px;
+  font-family: "Segoe UI", "Helvetica Neue", "Lucida Grande", "Roboto", "Ebrima",
+    "Nirmala UI", "Gadugi", "Segoe Xbox Symbol", "Segoe UI Symbol", "Meiryo UI",
+    "Khmer UI", "Tunga", "Lao UI", "Raavi", "Iskoola Pota", "Latha",
+    "Leelawadee", "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic",
+    "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue",
+    "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti",
+    "Mongolian Baiti", "MV Boli", "Myanmar Text", "Cambria Math";
+}
+
+.text-debug {
+  cursor: pointer;
+  transform: translate(12%, -10%);
+  font-size: 13px;
+  font-weight: 600;
+  height: 22px;
+  letter-spacing: 3px;
+  line-height: 22px;
+  outline-color: rgb(0, 0, 0);
+  outline-style: none;
+  outline-width: 0px;
+  text-align: left;
+  text-decoration: none;
+  text-wrap: nowrap;
+  vertical-align: top;
+  white-space-collapse: collapse;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate {
+  animation: 0.25s;
+  animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1);
+  animation-fill-mode: both;
+  transition-property: left;
+}
+
+.show-from-r {
+  position: relative;
+  animation-delay: 0.6s;
+  animation-name: show-from-right;
+}
+
+.hide-to-left {
+  position: relative;
+  animation-name: hide-to-left;
+}
+
+@keyframes show-from-right {
+  from {
+    left: 200px;
+    opacity: 0;
+  }
+
+  to {
+    left: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes hide-to-left {
+  from {
+    left: 0;
+    opacity: 1;
+  }
+
+  to {
+    left: -200px;
+    opacity: 0;
+    display: none;
+  }
+}
+
+.text-input,
+input[type="color"],
+input[type="date"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="email"],
+input[type="month"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="time"],
+input[type="url"],
+input[type="week"],
+textarea {
+  border-top-width: 0;
+  border-left-width: 0;
+  border-right-width: 0;
+  padding-left: 0;
+}
+
+.input.text-box {
+  padding: 4px 8px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(255, 255, 255, 0.4);
+  height: 32px;
+  height: 2rem;
+  padding: 6px 10px;
+  border-width: 1px;
+  border-color: #666;
+  border-color: rgba(0, 0, 0, 0.6);
+  height: 36px;
+  outline: none;
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  background-color: transparent;
+  border-top-width: 0;
+  border-left-width: 0;
+  border-right-width: 0;
+  padding-left: 0;
+}
+
+.input.text-box:focus {
+  background-color: #fff;
+  border-color: #0067b8;
+  background-color: transparent;
+}
+
+.input.text-box:hover {
+  border-color: #323232;
+  border-color: rgba(0, 0, 0, 0.8);
+}
+
+.input.text-box::-moz-placeholder {
+  color: rgba(0, 0, 0, 0.6);
+  opacity: 1;
+}
+
+.input.text-box:-ms-input-placeholder {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.input.text-box::-webkit-input-placeholder {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.input.text-box.has-error {
+  border-color: #e81123;
+}
+
+.input.text-box.has-error:focus {
+  border-color: #e81123;
+}
+
+a {
+  color: #ccc;
+  text-decoration: none;
+}
+
+a:link {
+  color: #0067b8;
+}
+
+a:visited {
+  color: #0067b8;
+}
+
+a:hover {
+  color: #666;
+}
+
+a:focus {
+  color: #0067b8;
+}
+
+a:active {
+  color: #999;
+}
+
+.button {
+  min-width: 100px;
+  padding: 4px 12px 4px 12px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  position: relative;
+  max-width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+  text-overflow: ellipsis;
+  touch-action: manipulation;
+  border-style: solid;
+  border-width: 2px;
+  height: 32px;
+}
+
+.button.secondary {
+  padding: 4px 12px 4px 12px;
+  position: relative;
+  max-width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  touch-action: manipulation;
+  color: #000;
+  border-style: solid;
+  border-width: 2px;
+  border-color: transparent;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.2);
+  width: 108px;
+  line-height: normal;
+  display: block;
+}
+
+.button.secondary:hover {
+  background-color: #b2b2b2;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.button.secondary:focus {
+  background-color: #b2b2b2;
+  background-color: rgba(0, 0, 0, 0.3);
+  text-decoration: underline;
+  outline: 2px solid #000;
+}
+
+.button.secondary:active {
+  outline: none;
+  text-decoration: none;
+  transform: scale(0.98);
+}
+
+.button.primary {
+  color: #fff;
+  border-color: #0067b8;
+  background-color: #0067b8;
+  display: block;
+}
+
+.button.primary:hover {
+  background-color: #005da6;
+}
+
+.button.primary:focus {
+  background-color: #005da6;
+  text-decoration: underline;
+  outline: 2px solid #000;
+}
+
+.button.primary:active {
+  outline: none;
+  text-decoration: none;
+  transform: scale(0.98);
+}
+
+.identity {
+  box-sizing: border-box;
+  display: block;
+  font-family: "Segoe UI", -apple-system, "Helvetica Neue", "Lucida Grande",
+    Roboto, Ebrima, "Nirmala UI", Gadugi, "Segoe Xbox Symbol", "Segoe UI Symbol",
+    "Meiryo UI", "Khmer UI", Tunga, "Lao UI", Raavi, "Iskoola Pota", Latha,
+    Leelawadee, "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic",
+    "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue",
+    "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti",
+    "Mongolian Baiti", "MV Boli", "Myanmar Text", "Cambria Math";
+  font-size: 15px;
+  font-weight: 400;
+  height: 24px;
+  line-height: 24px;
+  margin-bottom: 16px;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 16px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+  unicode-bidi: isolate;
+  white-space-collapse: collapse;
+}
