@@ -97,8 +97,8 @@ export const data = {
       items: [
         {
           title: "Configuración SMTP",
-          url: "/settings/smtp",
-          disabled: true,
+          url: "/settings#smtp",
+          disabled: false,
         },
         {
           title: "Gestión de usuarios",

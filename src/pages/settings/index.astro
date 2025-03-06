@@ -1,0 +1,128 @@
+---
+import { app } from "@/firebase/server";
+import { getAuth } from "firebase-admin/auth";
+
+import Layout from "@/layouts/Dashboard.astro";
+
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+const auth = getAuth(app);
+
+/* Check current session */
+if (!Astro.cookies.has("__session")) {
+  return Astro.redirect("/signin");
+}
+
+const sessionCookie = Astro.cookies.get("__session")?.value || "N/A";
+const decodedCookie = await auth.verifySessionCookie(sessionCookie);
+const user = await auth.getUser(decodedCookie.uid);
+
+if (!user) {
+  return Astro.redirect("/signin");
+}
+
+// Llamar al endpoint GET para obtener la configuración SMTP
+let smtpConfig = null;
+try {
+  const response = await fetch(`${Astro.url.origin}/api/settings/smtp`);
+  if (response.ok) {
+    smtpConfig = await response.json();
+  }
+} catch (error) {
+  console.error("Error al obtener la configuración SMTP:", error);
+}
+---
+
+<Layout title="Configuración SMTP">
+  <Card id="smtp">
+    <CardHeader>
+      <CardTitle>Configuración SMTP</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <form id="configForm" class="space-y-4">
+        <Label htmlFor="host">Host y Puerto</Label>
+        <div class="flex gap-2">
+          <Input
+            className=""
+            id="host"
+            type="text"
+            placeholder="smtp.example.com"
+            defaultValue={smtpConfig?.host || ""}
+            autoComplete="off"
+          />
+          <Input
+            className="flex-1/11"
+            id="port"
+            type="number"
+            placeholder="Puerto"
+            min={0}
+            max={65535}
+            defaultValue={smtpConfig?.port || "587"}
+            autoComplete="off"
+          />
+        </div>
+
+        <Label htmlFor="username">Usuario SMTP</Label>
+        <Input
+          id="username"
+          type="text"
+          placeholder="Ingrese el nombre de usuario"
+          defaultValue={smtpConfig?.auth?.user || ""}
+          autoComplete="off"
+        />
+        <Label htmlFor="password">Contraseña</Label>
+        <Input
+          id="password"
+          type="password"
+          placeholder="Ingrese la contraseña"
+          autoComplete="off"
+        />
+
+        <Button type="submit">Guardar cambios</Button>
+      </form>
+    </CardContent>
+  </Card>
+</Layout>
+
+<script>
+  let config = document.getElementById("configForm")!;
+
+  config.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const host = document.getElementById("host")?.value;
+    const port = parseInt(document.getElementById("port")?.value);
+    const username = document.getElementById("username")?.value;
+    const password = document.getElementById("password")?.value;
+
+    const data = {
+      host,
+      port,
+      auth: {
+        user: username,
+        pass: password,
+      },
+    };
+
+    try {
+      const response = await fetch("/api/settings/smtp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        alert("Configuración guardada correctamente");
+        location.reload();
+      } else {
+        alert("Error al guardar la configuración");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error en el servidor");
+    }
+  });
+</script>
