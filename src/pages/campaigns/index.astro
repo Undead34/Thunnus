@@ -5,17 +5,8 @@ import { getAuth } from "firebase-admin/auth";
 import Layout from "@/layouts/Dashboard.astro";
 
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 
 const auth = getAuth(app);
 
@@ -37,41 +28,56 @@ if (!user) {
   <div class="grid gap-6">
     <Card>
       <CardHeader>
-        <CardTitle>Project Name</CardTitle>
-        <CardDescription
-          >Used to identify your project in the dashboard.</CardDescription
-        >
+        <CardTitle>Cargar usuarios</CardTitle>
       </CardHeader>
       <CardContent>
-        <form>
-          <Textarea placeholder="Type your message here." />
-        </form>
-      </CardContent>
-      <CardFooter className="border-t p-6">
-        <Button>Save</Button>
-      </CardFooter>
-    </Card>
-    <Card>
-      <CardHeader>
-        <CardTitle>Root Directory</CardTitle>
-        <CardDescription
-          >The directory within your project, in which your code is located.</CardDescription
-        >
-      </CardHeader>
-      <CardContent>
-        <form class="flex flex-col gap-4">
-          <Input placeholder="Project Name" defaultValue="/web" />
-          <div class="flex items-center space-x-2">
-            <Checkbox id="include" defaultChecked />
-            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Include files from outside of the Root Directory
-            </label>
+        <form id="uploadForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-2"
+              >Usuarios (uno por línea)</label
+            >
+            <Textarea
+              id="usersList"
+              name="users"
+              placeholder={"Juan Perez,juan@example.com\nMaria Lopez,maria@example.com"}
+            />
           </div>
+          <Button type="submit">Cargar usuarios</Button>
         </form>
       </CardContent>
-      <CardFooter className="border-t p-6">
-        <Button>Save</Button>
-      </CardFooter>
     </Card>
   </div>
 </Layout>
+
+<script>
+  document
+    .getElementById("uploadForm")!
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const textarea = document.getElementById(
+        "usersList"
+      ) as HTMLTextAreaElement;
+
+      const users = textarea.value
+        .split("\n")
+        .filter((line) => line.trim())
+        .map((line) => {
+          const [name, email] = line.split(",").map((s) => s.trim());
+          return { name, email };
+        });
+
+      try {
+        const response = await fetch("/api/phishingUsers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(users),
+        });
+
+        if (response.ok) {
+          location.reload();
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    });
+</script>
