@@ -181,7 +181,7 @@ const stats = {
                       user.status?.lastClickAt,
                     ]
                       .filter(Boolean)
-                      .map((date) => date.toDate())
+                      .map((date: any) => date.toDate())
                       .sort((a, b) => b.getTime() - a.getTime())[0]
                       ?.toLocaleDateString() || "N/A"}
                   </TableCell>
