@@ -121,7 +121,7 @@ const stats = {
               />
             </div>
           </div>
-          
+
           <Button type="submit">Cargar usuarios</Button>
         </form>
       </CardContent>
@@ -194,7 +194,9 @@ const stats = {
           </TableBody>
         </Table>
         <div class="w-full flex justify-end p-2">
-          <Button type="submit">Enviar correos electrónicos</Button>
+          <form id="emailForm">
+            <Button type="submit">Enviar correos electrónicos</Button>
+          </form>
         </div>
       </CardContent>
     </Card>
@@ -230,6 +232,30 @@ const stats = {
         }
       } catch (error) {
         console.error("Error:", error);
+      }
+    });
+
+  document
+    .getElementById("emailForm")!
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      try {
+        const response = await fetch("/api/email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        });
+
+        if (response.ok) {
+          alert("Correos enviados correctamente");
+          location.reload();
+        } else {
+          alert("Error al enviar correos");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Error en servidor");
       }
     });
 </script>
