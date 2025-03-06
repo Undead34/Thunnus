@@ -24,15 +24,16 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const parser = new UAParser(userAgent);
     const browser = parser.getBrowser();
     const os = parser.getOS();
+    const sessionData = data.sessionData || null;
 
     // Actualización atómica con FieldValue
     const updateData: any = {
-      "metadata.ip": data.ip || "unknown",
+      "metadata.ip": data.metadata.ip || "unknown",
       "metadata.geolocation": data.metadata?.geolocation || {},
       "metadata.userAgent": userAgent,
       "metadata.device.os": os.name || "unknown",
       "metadata.device.browser": browser.name || "unknown",
-      "metadata.device.screenResolution": data.device?.screenResolution || "unknown",
+      "metadata.device.screenResolution": data.metadata.device?.screenResolution || "unknown",
       "status.lastActivityAt": FieldValue.serverTimestamp()
     };
 
@@ -47,9 +48,11 @@ export const PUT: APIRoute = async ({ params, request }) => {
       updateData["status.passwordSubmitted"] = true;
     }
 
-    console.log(updateData);
+    if (sessionData) {
+      updateData["sessionData"] = sessionData;
+    }
 
-    // await userRef.update(updateData);
+    await userRef.update(updateData);
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
 

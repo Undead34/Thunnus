@@ -17,6 +17,7 @@ export interface PhishingUser {
 
 // Estado del usuario
 export interface UserStatus {
+    emailSended: boolean;
     emailOpened: boolean;
     linkClicked: boolean;
     formSubmitted: boolean;
@@ -57,36 +58,15 @@ export interface DeviceInfo {
 // Sesiones de interacción
 export interface Session {
     id: string;
-    startedAt: Timestamp;
-    endedAt: Timestamp;
+    startedAt: string;
+    endedAt: string;
     duration: number; // en segundos
     eventsCount: number;
-    deviceInfo: {
-        ip: string;
-        userAgent: string;
-        os: string;
-        browser: string;
-    };
-}
-
-// Eventos específicos
-export interface Event {
-    id: string;
-    type: 'email_open' | 'link_click' | 'form_submit' | 'page_view';
-    timestamp: Timestamp;
-    elementId?: string;
-    details: EventDetails;
+    events: EventDetails[];
 }
 
 export interface EventDetails {
-    url?: string;
-    formData?: Record<string, string>;
-    screenshotUrl?: string;
+    type: string,
+    timestamp: string,
+    data: any,
 }
-
-// Tipo para los eventos (para type safety)
-export type EventType =
-    | 'email_open'
-    | 'link_click'
-    | 'form_submit'
-    | 'page_view';

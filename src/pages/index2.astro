@@ -102,17 +102,6 @@ import Layout from "@/layouts/Layout.astro";
       document.addEventListener("click", this.handleClick);
       window.addEventListener("scroll", this.handleScroll);
       window.addEventListener("beforeunload", this.handleUnload);
-
-      // Geolocalización
-      if (navigator.geolocation && false) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          sessionData.locationInfo = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-          };
-        });
-      }
     },
 
     handleClick(event: MouseEvent) {
