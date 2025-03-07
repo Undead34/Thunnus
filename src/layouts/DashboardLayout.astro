@@ -1,5 +1,5 @@
 ---
-import ReactLayout from "./DashboardLayout";
+import Dashboard from "../components/dashboard";
 import "@/styles/global.css";
 
 const currentPath = Astro.url.pathname;
@@ -11,7 +11,6 @@ const translateSegment = (segment: "campaigns" | "templates" | "settings") => {
     campaigns: "Campañas",
     templates: "Plantillas y páginas",
     settings: "Configuración",
-    // Agrega más traducciones según sea necesario
   };
 
   return translationMap[segment] || segment;
@@ -40,9 +39,9 @@ const breadcrumbItems = pathSegments.map((segment: any, index) => {
     <title>Dashboard</title>
   </head>
   <body>
-    <ReactLayout client:load breadcrumbItems={breadcrumbItems}>
+    <Dashboard client:load breadcrumbItems={breadcrumbItems}>
       <slot />
-    </ReactLayout>
+    </Dashboard>
   </body>
 </html>
 

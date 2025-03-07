@@ -2,7 +2,7 @@
 import { app } from "@/firebase/server";
 import { getAuth } from "firebase-admin/auth";
 
-import Layout from "@/layouts/Dashboard.astro";
+import Layout from "@/layouts/DashboardLayout.astro";
 import {
   Card,
   CardContent,
@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Combobox } from "@/components/templates/Combobox";
+import { Combobox } from "@/components/dashboard/templates/Combobox";
 
 const auth = getAuth(app);
 

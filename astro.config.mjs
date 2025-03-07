@@ -23,7 +23,8 @@ export default defineConfig({
 
   integrations: [react(), purgecss({
     content: [
-      './src/**/*.{astro,js,jsx,ts,tsx,vue,svelte}'
+      'src/pages/templates/**/*.{astro,js,jsx,ts,tsx,vue,svelte}',
+      'src/layouts/templates/**/*.{astro,js,jsx,ts,tsx,vue,svelte}',
     ]
   })],
 });

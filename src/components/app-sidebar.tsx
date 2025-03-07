@@ -25,39 +25,39 @@ export const data = {
   navMain: [
     {
       title: "Campañas",
-      url: "/campaigns",
+      url: "/dashboard/campaigns",
       icon: ShieldAlert,
       isActive: false,
       items: [
         {
           title: "Campañas activas",
-          url: "/campaigns",
+          url: "/dashboard/campaigns",
           badge: 3,
         },
         {
           title: "Campañas programadas",
-          url: "/campaigns/scheduled",
+          url: "/dashboard/campaigns/scheduled",
           disabled: true,
         },
       ],
     },
     {
       title: "Plantillas y páginas",
-      url: "/templates",
+      url: "/dashboard/templates",
       icon: FileCode,
       items: [
         {
           title: "Plantillas de correo",
-          url: "/templates/emails",
+          url: "/dashboard/templates/emails",
           disabled: true,
         },
         {
           title: "Páginas de inicio",
-          url: "/templates",
+          url: "/dashboard/templates",
         },
         {
           title: "Archivos adjuntos",
-          url: "/templates/attachments",
+          url: "/dashboard/templates/attachments",
           disabled: true,
         },
       ],
@@ -91,28 +91,28 @@ export const data = {
     // },
     {
       title: "Configuración",
-      url: "/settings",
+      url: "/dashboard/settings",
       icon: Settings2,
       isActive: true,
       items: [
         {
           title: "Configuración SMTP",
-          url: "/settings#smtp",
+          url: "/dashboard/settings#smtp",
           disabled: false,
         },
         {
           title: "Gestión de usuarios",
-          url: "/settings/users",
+          url: "/dashboard/settings/users",
           disabled: true,
         },
         {
           title: "Claves API",
-          url: "/settings/api",
+          url: "/dashboard/settings/api",
           disabled: true,
         },
         {
           title: "Reglas de seguridad",
-          url: "/settings/security",
+          url: "/dashboard/settings/security",
           disabled: true,
         },
       ],

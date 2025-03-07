@@ -2,7 +2,7 @@
 import { app } from "@/firebase/server";
 import { getAuth } from "firebase-admin/auth";
 
-import Layout from "@/layouts/Dashboard.astro";
+import Layout from "@/layouts/DashboardLayout.astro";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -94,9 +94,13 @@ try {
     e.preventDefault();
 
     const host = (document.getElementById("host") as HTMLInputElement)?.value;
-    const port = parseInt((document.getElementById("port") as HTMLInputElement)?.value);
-    const username = (document.getElementById("username") as HTMLInputElement)?.value;
-    const password = (document.getElementById("password")as HTMLInputElement)?.value;
+    const port = parseInt(
+      (document.getElementById("port") as HTMLInputElement)?.value
+    );
+    const username = (document.getElementById("username") as HTMLInputElement)
+      ?.value;
+    const password = (document.getElementById("password") as HTMLInputElement)
+      ?.value;
 
     const data = {
       host,
