@@ -1,36 +1,12 @@
 ---
-import Dashboard from "../components/dashboard";
+import Sidebar from "@/components/dashboard/sidebar";
+import Header from "@/components/dashboard/sidebar/Header.astro";
+
 import "@/styles/global.css";
-
-const currentPath = Astro.url.pathname;
-const pathSegments = currentPath.split("/").filter(Boolean);
-
-// Función para traducir los segmentos de la ruta
-const translateSegment = (segment: "campaigns" | "templates" | "settings") => {
-  const translationMap = {
-    campaigns: "Campañas",
-    templates: "Plantillas y páginas",
-    settings: "Configuración",
-  };
-
-  return translationMap[segment] || segment;
-};
-
-// Genera los items del Breadcrumb
-const breadcrumbItems = pathSegments.map((segment: any, index) => {
-  const translatedSegment = translateSegment(segment);
-  const href = "/" + pathSegments.slice(0, index + 1).join("/");
-
-  return {
-    label:
-      translatedSegment.charAt(0).toUpperCase() + translatedSegment.slice(1),
-    href: index < pathSegments.length - 1 ? href : undefined,
-  };
-});
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -39,17 +15,11 @@ const breadcrumbItems = pathSegments.map((segment: any, index) => {
     <title>Dashboard</title>
   </head>
   <body>
-    <Dashboard client:load breadcrumbItems={breadcrumbItems}>
-      <slot />
-    </Dashboard>
+    <Sidebar client:only>
+      <Header />
+      <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <slot />
+      </div>
+    </Sidebar>
   </body>
 </html>
-
-<style>
-  html,
-  body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-  }
-</style>

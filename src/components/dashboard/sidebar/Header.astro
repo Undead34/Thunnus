@@ -1,0 +1,41 @@
+---
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import Breadcrumb from "./Breadcrumb";
+
+const currentPath = Astro.url.pathname;
+const pathSegments = currentPath.split("/").filter(Boolean);
+
+// Función para traducir los segmentos de la ruta
+const translateSegment = (segment: "campaigns" | "templates" | "settings") => {
+  const translationMap = {
+    campaigns: "Campañas",
+    templates: "Plantillas y páginas",
+    settings: "Configuración",
+  };
+
+  return translationMap[segment] || segment;
+};
+
+// Genera los items del Breadcrumb
+const breadcrumbItems = pathSegments.map((segment: any, index) => {
+  const translatedSegment = translateSegment(segment);
+  const href = "/" + pathSegments.slice(0, index + 1).join("/");
+
+  return {
+    label:
+      translatedSegment.charAt(0).toUpperCase() + translatedSegment.slice(1),
+    href: index < pathSegments.length - 1 ? href : undefined,
+  };
+});
+---
+
+<header
+  class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12"
+>
+  <div class="flex items-center gap-2 px-4">
+    <SidebarTrigger client:only className="-ml-1" />
+    <Separator client:only orientation="vertical" className="mr-2 h-4" />
+    <Breadcrumb client:only breadcrumbItems={breadcrumbItems} />
+  </div>
+</header>

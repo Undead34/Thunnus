@@ -21,10 +21,15 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
-  integrations: [react(), purgecss({
-    content: [
-      'src/pages/templates/**/*.{astro,js,jsx,ts,tsx,vue,svelte}',
-      'src/layouts/templates/**/*.{astro,js,jsx,ts,tsx,vue,svelte}',
-    ]
-  })],
+  integrations: [
+    react({
+      experimentalReactChildren: true,
+    }),
+    purgecss({
+      content: [
+        'src/pages/templates/**/*.{astro,js,jsx,ts,tsx,vue,svelte}',
+        'src/layouts/templates/**/*.{astro,js,jsx,ts,tsx,vue,svelte}',
+      ]
+    })
+  ],
 });

@@ -62,33 +62,6 @@ export const data = {
         },
       ],
     },
-    // {
-    //   title: "Reporting & Analytics",
-    //   url: "/analytics",
-    //   icon: LineChart,
-    //   items: [
-    //     {
-    //       title: "Campaign Results",
-    //       url: "/analytics/campaigns",
-    //       disabled: true,
-    //     },
-    //     {
-    //       title: "User Activity",
-    //       url: "/analytics/users",
-    //       disabled: true,
-    //     },
-    //     {
-    //       title: "Heatmaps",
-    //       url: "/analytics/heatmaps",
-    //       disabled: true,
-    //     },
-    //     {
-    //       title: "Export Data",
-    //       url: "/analytics/export",
-    //       disabled: true,
-    //     },
-    //   ],
-    // },
     {
       title: "Configuración",
       url: "/dashboard/settings",
