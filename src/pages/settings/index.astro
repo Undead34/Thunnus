@@ -93,10 +93,10 @@ try {
   config.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const host = document.getElementById("host")?.value;
-    const port = parseInt(document.getElementById("port")?.value);
-    const username = document.getElementById("username")?.value;
-    const password = document.getElementById("password")?.value;
+    const host = (document.getElementById("host") as HTMLInputElement)?.value;
+    const port = parseInt((document.getElementById("port") as HTMLInputElement)?.value);
+    const username = (document.getElementById("username") as HTMLInputElement)?.value;
+    const password = (document.getElementById("password")as HTMLInputElement)?.value;
 
     const data = {
       host,
