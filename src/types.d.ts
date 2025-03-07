@@ -70,3 +70,13 @@ export interface EventDetails {
     timestamp: string,
     data: any,
 }
+
+export interface SMTP {
+    host: string;
+    port: number;
+    secure: boolean;
+    auth: {
+        user: string;
+        pass: string;
+    };
+}

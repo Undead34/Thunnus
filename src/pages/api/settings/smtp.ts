@@ -1,19 +1,10 @@
 import type { APIRoute } from "astro";
 import { app } from "@/firebase/server";
 import { getFirestore } from "firebase-admin/firestore";
+import type { SMTP } from "@/types";
 
 const db = getFirestore(app);
 const settingsRef = db.collection("settings");
-
-interface SMTP {
-    host: string;
-    port: number;
-    secure: boolean;
-    auth: {
-        user: string;
-        pass: string;
-    };
-}
 
 // Función para validar los campos del SMTP
 function validateSMTP(data: Partial<SMTP>): data is SMTP {

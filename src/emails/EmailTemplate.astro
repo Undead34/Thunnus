@@ -1,0 +1,17 @@
+---
+interface Props {
+  name: string;
+  customData?: string;
+}
+
+const { name, customData } = Astro.props;
+---
+
+<html>
+  <body>
+    <h1>Hola {name},</h1>
+    <p>Este es un correo personalizado:</p>
+    {customData && <blockquote>{customData}</blockquote>}
+    <p>Fecha: {new Date().toLocaleDateString()}</p>
+  </body>
+</html>
