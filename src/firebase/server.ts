@@ -1,6 +1,8 @@
 import type { ServiceAccount } from "firebase-admin";
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 
+import service from "service-account-key.json";
+
 const activeApps = getApps();
 const serviceAccount = {
   type: "service_account",
@@ -19,7 +21,10 @@ const initApp = () => {
   if (import.meta.env.PROD) {
     console.info("PROD env detected. Using default service account.");
     // Use default config in firebase functions. Should be already injected in the server by Firebase.
-    return initializeApp();
+    // return initializeApp();
+    return initializeApp({
+      credential: cert(service as ServiceAccount),
+    });
   }
   console.info("Loading service account from env.");
   return initializeApp({

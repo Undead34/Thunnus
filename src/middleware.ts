@@ -1,6 +1,10 @@
 import { defineMiddleware } from "astro:middleware";
+
 import { app } from "./firebase/server";
 import { getFirestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
+
+import { pathToRegexp } from "path-to-regexp";
 
 const db = getFirestore(app);
 
@@ -25,16 +29,51 @@ const setupFirestoreListener = () => {
 
 setupFirestoreListener();
 
+interface Matcher {
+    public: string[];
+    protected: string[];
+}
+
+const matcher: Matcher = {
+    public: ["/"],
+    protected: ["/dashboard/:path", "/dashboard"]
+}
+
 // Middleware
 export const onRequest = defineMiddleware(async (context, next) => {
-    if (context.url.pathname === "/") {
-        const req = new Request(new URL(cachedTemplatePath, context.url), {
-            headers: {
-                "x-redirect-to": context.url.pathname
-            }
-        });
+    const currentPath = context.url.pathname;
 
-        return next(req);
+    const isPublicRoute = matcher.public.some((route) => {
+        return pathToRegexp(route).regexp.test(currentPath);
+    });
+
+    const isProtectedRoute = matcher.protected.some(route => pathToRegexp(route).regexp.test(currentPath));
+
+    if (!isPublicRoute && !isProtectedRoute) {
+        return next();
+    }
+
+    if (isPublicRoute) {
+        if (currentPath === "/") {
+            const req = new Request(new URL(cachedTemplatePath, context.url), {
+                headers: {
+                    "x-redirect-to": context.url.pathname
+                }
+            });
+
+            return next(req);
+        }
+    } else {
+        const sessionCookie = context.cookies.get("__session")?.value;
+        if (!sessionCookie) return context.redirect("/login");
+
+        try {
+            const auth = getAuth(app);
+            const decodedCookie = await auth.verifySessionCookie(sessionCookie);
+            context.locals.user = await auth.getUser(decodedCookie.uid);
+        } catch (error) {
+            return context.redirect("/login");
+        }
     }
 
     return next();

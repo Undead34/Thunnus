@@ -1,35 +1,22 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import tailwindcss from '@tailwindcss/vite';
 
-import node from "@astrojs/node";
+import react from '@astrojs/react';
 
-import tailwindcss from "@tailwindcss/vite";
-
-import react from "@astrojs/react";
-
-import purgecss from "astro-purgecss";
+import node from '@astrojs/node';
 
 // https://astro.build/config
 export default defineConfig({
   output: "server",
 
-  adapter: node({
-    mode: "standalone",
-  }),
-
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss()]
   },
 
-  integrations: [
-    react({
-      experimentalReactChildren: true,
-    }),
-    purgecss({
-      content: [
-        'src/pages/templates/**/*.{astro,js,jsx,ts,tsx,vue,svelte}',
-        'src/layouts/templates/**/*.{astro,js,jsx,ts,tsx,vue,svelte}',
-      ]
-    })
-  ],
+  integrations: [react()],
+
+  adapter: node({
+    mode: 'standalone'
+  })
 });

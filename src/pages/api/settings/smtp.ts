@@ -20,7 +20,7 @@ function validateSMTP(data: Partial<SMTP>): data is SMTP {
 export const POST: APIRoute = async ({ request }) => {
     try {
         const data: Partial<SMTP> = await request.json();
-
+        
         // Validar que los campos no estén vacíos
         if (!validateSMTP(data)) {
             return new Response(

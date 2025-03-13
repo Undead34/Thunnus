@@ -1,12 +1,104 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import { RegisterForm } from "@/components/register-form";
+import RegisterContainer from "@/components/register-container";
+import { Toaster } from "@/components/ui/sonner";
+
+import Layout from "@/layouts/main.astro";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 ---
 
-<Layout title="Register">
+<Layout title="Registrarse">
+  <Toaster client:only />
+
   <div class="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
     <div class="w-full max-w-sm">
-      <RegisterForm client:only />
+      <RegisterContainer>
+        <form id="register-form" novalidate>
+          <div class="flex flex-col gap-6">
+            <div class="grid gap-2">
+              <Label htmlFor="name">Nombre</Label>
+              <Input
+                id="name"
+                type="text"
+                name="name"
+                placeholder="Su nombre"
+              />
+            </div>
+            <div class="grid gap-2">
+              <Label htmlFor="email">Correo electrónico</Label>
+              <Input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="m@example.com"
+              />
+            </div>
+            <div class="grid gap-2">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input id="password" type="password" name="password" />
+            </div>
+            <Button type="submit" className="w-full"> Registrarse </Button>
+          </div>
+          <div class="mt-4 text-center text-sm">
+            ¿Ya tiene una cuenta?{" "}
+            <a href="/login" class="underline underline-offset-4">
+              Inicia Sesión
+            </a>
+          </div>
+        </form>
+      </RegisterContainer>
     </div>
   </div>
 </Layout>
+
+<script>
+  import { toast } from "sonner";
+
+  const handleSubmit = async (event: SubmitEvent) => {
+    event.preventDefault();
+
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    // Validaciones
+    if (!data.name || !data.email || !data.password) {
+      toast.error("Todos los campos son requeridos");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.toString())) {
+      toast.error("Formato de email inválido");
+      return;
+    }
+
+    if (data.password.toString().length < 6) {
+      toast.error("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        window.location.href = "/login";
+      } else {
+        const error = await response.text();
+        toast.error(error);
+      }
+    } catch (error) {
+      toast.error("Error de conexión");
+    }
+  };
+
+  document
+    .getElementById("register-form")
+    ?.addEventListener("submit", handleSubmit);
+</script>

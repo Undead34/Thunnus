@@ -1,265 +1,145 @@
 ---
-import { app } from "@/firebase/server";
-import { getAuth } from "firebase-admin/auth";
+import Layout from "@/layouts/dashboard.astro";
 
-import Layout from "@/layouts/DashboardLayout.astro";
-
+import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Toaster } from "@/components/ui/sonner";
 
-import { DataTableRowActions } from "@/components/data-table-row-actions";
+import GroupsTable from "@/components/dashboard/campaigns/groups-table";
+
+import { app } from "@/firebase/server";
 import { getFirestore } from "firebase-admin/firestore";
 import type { PhishingUser } from "@/types";
-
-const auth = getAuth(app);
-
-/* Check current session */
-if (!Astro.cookies.has("__session")) {
-  return Astro.redirect("/signin");
-}
-
-const sessionCookie = Astro.cookies.get("__session")?.value || "N/A";
-const decodedCookie = await auth.verifySessionCookie(sessionCookie);
-const user = await auth.getUser(decodedCookie.uid);
-
-if (!user) {
-  return Astro.redirect("/signin");
-}
 
 const db = getFirestore(app);
 const phishingUsersRef = db.collection("phishingUsers");
 
-// Obtener datos
 const allUsersSnapshot = await phishingUsersRef.get();
-
 const users: PhishingUser[] = allUsersSnapshot.docs.map((doc: any) =>
   doc.data()
 );
-
-const stats = {
-  totalUsers: 0,
-  visitedUsers: 0,
-  submittedCredentials: 0,
-};
 ---
 
-<Layout title="Campaigns">
-  <div class="space-y-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">Usuarios totales</CardTitle>
-          <div class="bg-blue-100 dark:bg-blue-800 p-3 rounded-full">
-            <span class="text-blue-600 dark:text-blue-300">👥</span>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p class="text-3xl font-bold">{stats.totalUsers}</p>
-        </CardContent>
-      </Card>
+<Layout title="Campañas">
+  <Toaster client:only />
+  <main class="space-y-6">
+    <section aria-labelledby="upload-heading">
+      <form id="uploadForm" class="flex flex-col gap-4">
+        <header>
+          <h3 id="upload-heading" class="text-lg font-medium mb-2">
+            Cargar usuarios
+          </h3>
+        </header>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">Visitas</CardTitle>
-          <div class="bg-green-100 dark:bg-green-800 p-3 rounded-full">
-            <span class="text-green-600 dark:text-green-300">🌐</span>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p class="text-3xl font-bold">{stats.visitedUsers}</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">Credenciales</CardTitle>
-          <div class="bg-red-100 dark:bg-red-800 p-3 rounded-full">
-            <span class="text-red-600 dark:text-red-300">🔑</span>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p class="text-3xl font-bold">{stats.submittedCredentials}</p>
-        </CardContent>
-      </Card>
-    </div>
-
-    <Card>
-      <CardHeader>
-        <CardTitle>Cargar usuarios</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form id="uploadForm" class="space-y-4">
-          <div class="space-y-4">
-            <div>
-              <Label htmlFor="group">Grupo</Label>
-              <Input
-                id="group"
-                type="text"
-                placeholder="Ingrese el nombre del grupo"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="usersList">Usuarios (uno por línea)</Label>
-              <Textarea
-                id="usersList"
-                name="users"
-                rows={6}
-                className="w-full"
-                placeholder={"Juan Perez,juan@example.com\nMaria Lopez,maria@example.com"}
-              />
-            </div>
+        <div class="space-y-4">
+          <div class="grid gap-2">
+            <Label htmlFor="group">Grupo</Label>
+            <Input
+              id="group"
+              type="text"
+              placeholder="Ingrese el nombre del grupo"
+              className="w-full max-w-md"
+            />
           </div>
 
-          <Button type="submit">Cargar usuarios</Button>
-        </form>
-      </CardContent>
-    </Card>
+          <div class="grid gap-2">
+            <Label htmlFor="usersList">Usuarios (uno por línea)</Label>
+            <Textarea
+              id="usersList"
+              name="users"
+              rows={6}
+              className="w-full max-w-2xl"
+              placeholder={"Juan Perez,juan@example.com\nMaria Lopez,maria@example.com"}
+            />
+          </div>
 
-    <Card>
-      <CardHeader>
-        <CardTitle>Usuarios objetivo</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Correo enviado</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Última actividad</TableHead>
-              <TableHead>Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {
-              users.map((user: PhishingUser) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    {user.status.emailSended ? "Correo enviado" : "Pendiente"}
-                  </TableCell>
-                  <TableCell>
-                    <div class="flex items-center gap-2">
-                      <span
-                        class={`h-2 w-2 rounded-full ${
-                          user.status?.formSubmitted
-                            ? "bg-green-500"
-                            : user.status?.linkClicked
-                              ? "bg-yellow-500"
-                              : user.status?.emailOpened
-                                ? "bg-blue-500"
-                                : "bg-gray-300"
-                        }`}
-                      />
-                      {user.status?.formSubmitted
-                        ? "Credenciales capturadas"
-                        : user.status?.linkClicked
-                          ? "Enlace clickeado"
-                          : user.status?.emailOpened
-                            ? "Correo abierto"
-                            : "Nunca interactuó"}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {[
-                      user.status?.emailOpenedAt,
-                      user.status?.firstClickAt,
-                      user.status?.lastClickAt,
-                    ]
-                      .filter(Boolean)
-                      .map((date: any) => date.toDate())
-                      .sort((a, b) => b.getTime() - a.getTime())[0]
-                      ?.toLocaleDateString() || "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    <DataTableRowActions client:load />
-                  </TableCell>
-                </TableRow>
-              ))
-            }
-          </TableBody>
-        </Table>
-        <div class="w-full flex justify-end p-2">
-          <form id="emailForm">
-            <Button type="submit">Enviar correos electrónicos</Button>
-          </form>
+          <div class="mt-2">
+            <Button type="submit">Cargar usuarios</Button>
+          </div>
         </div>
-      </CardContent>
-    </Card>
-  </div>
+      </form>
+    </section>
+
+    <Separator className="my-6" />
+
+    <section aria-labelledby="users-table-heading">
+      <form>
+        <header class="mb-4">
+          <h3 id="users-table-heading" class="text-lg font-medium">
+            Lista de Usuarios
+          </h3>
+        </header>
+
+        <GroupsTable client:only="react" data={users} />
+
+        <div class="mt-6 flex justify-end">
+          <Button type="submit">Enviar correos electrónicos</Button>
+        </div>
+      </form>
+    </section>
+  </main>
 </Layout>
 
 <script>
-  document
-    .getElementById("uploadForm")!
-    .addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const textarea = document.getElementById(
-        "usersList"
-      ) as HTMLTextAreaElement;
+  async function handleUpload(e: SubmitEvent) {
+    e.preventDefault();
+    const textarea = document.getElementById(
+      "usersList"
+    ) as HTMLTextAreaElement;
 
-      const users = textarea.value
-        .split("\n")
-        .filter((line) => line.trim())
-        .map((line) => {
-          const [name, email] = line.split(",").map((s) => s.trim());
-          return { name, email };
-        });
+    const users = textarea.value
+      .split("\n")
+      .filter((line) => line.trim())
+      .map((line) => {
+        const [name, email] = line.split(",").map((s) => s.trim());
+        return { name, email };
+      });
 
-      try {
-        const response = await fetch("/api/phishingUsers", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(users),
-        });
+    try {
+      const response = await fetch("/api/phishingUsers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(users),
+      });
 
-        if (response.ok) {
-          location.reload();
-        }
-      } catch (error) {
-        console.error("Error:", error);
+      if (response.ok) {
+        location.reload();
       }
-    });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
 
-  document
-    .getElementById("emailForm")!
-    .addEventListener("submit", async (e) => {
-      e.preventDefault();
+  const uploadForm = document.getElementById("uploadForm") as HTMLFormElement;
+  uploadForm.addEventListener("submit", handleUpload);
 
-      try {
-        const response = await fetch("/api/email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            to: "maizogabriel@gmail.com",
-            subject: "Holaa!",
-            text: "Holaa!",
-          }),
-        });
+  // const emailForm = document.getElementById("emailForm") as HTMLFormElement;
+  // emailForm.addEventListener("submit", async (e) => {
+  //   e.preventDefault();
 
-        if (response.ok) {
-          alert("Correos enviados correctamente");
-          location.reload();
-        } else {
-          alert("Error al enviar correos");
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Error en servidor");
-      }
-    });
+  //   try {
+  //     const response = await fetch("/api/email", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         to: "maizogabriel@gmail.com",
+  //         subject: "Holaa!",
+  //         text: "Holaa!",
+  //       }),
+  //     });
+
+  //     if (response.ok) {
+  //       alert("Correos enviados correctamente");
+  //       location.reload();
+  //     } else {
+  //       alert("Error al enviar correos");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     alert("Error en servidor");
+  //   }
+  // });
 </script>

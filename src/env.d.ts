@@ -1,3 +1,5 @@
+import type { UserRecord } from "firebase-admin/auth";
+
 interface ImportMetaEnv {
   readonly FIREBASE_TYPE: string;
   readonly FIREBASE_PRIVATE_KEY_ID: string;
@@ -15,4 +17,10 @@ interface ImportMetaEnv {
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
+}
+
+declare namespace App {
+  interface Locals {
+    user: UserRecord;
+  }
 }

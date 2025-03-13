@@ -1,31 +1,13 @@
 ---
-import { app } from "@/firebase/server";
-import { getAuth } from "firebase-admin/auth";
-
-import Layout from "@/layouts/DashboardLayout.astro";
-
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const auth = getAuth(app);
+import Layout from "@/layouts/dashboard.astro";
 
-/* Check current session */
-if (!Astro.cookies.has("__session")) {
-  return Astro.redirect("/signin");
-}
-
-const sessionCookie = Astro.cookies.get("__session")?.value || "N/A";
-const decodedCookie = await auth.verifySessionCookie(sessionCookie);
-const user = await auth.getUser(decodedCookie.uid);
-
-if (!user) {
-  return Astro.redirect("/signin");
-}
-
-// Llamar al endpoint GET para obtener la configuración SMTP
 let smtpConfig = null;
+
 try {
   const response = await fetch(`${Astro.url.origin}/api/settings/smtp`);
   if (response.ok) {
@@ -42,7 +24,7 @@ try {
       <CardTitle>Configuración SMTP</CardTitle>
     </CardHeader>
     <CardContent>
-      <form id="configForm" class="space-y-4">
+      <form id="configForm" class="flex flex-col gap-2">
         <Label htmlFor="host">Host y Puerto</Label>
         <div class="flex gap-2">
           <Input
@@ -81,7 +63,9 @@ try {
           autoComplete="off"
         />
 
-        <Button type="submit">Guardar cambios</Button>
+        <div>
+          <Button type="submit">Guardar cambios</Button>
+        </div>
       </form>
     </CardContent>
   </Card>
@@ -105,6 +89,7 @@ try {
     const data = {
       host,
       port,
+      secure: false,
       auth: {
         user: username,
         pass: password,

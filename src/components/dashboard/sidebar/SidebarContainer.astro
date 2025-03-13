@@ -1,0 +1,38 @@
+---
+import Sidebar from "./sidebar";
+
+const currentPath = Astro.url.pathname;
+const pathSegments = currentPath.split("/").filter(Boolean);
+
+// Función para traducir los segmentos de la ruta
+const translateSegment = (segment: "campaigns" | "templates" | "settings") => {
+  const translationMap = {
+    campaigns: "Campañas",
+    templates: "Plantillas y páginas",
+    settings: "Configuración",
+  };
+
+  return translationMap[segment] || segment;
+};
+
+// Genera los items del Breadcrumb
+const breadcrumbItems = pathSegments.map((segment: any, index) => {
+  const translatedSegment = translateSegment(segment);
+  const href = "/" + pathSegments.slice(0, index + 1).join("/");
+
+  return {
+    label:
+      translatedSegment.charAt(0).toUpperCase() + translatedSegment.slice(1),
+    href: index < pathSegments.length - 1 ? href : undefined,
+  };
+});
+
+// @ts-ignore
+const user = Astro.locals.user;
+---
+
+<Sidebar client:load data={breadcrumbItems} user={user}>
+  <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
+    <slot />
+  </div>
+</Sidebar>
