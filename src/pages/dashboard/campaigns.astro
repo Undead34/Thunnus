@@ -65,20 +65,14 @@ const users: PhishingUser[] = allUsersSnapshot.docs.map((doc: any) =>
 
     <Separator className="my-6" />
 
-    <section aria-labelledby="users-table-heading">
-      <form>
-        <header class="mb-4">
-          <h3 id="users-table-heading" class="text-lg font-medium">
-            Lista de Usuarios
-          </h3>
-        </header>
+    <section class="overflow-auto" aria-labelledby="users-table-heading">
+      <header class="mb-4">
+        <h3 id="users-table-heading" class="text-lg font-medium">
+          Lista de Usuarios
+        </h3>
+      </header>
 
-        <GroupsTable client:only="react" data={users} />
-
-        <div class="mt-6 flex justify-end">
-          <Button type="submit">Enviar correos electrónicos</Button>
-        </div>
-      </form>
+      <GroupsTable client:only="react" data={users} />
     </section>
   </main>
 </Layout>
@@ -115,31 +109,4 @@ const users: PhishingUser[] = allUsersSnapshot.docs.map((doc: any) =>
 
   const uploadForm = document.getElementById("uploadForm") as HTMLFormElement;
   uploadForm.addEventListener("submit", handleUpload);
-
-  // const emailForm = document.getElementById("emailForm") as HTMLFormElement;
-  // emailForm.addEventListener("submit", async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const response = await fetch("/api/email", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         to: "maizogabriel@gmail.com",
-  //         subject: "Holaa!",
-  //         text: "Holaa!",
-  //       }),
-  //     });
-
-  //     if (response.ok) {
-  //       alert("Correos enviados correctamente");
-  //       location.reload();
-  //     } else {
-  //       alert("Error al enviar correos");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //     alert("Error en servidor");
-  //   }
-  // });
 </script>

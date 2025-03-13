@@ -12,56 +12,112 @@ import { PhishingUserSchema } from "@/lib/typesValidator";
 import { toast } from "sonner";
 import React from "react";
 import { cn } from "@/lib/utils";
+import type { PhishingUser } from "@/types";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
+  onUserDeleted: (userId: string) => void;
+}
+
+async function sendEmailRequest(userId: string, signal?: AbortSignal) {
+  console.log(userId);
+  const response = await fetch("/api/emails/send", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userIds: [userId] }),
+    signal,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to send email");
+  }
+
+  return response.json();
+}
+
+async function deleteUserRequest(userId: string, signal?: AbortSignal) {
+  const response = await fetch(`/api/users/${userId}`, {
+    method: "DELETE",
+    signal,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to delete user");
+  }
+
+  return response.json();
 }
 
 export function DataTableRowActions<TData>({
   row,
+  onUserDeleted,
 }: DataTableRowActionsProps<TData>) {
-  const user = PhishingUserSchema.parse(row.original);
+  const user = PhishingUserSchema.parse(row.original) as PhishingUser;
   const [isSending, setIsSending] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
+  const controllerRef = React.useRef<AbortController | undefined>(undefined);
 
-  const handleSendEmail = async () => {
+  const handleApiCall = async (
+    action: () => Promise<void>,
+    loadingState: React.Dispatch<React.SetStateAction<boolean>>,
+    successMessage: string,
+    errorPrefix: string
+  ) => {
     try {
-      setIsSending(true);
-      // await onSendEmail(user);
-      toast("✅ Correo enviado", {
-        description: `Se envió correctamente a ${user.email}`,
-        dismissible: true,
-        className: cn("select-none"),
+      loadingState(true);
+      controllerRef.current = new AbortController();
+
+      await toast.promise(action(), {
+        loading: "Procesando solicitud...",
+        success: () => {
+          return successMessage;
+        },
+        error: (error) => {
+          return `${errorPrefix}: ${error.message || "Error desconocido"}`;
+        },
       });
     } catch (error) {
-      toast("❌ Error", {
-        description: "No se pudo enviar el correo",
-        dismissible: true,
-        className: cn("select-none"),
-      });
+      console.error("Error:", error);
     } finally {
-      setIsSending(false);
+      loadingState(false);
+      controllerRef.current = undefined;
     }
+  };
+
+  const handleSendEmail = async () => {
+    await handleApiCall(
+      async () => {
+        await sendEmailRequest(user.id, controllerRef.current?.signal);
+      },
+      setIsSending,
+      `✅ Correo enviado a ${user.email}`,
+      "❌ Error al enviar correo"
+    );
   };
 
   const handleDelete = async () => {
-    try {
-      setIsDeleting(true);
-      toast("🗑️ Usuario eliminado", {
-        description: `${user.email} fue removido del sistema`,
-        dismissible: true,
-        className: cn("select-none"),
-      });
-    } catch (error) {
-      toast("❌ Error", {
-        description: "No se pudo eliminar el usuario",
-        dismissible: true,
-        className: cn("select-none"),
-      });
-    } finally {
-      setIsDeleting(false);
-    }
+    if (!window.confirm(`¿Estás seguro de eliminar a ${user.email}?`)) return;
+
+    await handleApiCall(
+      async () => {
+        await deleteUserRequest(user.id, controllerRef.current?.signal);
+        onUserDeleted(user.id);
+      },
+      setIsDeleting,
+      `🗑️ ${user.email} fue eliminado`,
+      "❌ Error al eliminar usuario"
+    );
   };
+
+  React.useEffect(() => {
+    return () => {
+      if (controllerRef.current) {
+        controllerRef.current.abort();
+      }
+    };
+  }, []);
 
   return (
     <DropdownMenu>

@@ -68,7 +68,9 @@ export default function GroupsTable<TData>({ data }: Props<TData>) {
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} />
+      <div className="overflow-auto">
+        <DataTableToolbar table={table} />
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>

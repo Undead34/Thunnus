@@ -1,5 +1,3 @@
-"use client";
-
 import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -54,10 +52,7 @@ export function NavUser({ user }: { user: UserRecord }) {
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={avatar} alt={displayName} />
                 <AvatarFallback className="rounded-lg">
-                  {displayName
-                    .split(" ")
-                    .map((s: string) => s[0].toUpperCase())
-                    .join("")}
+                  {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -100,7 +95,7 @@ export function NavUser({ user }: { user: UserRecord }) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={(e) => window.location.replace("/api/auth/signout")}
+              onClick={(_) => window.location.replace("/api/auth/signout")}
             >
               <LogOut />
               Cerrar sesión

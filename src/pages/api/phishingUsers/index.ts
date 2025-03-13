@@ -93,3 +93,70 @@ export const POST: APIRoute = async ({ request }) => {
     }), { status: 500 });
   }
 };
+
+export const DELETE: APIRoute = async ({ request }) => {
+  try {
+    const { userIds } = await request.json();
+
+    // Validación básica
+    if (!userIds && userIds !== undefined) {
+      return new Response(JSON.stringify({ error: "Datos inválidos" }), {
+        status: 400,
+      });
+    }
+
+    let deleteResult;
+
+    if (userIds && Array.isArray(userIds)) {
+      // Eliminar usuarios seleccionados
+      const batch = db.batch();
+      const usersToDelete = await phishingUsersRef.where('id', 'in', userIds).get();
+
+      if (usersToDelete.empty) {
+        return new Response(JSON.stringify({ error: "Usuarios no encontrados" }), {
+          status: 404,
+        });
+      }
+
+      usersToDelete.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      deleteResult = await batch.commit();
+    } else {
+      // Eliminar todos los usuarios
+      const allUsers = await phishingUsersRef.get();
+
+      if (allUsers.empty) {
+        return new Response(JSON.stringify({ error: "No hay usuarios para eliminar" }), {
+          status: 404,
+        });
+      }
+
+      const batch = db.batch();
+      allUsers.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      deleteResult = await batch.commit();
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        deletedCount: deleteResult.length,
+      }),
+      { status: 200 }
+    );
+
+  } catch (error: any) {
+    console.error("Error en DELETE:", error);
+    return new Response(
+      JSON.stringify({
+        error: "Error en el servidor al eliminar usuarios",
+        details: error.message,
+      }),
+      { status: 500 }
+    );
+  }
+};
