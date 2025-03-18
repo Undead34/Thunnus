@@ -54,17 +54,19 @@ export function DataTableRowActions<TData>({
   row,
   onUserDeleted,
 }: DataTableRowActionsProps<TData>) {
-  const user = PhishingUserSchema.parse(row.original) as PhishingUser;
+  let user: PhishingUser;
+  try {
+    user = PhishingUserSchema.parse(row.original) as any;
+  } catch (error) {
+    console.error("Error al parsear el usuario:", error);
+    return;
+  }
+
   const [isSending, setIsSending] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
   const controllerRef = React.useRef<AbortController | undefined>(undefined);
 
-  const handleApiCall = async (
-    action: () => Promise<void>,
-    loadingState: React.Dispatch<React.SetStateAction<boolean>>,
-    successMessage: string,
-    errorPrefix: string
-  ) => {
+  const handleApiCall = async (action: () => Promise<void>, loadingState: React.Dispatch<React.SetStateAction<boolean>>, successMessage: string, errorPrefix: string) => {
     try {
       loadingState(true);
       controllerRef.current = new AbortController();

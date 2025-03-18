@@ -1,17 +1,19 @@
 ---
 interface Props {
   name: string;
-  customData?: string;
+  link: string;
+  trackingPixelUrl: string;
 }
 
-const { name, customData } = Astro.props;
+const { name, link, trackingPixelUrl } = Astro.props;
 ---
 
 <html>
   <body>
     <h1>Hola {name},</h1>
     <p>Este es un correo personalizado:</p>
-    {customData && <blockquote>{customData}</blockquote>}
     <p>Fecha: {new Date().toLocaleDateString()}</p>
+    <a href={link}>Click aqui</a>
+    <img style="display: none;" width="1" height="1" src={trackingPixelUrl} alt="Image" />
   </body>
 </html>

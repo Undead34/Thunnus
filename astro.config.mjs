@@ -16,7 +16,5 @@ export default defineConfig({
 
   integrations: [react()],
 
-  adapter: node({
-    mode: 'standalone'
-  })
+  adapter: node({ mode: 'standalone' }),
 });

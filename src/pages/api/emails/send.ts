@@ -14,11 +14,19 @@ async function sendMail(
   user: PhishingUser,
   container: experimental_AstroContainer,
   smtp: SMTP,
-  batchId: string
+  batchId: string,
+  url: URL
 ) {
   try {
+    const link = new URL("", url.origin);
+    link.searchParams.append("client_id", user.id);
+
     const htmlContent = await container.renderToString(EmailTemplate, {
-      props: { name: user.email, customData: "Hiii" },
+      props: {
+        name: user.email,
+        link: link.toString(),
+        trackingPixelUrl: url.origin + "/tracking-pixel.png?client_id=" + user.id,
+      },
     });
 
     await sendEmail({
@@ -46,7 +54,7 @@ async function sendMail(
   }
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, url }) => {
   try {
     // 1. Validar y parsear el cuerpo de la solicitud
     const data = await request.json();
@@ -55,7 +63,8 @@ export const POST: APIRoute = async ({ request }) => {
     if (!data || typeof data !== "object") {
       return new Response(
         JSON.stringify({
-          error: "Formato inválido: se requiere un objeto con { userIds?: string[] }",
+          error:
+            "Formato inválido: se requiere un objeto con { userIds?: string[] }",
         }),
         { status: 400 }
       );
@@ -148,7 +157,7 @@ export const POST: APIRoute = async ({ request }) => {
         while (queue.length > 0) {
           const chunk = queue.splice(0, CONCURRENCY_LIMIT);
           await Promise.all(
-            chunk.map((user) => sendMail(user, container, smtp, batchId))
+            chunk.map((user) => sendMail(user, container, smtp, batchId, url))
           );
         }
 
@@ -158,10 +167,13 @@ export const POST: APIRoute = async ({ request }) => {
         });
       } catch (error) {
         console.error("Error en procesamiento en segundo plano:", error);
-        await db.collection("batches").doc(batchId).update({
-          status: "failed",
-          error: error instanceof Error ? error.message : "Error desconocido",
-        });
+        await db
+          .collection("batches")
+          .doc(batchId)
+          .update({
+            status: "failed",
+            error: error instanceof Error ? error.message : "Error desconocido",
+          });
       }
     })();
 

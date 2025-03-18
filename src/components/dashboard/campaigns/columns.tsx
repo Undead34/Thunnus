@@ -13,6 +13,7 @@ import {
   MousePointerClick,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { PhishingUserSchema } from "@/lib/typesValidator";
 
 export const columns: ColumnDef<PhishingUser>[] = [
   {
@@ -80,7 +81,16 @@ export const columns: ColumnDef<PhishingUser>[] = [
       <DataTableColumnHeader column={column} title="Progreso" />
     ),
     cell: ({ row }) => {
-      const status = row.original.status;
+      let user: PhishingUser;
+      try {
+        user = PhishingUserSchema.parse(row.original) as any;
+      } catch (error) {
+        console.error("Error al parsear el usuario:", error);
+        return;
+      }
+
+      const status = user.status;
+
       const getStatusState = () => {
         if (status.formSubmitted) return "submit";
         if (status.linkClicked) return "clicked";
@@ -90,6 +100,7 @@ export const columns: ColumnDef<PhishingUser>[] = [
       };
 
       const state = getStatusState();
+      console.log(state);
       const variants = {
         sent: {
           label: "Correo Enviado",
@@ -142,6 +153,6 @@ export const columns: ColumnDef<PhishingUser>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => <DataTableRowActions onUserDeleted={() => {}} row={row} />,
   },
 ];

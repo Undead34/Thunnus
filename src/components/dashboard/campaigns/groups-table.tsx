@@ -28,6 +28,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { DataTableToolbar } from "./data-table-toolbar";
+import type { PhishingUser } from "@/types";
+import { PhishingUserSchema } from "@/lib/typesValidator";
 
 interface Props<TData> {
   data: TData[];
@@ -93,21 +95,38 @@ export default function GroupsTable<TData>({ data }: Props<TData>) {
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              table.getRowModel().rows.map((row) => {
+                try {
+                  PhishingUserSchema.parse(row.original) as any;
+                } catch (error) {
+                  return (
+                    <TableRow key={row.id}>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        Error al parsear el usuario
+                      </TableCell>
+                  </TableRow>
+                  );
+                }
+
+                return (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell
