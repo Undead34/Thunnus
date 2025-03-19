@@ -1,0 +1,210 @@
+---
+import { app } from "@/firebase/server";
+import Layout from "@/layouts/dashboard.astro";
+import { getFirestore } from "firebase-admin/firestore";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { InputPassword } from "@/components/dashboard/campaigns/input-password";
+import KeyValueCard from "@/components/dashboard/users/KeyValueCard";
+
+const id = Astro.params.id;
+
+const db = getFirestore(app);
+const phishingUsersRef = db.collection("phishingUsers");
+
+const userSnapshot = await phishingUsersRef.doc(id?.toString() || "").get();
+const user = userSnapshot.data();
+
+if (!user) {
+  return Astro.redirect("/dashboard");
+}
+
+const formatDate = (timestamp: { _seconds: number; _nanoseconds: number }) => {
+  if (!timestamp) return "N/A";
+  return new Date(timestamp._seconds * 1000).toLocaleString();
+};
+
+const events = user.events || [];
+const sessionEvents = user.sessionData?.events || [];
+
+const allEvents = [...events, ...sessionEvents];
+allEvents.sort((a, b) => b.timestamp - a.timestamp);
+---
+
+<Layout title={`Usuario - ${user.name}`}>
+  <div class="container mx-auto py-6 space-y-6">
+    <!-- Información básica -->
+    <Card>
+      <CardHeader>
+        <CardTitle>Información Personal</CardTitle>
+        <CardDescription>Datos básicos del usuario</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div class="grid gap-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm font-medium text-muted-foreground">Nombre</p>
+              <p>{user.name}</p>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-muted-foreground">Email</p>
+              <p>{user.email}</p>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    <!-- Estado y Progreso -->
+    <Card>
+      <CardHeader>
+        <CardTitle>Estado y Progreso</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <Badge variant="secondary">
+              {user.status.emailSent ? "✅" : "❌"}
+              Email Enviado
+            </Badge>
+          </div>
+          <div>
+            <Badge variant="secondary">
+              {user.status.emailOpened ? "✅" : "❌"}
+              Email Abierto
+            </Badge>
+          </div>
+          <div>
+            <Badge variant="secondary">
+              {user.status.linkClicked ? "✅" : "❌"}
+              Link Visitado
+            </Badge>
+          </div>
+          <div>
+            <Badge variant="secondary">
+              {user.status.formSubmitted ? "✅" : "❌"}
+              Formulario Enviado
+            </Badge>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-sm font-medium text-muted-foreground">
+            Última actividad
+          </p>
+          <p>{formatDate(user.status.lastActivityAt)}</p>
+        </div>
+      </CardContent>
+    </Card>
+
+    <!-- Credenciales Capturadas -->
+    {
+      user.capturedCredentials && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Credenciales Capturadas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="space-y-4">
+              {user.capturedCredentials.email && (
+                <div>
+                  <p class="text-sm font-medium text-muted-foreground mb-2">
+                    Email
+                  </p>
+                  <InputPassword
+                    client:load
+                    value={user.capturedCredentials.email}
+                  />
+                </div>
+              )}
+              {user.capturedCredentials.password && (
+                <div>
+                  <p class="text-sm font-medium text-muted-foreground mb-2">
+                    Contraseña
+                  </p>
+                  <InputPassword
+                    client:load
+                    value={user.capturedCredentials.password}
+                  />
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )
+    }
+
+    <!-- Metadata -->
+    <Card>
+      <CardHeader>
+        <CardTitle>Metadata</CardTitle>
+        <CardDescription>Información técnica del dispositivo</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div class="grid gap-4">
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div>
+              <p class="text-sm font-medium text-muted-foreground">IP</p>
+              <p>{user.metadata.ip}</p>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-muted-foreground">Navegador</p>
+              <p>{user.metadata.device.browser}</p>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-muted-foreground">
+                Sistema Operativo
+              </p>
+              <p>{user.metadata.device.os}</p>
+            </div>
+            {
+              user.metadata.geolocation && (
+                <div class="col-span-2">
+                  <p class="text-sm font-medium text-muted-foreground">
+                    Ubicación
+                  </p>
+                  <p>
+                    {user.metadata.geolocation.city},{" "}
+                    {user.metadata.geolocation.country}
+                  </p>
+                </div>
+              )
+            }
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    <!-- Eventos -->
+    <Card>
+      <CardHeader>
+        <CardTitle>Historial de Eventos</CardTitle>
+        <CardDescription>Registro de actividades del usuario</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div class="space-y-4">
+          {
+            allEvents?.map((event: any) => (
+              <div class="flex items-center justify-between border-b pb-2">
+                <div>
+                  <p class="font-medium">{event.type}</p>
+                  <p class="text-sm text-muted-foreground">
+                    {new Date(event.timestamp).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <KeyValueCard client:load event={event} />
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+</Layout>

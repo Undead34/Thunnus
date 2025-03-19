@@ -1,7 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 
 import { app } from "./firebase/server";
-import { getFirestore } from "firebase-admin/firestore";
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 
 import { pathToRegexp } from "path-to-regexp";
@@ -38,7 +38,7 @@ interface Matcher {
 
 const matcher: Matcher = {
   public: ["/"],
-  protected: ["/dashboard/:path", "/dashboard"],
+  protected: ["/dashboard", "/dashboard/*path"],
   observed: ["/public/tracking-pixel.png", "/tracking-pixel.png"],
 };
 
@@ -87,9 +87,27 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const client_id = context.url.searchParams.get("client_id");
       if (!client_id) return new Response("", { status: 200 });
 
+      // Get IP and User Agent
+      const ip =
+        context.clientAddress ||
+        context.request.headers.get("cf-connecting-ip") ||
+        context.request.headers.get("x-forwarded-for") ||
+        context.request.headers.get("x-real-ip");
+      const userAgent = context.request.headers.get("user-agent");
+
+      const event = {
+        type: "email_opened",
+        timestamp: new Date().toISOString(),
+        data: {
+          ip,
+          userAgent,
+        },
+      };
+
       const userRef = db.collection("phishingUsers").doc(client_id);
       await userRef.update({
         "status.emailOpened": true,
+        events: FieldValue.arrayUnion(event),
       });
 
       return new Response("", { status: 200 });

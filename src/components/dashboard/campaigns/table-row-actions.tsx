@@ -16,7 +16,6 @@ import type { PhishingUser } from "@/types";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
-  onUserDeleted: (userId: string) => void;
 }
 
 async function sendEmailRequest(userId: string, signal?: AbortSignal) {
@@ -37,7 +36,7 @@ async function sendEmailRequest(userId: string, signal?: AbortSignal) {
 }
 
 async function deleteUserRequest(userId: string, signal?: AbortSignal) {
-  const response = await fetch(`/api/users/${userId}`, {
+  const response = await fetch(`/api/phishingUsers/${userId}`, {
     method: "DELETE",
     signal,
   });
@@ -52,7 +51,6 @@ async function deleteUserRequest(userId: string, signal?: AbortSignal) {
 
 export function DataTableRowActions<TData>({
   row,
-  onUserDeleted,
 }: DataTableRowActionsProps<TData>) {
   let user: PhishingUser;
   try {
@@ -66,7 +64,12 @@ export function DataTableRowActions<TData>({
   const [isDeleting, setIsDeleting] = React.useState(false);
   const controllerRef = React.useRef<AbortController | undefined>(undefined);
 
-  const handleApiCall = async (action: () => Promise<void>, loadingState: React.Dispatch<React.SetStateAction<boolean>>, successMessage: string, errorPrefix: string) => {
+  const handleApiCall = async (
+    action: () => Promise<void>,
+    loadingState: React.Dispatch<React.SetStateAction<boolean>>,
+    successMessage: string,
+    errorPrefix: string
+  ) => {
     try {
       loadingState(true);
       controllerRef.current = new AbortController();
@@ -105,7 +108,6 @@ export function DataTableRowActions<TData>({
     await handleApiCall(
       async () => {
         await deleteUserRequest(user.id, controllerRef.current?.signal);
-        onUserDeleted(user.id);
       },
       setIsDeleting,
       `🗑️ ${user.email} fue eliminado`,

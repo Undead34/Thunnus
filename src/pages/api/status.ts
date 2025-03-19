@@ -1,6 +1,6 @@
 import { app } from "@/firebase/server";
 import type { APIRoute } from "astro";
-import { getFirestore } from "firebase-admin/firestore";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
 const db = getFirestore(app);
 
@@ -18,6 +18,12 @@ export const POST: APIRoute = async ({ request }) => {
     if (!userSnapshot.exists) {
       return new Response(JSON.stringify({ error: "Usuario no encontrado" }), {
         status: 404,
+      });
+    }
+
+    if (status === "clicked") {
+      await userRef.update({
+        clickCount: FieldValue.increment(1),
       });
     }
 

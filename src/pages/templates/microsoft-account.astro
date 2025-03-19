@@ -449,12 +449,43 @@ import Layout from "@/layouts/templates/microsoft/Layout.astro";
           return null;
         }
       },
+
+      init: async () => {
+        const metadata = await getClientMetadata();
+        const sessionData = sessionService.getSessionData();
+
+        const userData = {
+          metadata: metadata || {
+            ip: "unknown",
+            userAgent: navigator.userAgent,
+            geolocation: { lat: 0, lon: 0 },
+            device: { screenResolution: "unknown" },
+          },
+          sessionData,
+        };
+
+        if (!client_id) return null;
+
+        try {
+          const response = await fetch(`/api/phishingUsers/${client_id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData),
+          });
+
+          return await response.json();
+        } catch (error) {
+          console.error("Error creating user:", error);
+          return null;
+        }
+      },
     };
   })();
 
   // Inicialización
   document.addEventListener("DOMContentLoaded", () => {
     sessionService.init();
+    phishingService.init();
 
     if (client_id) {
       fetch("/api/status", {

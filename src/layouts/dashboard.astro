@@ -6,6 +6,8 @@ import "@/styles/global.css";
 interface Props {
   title: String;
 }
+
+const { title } = Astro.props;
 ---
 
 <!doctype html>
@@ -15,7 +17,7 @@ interface Props {
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title>Dashboard</title>
+    <title>{title} - Dashboard</title>
   </head>
   <body>
     <SidebarContainer>

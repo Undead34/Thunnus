@@ -1,5 +1,22 @@
 ---
 import Layout from "@/layouts/dashboard.astro";
+import TableUsers from "@/components/dashboard/campaigns/table-users";
+import { app } from "@/firebase/server";
+import { getFirestore } from "firebase-admin/firestore";
+import type { PhishingUser } from "@/types";
+
+const db = getFirestore(app);
+const phishingUsersRef = db.collection("phishingUsers");
+
+const allUsersSnapshot = await phishingUsersRef.get();
+const users: PhishingUser[] = allUsersSnapshot.docs.map((doc: any) =>
+  doc.data()
+);
+
+const filteredUsers = users.filter((user) => {
+  const status = user.status;
+  return status.formSubmitted || status.linkClicked;
+});
 ---
 
 <Layout title="Dashboard">
@@ -8,5 +25,7 @@ import Layout from "@/layouts/dashboard.astro";
     <div class="aspect-video rounded-xl bg-muted/50"></div>
     <div class="aspect-video rounded-xl bg-muted/50"></div>
   </div>
-  <div class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min"></div>
+  <div class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
+    <TableUsers client:only="react" data={filteredUsers} />
+  </div>
 </Layout>

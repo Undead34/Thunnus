@@ -5,11 +5,12 @@ const currentPath = Astro.url.pathname;
 const pathSegments = currentPath.split("/").filter(Boolean);
 
 // Función para traducir los segmentos de la ruta
-const translateSegment = (segment: "campaigns" | "templates" | "settings") => {
+const translateSegment = (segment: "campaigns" | "templates" | "settings" | "users") => {
   const translationMap = {
     campaigns: "Campañas",
     templates: "Plantillas y páginas",
     settings: "Configuración",
+    users: "Usuarios",
   };
 
   return translationMap[segment] || segment;

@@ -51,14 +51,8 @@ export const PhishingUserSchema = z.object({
         events:z.array(z.object({ type: z.string(), timestamp: z.string(), data: z.any() })),
     })).optional(),
     events: z.array(z.object({
-        id: z.string(),
-        type: z.enum(['email_open', 'link_click', 'form_submit', 'page_view']),
+        type: z.enum(['email_open', 'link_click', 'form_submit', 'page_view', 'email_opened']),
         timestamp: z.string(),
-        elementId: z.string().optional(),
-        details: z.object({
-            url: z.string().optional(),
-            formData: z.record(z.string()).optional(),
-            screenshotUrl: z.string().optional()
-        })
+        data: z.any()
     })).optional()
 });
