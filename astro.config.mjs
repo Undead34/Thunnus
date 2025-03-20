@@ -4,24 +4,17 @@ import tailwindcss from '@tailwindcss/vite';
 
 import react from '@astrojs/react';
 
-import vercel from '@astrojs/vercel/serverless';
+import node from '@astrojs/node';
 
 // https://astro.build/config
 export default defineConfig({
   output: "server",
 
   vite: {
-    plugins: [tailwindcss()],
-    // Soluciona el error de los módulos node:*
-    ssr: {
-      noExternal: ['firebase-admin', 'google-logging-utils', '@fastify/busboy'],
-      external: ['node:events', 'node:util', 'node:stream', 'node:process']
-    }
+    plugins: [tailwindcss()]
   },
 
   integrations: [react()],
 
-  adapter: vercel({
-    edgeMiddleware: true
-  })
+  adapter: node({ mode: 'standalone' }),
 });

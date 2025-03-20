@@ -38,6 +38,7 @@
     "express": "^4.21.2",
     "firebase": "^11.4.0",
     "firebase-admin": "^13.2.0",
+    "firebase-tools": "^13.34.0",
     "lucide-react": "^0.479.0",
     "next-themes": "^0.4.4",
     "nodemailer": "^6.10.0",
