@@ -1,11 +1,4 @@
 import type { UserRecord } from "firebase-admin/auth";
-type EdgeLocals = import("@astrojs/vercel").EdgeLocals;
-
-declare namespace App {
-  interface Locals extends EdgeLocals {
-    user: UserRecord;
-  }
-}
 
 interface ImportMetaEnv {
   readonly FIREBASE_TYPE: string;
@@ -24,4 +17,10 @@ interface ImportMetaEnv {
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
+}
+
+declare namespace App {
+  interface Locals {
+    user: UserRecord;
+  }
 }
