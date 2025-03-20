@@ -11,11 +11,19 @@ export default defineConfig({
   output: "server",
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    // Soluciona el error de los módulos node:*
+    ssr: {
+      noExternal: ['firebase-admin', 'google-logging-utils', '@fastify/busboy'],
+      external: ['node:events', 'node:util', 'node:stream', 'node:process']
+    }
   },
 
   integrations: [react()],
 
   adapter: vercel({
-  }),
+    webAnalytics: {
+      enabled: true
+    }
+  })
 });
