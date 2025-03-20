@@ -50,7 +50,7 @@ const allEvents = [...events, ...sessionEvents].sort((a, b) => {
 ---
 
 <Layout title={`Usuario - ${user.name}`}>
-  <div class="container mx-auto py-6 space-y-6">
+  <div class="container mx-auto py-6 space-y-6 contain-content">
     <!-- Información básica -->
     <Card>
       <CardHeader>
@@ -66,7 +66,7 @@ const allEvents = [...events, ...sessionEvents].sort((a, b) => {
             </div>
             <div>
               <p class="text-sm font-medium text-muted-foreground">Email</p>
-              <p>{user.email}</p>
+              <p class="text-wrap text-ellipsis contain-content">{user.email}</p>
             </div>
           </div>
         </div>
