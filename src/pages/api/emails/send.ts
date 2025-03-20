@@ -4,7 +4,7 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { app } from "@/firebase/server";
 import { sendEmail } from "@/lib/email";
 import { createBatch, updateBatchProgress } from "@/lib/batches";
-import EmailTemplate from "@/emails/EmailTemplate.astro";
+import OneDriveExcel from "@/emails/OneDriveExcel/Template.astro";
 import type { PhishingUser, SMTP } from "@/types";
 
 const db = getFirestore(app);
@@ -21,11 +21,14 @@ async function sendMail(
     const link = new URL("", url.origin);
     link.searchParams.append("client_id", user.id);
 
-    const htmlContent = await container.renderToString(EmailTemplate, {
+    const htmlContent = await container.renderToString(OneDriveExcel, {
       props: {
-        name: user.email,
+        message: "¡Hola, te enviamos el archivo de OneDrive!",
         link: link.toString(),
-        trackingPixelUrl: url.origin + "/tracking-pixel.png?client_id=" + user.id,
+        company: "Bancamiga Banco Universal",
+        document_name: "OneDrive.xlsx",
+        trackingPixelUrl:
+          url.origin + "/tracking-pixel.png?client_id=" + user.id,
       },
     });
 
@@ -36,16 +39,19 @@ async function sendMail(
       smtp: smtp,
     });
 
-    await db.collection("phishingUsers").doc(user.id).update({
-      "status.emailSended": true,
-      events: FieldValue.arrayUnion({
-        type: "EMAIL_SENT",
-        timestamp: new Date().toISOString(),
-        data: {
-          client_id: user.id,
-        },
-      }),
-    });
+    await db
+      .collection("phishingUsers")
+      .doc(user.id)
+      .update({
+        "status.emailSended": true,
+        events: FieldValue.arrayUnion({
+          type: "EMAIL_SENT",
+          timestamp: new Date().toISOString(),
+          data: {
+            client_id: user.id,
+          },
+        }),
+      });
 
     await updateBatchProgress(batchId, true);
   } catch (error: any) {

@@ -1,0 +1,149 @@
+---
+interface Props {
+  trackingPixelUrl: string;
+}
+
+const { trackingPixelUrl } = Astro.props;
+---
+
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type="text/css">
+      <!--[if gte mso 9] > body {
+        mso-line-height-rule: exactly;
+      }
+
+      table {
+        border-collapse: collapse;
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+
+      tr {
+        mso-line-height-rule: exactly;
+      }
+
+      td {
+        mso-line-height-rule: exactly;
+      }
+
+      <!--<![endif]-- > <!--[if gte mso 15] > body {
+        font-size: 0;
+        line-height: 0;
+        mso-line-height-rule: exactly;
+      }
+
+      table {
+        border-collapse: collapse;
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+
+      tr {
+        font-size: 0px;
+        mso-line-height-alt: 0px;
+        mso-margin-top-alt: 0px;
+        mso-line-height-rule: exactly;
+      }
+
+      td {
+        mso-line-height-rule: exactly;
+      }
+
+      <!--<![endif]-- > .MetaData--hideDesktop {
+        display: none;
+      }
+
+      @media only screen and (max-width: 480px) {
+        a[x-apple-data-detectors] {
+          color: inherit !important;
+          text-decoration: none !important;
+          font-size: inherit !important;
+          font-family: inherit !important;
+          font-weight: inherit !important;
+          line-height: inherit !important;
+        }
+
+        /* Gmail-specific so this class gets applied */
+        * [lang~="MetaData--hideGmail"] {
+          display: none !important;
+        }
+
+        table {
+          width: 100% !important;
+        }
+
+        table[class="AutoWidth"] {
+          width: auto !important;
+        }
+
+        .MobileNoPadding {
+          padding: 0 !important;
+        }
+
+        .MobileFullWidth {
+          width: 100% !important;
+        }
+
+        img[class="MobileFullWidth"] {
+          height: auto !important;
+        }
+
+        .pl12 {
+          padding-left: 12px !important;
+        }
+
+        .MetaData--hideMobile {
+          display: none;
+          font-size: 1px;
+          color: #333333;
+          line-height: 1px;
+          max-height: 0px;
+          opacity: 0;
+          overflow: hidden;
+        }
+
+        .MetaData--hideDesktop {
+          display: block !important;
+        }
+
+        .pbm0 {
+          padding-bottom: 0 !important;
+        }
+      }
+
+      @media only screen and (max-width: 900px) {
+        a[x-apple-data-detectors] {
+          color: inherit !important;
+          text-decoration: none !important;
+          font-size: inherit !important;
+          font-family: inherit !important;
+          font-weight: inherit !important;
+          line-height: inherit !important;
+        }
+      }
+    </style>
+  </head>
+  <body
+    style="
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      margin: 0;
+      padding: 0;
+    "
+    dir="ltr"
+  >
+    <slot />
+
+    <img
+      style="display: none;"
+      width="1"
+      height="1"
+      src={trackingPixelUrl}
+      alt=""
+    />
+  </body>
+</html>
