@@ -96,7 +96,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const userAgent = context.request.headers.get("user-agent");
 
       const event = {
-        type: "email_opened",
+        type: "EMAIL_OPENED",
         timestamp: new Date().toISOString(),
         data: {
           ip,
@@ -107,6 +107,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const userRef = db.collection("phishingUsers").doc(client_id);
       await userRef.update({
         "status.emailOpened": true,
+        "status.emailOpenedAt": new Date(),
+        "status.lastActivityAt": new Date(),
         events: FieldValue.arrayUnion(event),
       });
 

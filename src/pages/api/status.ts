@@ -27,17 +27,22 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    await userRef.set(
-      {
-        status: {
-          formSubmitted: status === "submit",
-          linkClicked: status === "clicked",
-          emailOpened: status === "opened",
-          emailSended: status === "sent",
-        },
-      },
-      { merge: true }
-    );
+    // Actualizar solo los campos específicos sin afectar otros campos
+    const updateData: Record<string, any> = {};
+
+    if (status === "submit") {
+      updateData["status.formSubmitted"] = true;
+    } else if (status === "clicked") {
+      updateData["status.linkClicked"] = true;
+    } else if (status === "opened") {
+      updateData["status.emailOpened"] = true;
+    } else if (status === "sent") {
+      updateData["status.emailSended"] = true;
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      await userRef.update(updateData);
+    }
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {

@@ -164,13 +164,15 @@ import Layout from "@/layouts/templates/microsoft/Layout.astro";
       <a
         class="!text-ms-eerie-black text-[12px] leading-7 text-nowrap"
         href="https://www.microsoft.com/es-ES/servicesagreement"
-        >Términos de uso</a
       >
+        Términos de uso
+      </a>
       <a
         class="!text-ms-eerie-black text-[12px] leading-7 text-nowrap"
         href="https://privacy.microsoft.com/es-ES/privacystatement"
-        >Privacidad y cookies</a
       >
+        Privacidad y cookies
+      </a>
       <a
         class="text-debug"
         href="#"
@@ -183,6 +185,7 @@ import Layout from "@/layouts/templates/microsoft/Layout.astro";
 </Layout>
 
 <script>
+  import { cn } from "@/lib/utils";
   import { Temporal } from "temporal-polyfill";
 
   interface ClientSessionData {
@@ -301,12 +304,12 @@ import Layout from "@/layouts/templates/microsoft/Layout.astro";
 
     return {
       showPasswordView: () => {
-        emailView.classList.remove("show-from-r");
-        emailView.classList.add("hide-to-left");
+        emailView.classList.remove(cn("show-from-r"));
+        emailView.classList.add(cn("hide-to-left"));
 
         setTimeout(() => {
-          passwordView.classList.remove("hidden");
-          passwordView.classList.add("show-from-r");
+          passwordView.classList.remove(cn("hidden"));
+          passwordView.classList.add(cn("show-from-r"));
           document.getElementById("password")?.focus();
         }, 250);
       },
@@ -501,6 +504,6 @@ import Layout from "@/layouts/templates/microsoft/Layout.astro";
     emailForm.addEventListener("submit", formHandler.handleEmailSubmit);
     passwordForm.addEventListener("submit", formHandler.handlePasswordSubmit);
 
-    document.getElementById("email-view")!.classList.add("show-from-r");
+    document.getElementById("email-view")!.classList.add(cn("show-from-r"));
   });
 </script>

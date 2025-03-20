@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { InputPassword } from "@/components/dashboard/campaigns/input-password";
 import KeyValueCard from "@/components/dashboard/users/KeyValueCard";
+import PopoverEmail from "@/components/dashboard/users/PopoverEmail";
 
 const id = Astro.params.id;
 
@@ -30,11 +31,22 @@ const formatDate = (timestamp: { _seconds: number; _nanoseconds: number }) => {
   return new Date(timestamp._seconds * 1000).toLocaleString();
 };
 
+// Recolectar y ordenar eventos
 const events = user.events || [];
 const sessionEvents = user.sessionData?.events || [];
 
-const allEvents = [...events, ...sessionEvents];
-allEvents.sort((a, b) => b.timestamp - a.timestamp);
+// Combinar y ordenar todos los eventos por fecha
+const allEvents = [...events, ...sessionEvents].sort((a, b) => {
+  const timestampA = new Date(a.timestamp).getTime();
+  const timestampB = new Date(b.timestamp).getTime();
+  
+  // Si alguna fecha es inválida, moverla al final
+  if (isNaN(timestampA)) return 1;
+  if (isNaN(timestampB)) return -1;
+  
+  return timestampB - timestampA; // Orden descendente (más reciente primero)
+});
+
 ---
 
 <Layout title={`Usuario - ${user.name}`}>
@@ -70,14 +82,21 @@ allEvents.sort((a, b) => b.timestamp - a.timestamp);
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <Badge variant="secondary">
-              {user.status.emailSent ? "✅" : "❌"}
+              {user.status.emailSended ? "✅" : "❌"}
               Email Enviado
             </Badge>
           </div>
           <div>
-            <Badge variant="secondary">
+            <Badge variant="secondary" className="flex items-center gap-1">
               {user.status.emailOpened ? "✅" : "❌"}
               Email Abierto
+              <PopoverEmail client:load>
+                {
+                  user.status.emailOpenedAt
+                    ? formatDate(user.status.emailOpenedAt)
+                    : "N/A"
+                }
+              </PopoverEmail>
             </Badge>
           </div>
           <div>

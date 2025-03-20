@@ -12,26 +12,36 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     // Validar cabecera JSON
     if (request.headers.get("content-type") !== "application/json") {
-      return new Response(JSON.stringify({ error: "Requiere application/json" }), { status: 400 });
+      return new Response(
+        JSON.stringify({ error: "Requiere application/json" }),
+        { status: 400 }
+      );
     }
 
-    const usersBatch: [{ name: string, email: string }] = await request.json();
+    const usersBatch: [{ name: string; email: string }] = await request.json();
 
     // Validar estructura de datos
     if (!Array.isArray(usersBatch)) {
-      return new Response(JSON.stringify({ error: "Formato de request inválido" }), { status: 400 });
+      return new Response(
+        JSON.stringify({ error: "Formato de request inválido" }),
+        { status: 400 }
+      );
     }
 
-    const validUsers = usersBatch.filter(user =>
-      typeof user === 'object' &&
-      user.name &&
-      user.email &&
-      typeof user.name === 'string' &&
-      typeof user.email === 'string'
+    const validUsers = usersBatch.filter(
+      (user) =>
+        typeof user === "object" &&
+        user.name &&
+        user.email &&
+        typeof user.name === "string" &&
+        typeof user.email === "string"
     );
 
     if (validUsers.length === 0) {
-      return new Response(JSON.stringify({ error: "No valid users found in the batch" }), { status: 400 });
+      return new Response(
+        JSON.stringify({ error: "No valid users found in the batch" }),
+        { status: 400 }
+      );
     }
 
     const batch = db.batch();
@@ -40,7 +50,6 @@ export const POST: APIRoute = async ({ request }) => {
     for (const userInput of usersBatch) {
       const userId = uuidv4();
 
-      // Proporcionar valores por defecto para status y metadata
       const newUser = PhishingUserSchema.parse({
         id: userId,
         name: userInput.name.trim(),
@@ -52,7 +61,7 @@ export const POST: APIRoute = async ({ request }) => {
           formSubmitted: false,
           emailOpenedAt: null,
           firstClickAt: null,
-          lastClickAt: null
+          lastClickAt: null,
         },
         metadata: {
           ip: "unknown",
@@ -61,15 +70,18 @@ export const POST: APIRoute = async ({ request }) => {
             lat: 0,
             lon: 0,
             city: "unknown",
-            country: "unknown"
+            country: "unknown",
           },
           device: {
             os: "unknown",
             browser: "unknown",
-            screenResolution: "unknown"
+            screenResolution: "unknown",
           },
-          referralSource: "unknown"
-        }
+          referralSource: "unknown",
+        },
+        events: [
+          { type: "CREATE", timestamp: new Date().toISOString(), data: {} },
+        ],
       });
 
       const userRef = phishingUsersRef.doc(userId);
@@ -79,18 +91,23 @@ export const POST: APIRoute = async ({ request }) => {
 
     await batch.commit();
 
-    return new Response(JSON.stringify({
-      success: true,
-      created: createdUsers.length,
-      ids: createdUsers
-    }), { status: 201 });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        created: createdUsers.length,
+        ids: createdUsers,
+      }),
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error:", error);
-    return new Response(JSON.stringify({
-      success: false,
-      error: error instanceof Error ? error.message : "Error desconocido"
-    }), { status: 500 });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : "Error desconocido",
+      }),
+      { status: 500 }
+    );
   }
 };
 
@@ -110,15 +127,20 @@ export const DELETE: APIRoute = async ({ request }) => {
     if (userIds && Array.isArray(userIds)) {
       // Eliminar usuarios seleccionados
       const batch = db.batch();
-      const usersToDelete = await phishingUsersRef.where('id', 'in', userIds).get();
+      const usersToDelete = await phishingUsersRef
+        .where("id", "in", userIds)
+        .get();
 
       if (usersToDelete.empty) {
-        return new Response(JSON.stringify({ error: "Usuarios no encontrados" }), {
-          status: 404,
-        });
+        return new Response(
+          JSON.stringify({ error: "Usuarios no encontrados" }),
+          {
+            status: 404,
+          }
+        );
       }
 
-      usersToDelete.forEach(doc => {
+      usersToDelete.forEach((doc) => {
         batch.delete(doc.ref);
       });
 
@@ -128,13 +150,16 @@ export const DELETE: APIRoute = async ({ request }) => {
       const allUsers = await phishingUsersRef.get();
 
       if (allUsers.empty) {
-        return new Response(JSON.stringify({ error: "No hay usuarios para eliminar" }), {
-          status: 404,
-        });
+        return new Response(
+          JSON.stringify({ error: "No hay usuarios para eliminar" }),
+          {
+            status: 404,
+          }
+        );
       }
 
       const batch = db.batch();
-      allUsers.forEach(doc => {
+      allUsers.forEach((doc) => {
         batch.delete(doc.ref);
       });
 
@@ -148,7 +173,6 @@ export const DELETE: APIRoute = async ({ request }) => {
       }),
       { status: 200 }
     );
-
   } catch (error: any) {
     console.error("Error en DELETE:", error);
     return new Response(

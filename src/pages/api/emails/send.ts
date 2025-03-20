@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { experimental_AstroContainer } from "astro/container";
-import { getFirestore } from "firebase-admin/firestore";
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { app } from "@/firebase/server";
 import { sendEmail } from "@/lib/email";
 import { createBatch, updateBatchProgress } from "@/lib/batches";
@@ -38,6 +38,13 @@ async function sendMail(
 
     await db.collection("phishingUsers").doc(user.id).update({
       "status.emailSended": true,
+      events: FieldValue.arrayUnion({
+        type: "EMAIL_SENT",
+        timestamp: new Date().toISOString(),
+        data: {
+          client_id: user.id,
+        },
+      }),
     });
 
     await updateBatchProgress(batchId, true);

