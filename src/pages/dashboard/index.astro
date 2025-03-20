@@ -4,6 +4,7 @@ import TableUsers from "@/components/dashboard/campaigns/table-users";
 import { app } from "@/firebase/server";
 import { getFirestore } from "firebase-admin/firestore";
 import type { PhishingUser } from "@/types";
+import { Separator } from "@radix-ui/react-separator";
 
 const db = getFirestore(app);
 const phishingUsersRef = db.collection("phishingUsers");
@@ -20,12 +21,25 @@ const filteredUsers = users.filter((user) => {
 ---
 
 <Layout title="Dashboard">
-  <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-    <div class="aspect-video rounded-xl bg-muted/50"></div>
-    <div class="aspect-video rounded-xl bg-muted/50"></div>
-    <div class="aspect-video rounded-xl bg-muted/50"></div>
-  </div>
-  <div class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
-    <TableUsers client:only="react" data={filteredUsers} />
-  </div>
+  <main class="space-y-6">
+    <section>
+      <div class="grid auto-rows-min gap-4 md:grid-cols-3">
+        <div class="aspect-video rounded-xl bg-muted/50"></div>
+        <div class="aspect-video rounded-xl bg-muted/50"></div>
+        <div class="aspect-video rounded-xl bg-muted/50"></div>
+      </div>
+    </section>
+
+    <Separator className="my-6" />
+
+    <section class="overflow-auto contain-inline-size">
+      <header class="mb-4">
+        <h3 id="users-table-heading" class="text-lg font-medium">
+          Lista de Usuarios
+        </h3>
+      </header>
+
+      <TableUsers client:only="react" data={filteredUsers} />
+    </section>
+  </main>
 </Layout>
