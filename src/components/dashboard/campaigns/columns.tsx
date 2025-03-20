@@ -16,10 +16,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PhishingUserSchema } from "@/lib/typesValidator";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { InputPassword } from "./input-password";
-import { cn } from "@/lib/utils";
 
 export const columns: ColumnDef<PhishingUser>[] = [
   {
@@ -256,6 +253,8 @@ export const columnsUser: ColumnDef<PhishingUser>[] = [
         user = PhishingUserSchema.parse(row.original) as any;
       } catch (error) {
         console.error("Error al parsear el usuario:", error);
+        console.log(row.original.email)
+        console.log(row.original.capturedCredentials)
         return;
       }
 

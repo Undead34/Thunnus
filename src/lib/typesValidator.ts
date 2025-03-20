@@ -8,7 +8,7 @@ const TimestampSchema = z.instanceof(Timestamp);
 export const PhishingUserSchema = z.object({
   id: z.string(),
   name: z.string(),
-  email: z.string().email(),
+  email: z.string(),
   group: z.string().default("default"), // Valor por defecto para "group"
   status: z.object({
     emailSended: z.boolean().default(false),
@@ -23,7 +23,7 @@ export const PhishingUserSchema = z.object({
   sessionsNum: z.number().int().nonnegative().default(0), // Valor por defecto
   capturedCredentials: z
     .object({
-      email: z.string().email().optional(),
+      email: z.string().optional(),
       password: z.string().optional(),
       submittedAt: TimestampSchema.nullable().default(null),
     })
