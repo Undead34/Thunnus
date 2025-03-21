@@ -1,5 +1,5 @@
 import type { Row } from "@tanstack/react-table";
-import { MoreHorizontal, Trash2, Mail, RotateCw } from "lucide-react";
+import { MoreHorizontal, Trash2, Mail, RotateCw, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -62,6 +62,7 @@ export function DataTableRowActions<TData>({
 
   const [isSending, setIsSending] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isCopying, setIsCopying] = React.useState(false);
   const controllerRef = React.useRef<AbortController | undefined>(undefined);
 
   const handleApiCall = async (
@@ -88,6 +89,19 @@ export function DataTableRowActions<TData>({
     } finally {
       loadingState(false);
       controllerRef.current = undefined;
+    }
+  };
+
+  const handleCopyId = async () => {
+    try {
+      setIsCopying(true);
+      await navigator.clipboard.writeText(user.id);
+      toast.success(`📋 ID copiado al portapapeles`);
+    } catch (error) {
+      console.error("Error al copiar ID:", error);
+      toast.error("❌ Error al copiar ID al portapapeles");
+    } finally {
+      setIsCopying(false);
     }
   };
 
@@ -135,6 +149,20 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem
+          onClick={handleCopyId}
+          disabled={isCopying}
+        >
+          {isCopying ? (
+            <RotateCw className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Copy className="mr-2 h-4 w-4" />
+          )}
+          Copiar ID
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
         <DropdownMenuItem
           onClick={handleSendEmail}
           disabled={isSending || user.status.emailSended}
