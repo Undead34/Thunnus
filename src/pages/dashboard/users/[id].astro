@@ -28,7 +28,9 @@ if (!user) {
 
 const formatDate = (timestamp: { _seconds: number; _nanoseconds: number }) => {
   if (!timestamp) return "N/A";
-  return new Date(timestamp._seconds * 1000).toLocaleString();
+
+  const venezuelaTime = new Date(timestamp._seconds * 1000);
+  return venezuelaTime.toLocaleString('es-VE', { timeZone: 'America/Caracas' });
 };
 
 // Recolectar y ordenar eventos
