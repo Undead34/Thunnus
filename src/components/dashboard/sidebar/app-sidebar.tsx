@@ -24,7 +24,7 @@ const data = {
       title: "Campañas",
       url: "/dashboard/campaigns",
       icon: ShieldAlert,
-      isActive: false,
+      isActive: true,
       items: [
         {
           title: "Campañas activas",
@@ -42,15 +42,15 @@ const data = {
       title: "Plantillas y páginas",
       url: "/dashboard/templates",
       icon: FileCode,
+      isActive: true,
       items: [
-        {
-          title: "Plantillas de correo",
-          url: "/dashboard/templates/emails",
-          disabled: true,
-        },
         {
           title: "Páginas de inicio",
           url: "/dashboard/templates",
+        },
+        {
+          title: "Plantillas de correo",
+          url: "/dashboard/templates/emails",
         },
         {
           title: "Archivos adjuntos",
@@ -68,7 +68,6 @@ const data = {
         {
           title: "Configuración SMTP",
           url: "/dashboard/settings#smtp",
-          disabled: false,
         },
         {
           title: "Gestión de usuarios",
@@ -76,13 +75,13 @@ const data = {
           disabled: true,
         },
         {
-          title: "Claves API",
-          url: "/dashboard/settings/api",
+          title: "Reglas de seguridad",
+          url: "/dashboard/settings/security",
           disabled: true,
         },
         {
-          title: "Reglas de seguridad",
-          url: "/dashboard/settings/security",
+          title: "Claves API",
+          url: "/dashboard/settings/api",
           disabled: true,
         },
       ],

@@ -60,6 +60,7 @@ export function DataTableToolbar<TData>({
   const [isSending, setIsSending] = React.useState(false);
   const isFiltered = table.getState().columnFilters.length > 0;
   const hasSelection = table.getSelectedRowModel().rows.length > 0;
+  const hasRows = table.getCoreRowModel().rows.length > 0;
 
   const handleSendEmails = async () => {
     setIsSending(true);
@@ -125,7 +126,7 @@ export function DataTableToolbar<TData>({
           variant="ghost"
           className="h-8 px-2 lg:px-3"
           onClick={handleSendEmails}
-          disabled={isSending}
+          disabled={isSending || !hasRows}
         >
           {isSending ? (
             <RotateCw className="mr-2 h-4 w-4 animate-spin" />

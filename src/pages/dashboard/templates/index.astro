@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -11,6 +10,13 @@ import { Button } from "@/components/ui/button";
 
 import Layout from "@/layouts/dashboard.astro";
 import TemplateSelector from "@/components/dashboard/templates/TemplateSelector";
+import { getFirestore } from "firebase-admin/firestore";
+import { app } from "@/firebase/server";
+
+const db = getFirestore(app);
+const settings = db.collection("settings").doc("template");
+
+const defaultValue = (await settings.get()).data()?.id || "";
 ---
 
 <Layout title="Templates">
@@ -24,7 +30,11 @@ import TemplateSelector from "@/components/dashboard/templates/TemplateSelector"
       </CardHeader>
       <CardContent>
         <form id="templateForm" class="flex flex-col gap-2">
-          <TemplateSelector client:load id="template-selector" />
+          <TemplateSelector
+            client:load
+            id="template-selector"
+            defaultValue={defaultValue}
+          />
 
           <div>
             <Button type="submit">Save</Button>
