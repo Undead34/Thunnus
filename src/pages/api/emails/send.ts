@@ -4,11 +4,34 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { app } from "@/firebase/server";
 import { sendEmail } from "@/lib/email";
 import { createBatch, updateBatchProgress } from "@/lib/batches";
-import OneDriveExcel from "@/emails/OneDriveExcel/Template.astro";
 import type { PhishingUser, SMTP } from "@/types";
+
+import OneDriveExcel from "@/emails/OneDriveExcel/Template.astro";
+import Microsoft from "@/emails/Microsoft/Template.astro";
 
 const db = getFirestore(app);
 const CONCURRENCY_LIMIT = 5;
+
+function censorEmail(email: string) {
+  // Split into local part and domain
+  const [local, domain] = email.split("@");
+
+  // Handle invalid emails
+  if (!domain) return email;
+
+  // Censor the local part
+  let censoredLocal;
+  if (local.length <= 1) {
+    censoredLocal = local; // For very short emails
+  } else {
+    const firstChar = local[0];
+    const lastChar = local.slice(-1);
+    const hiddenChars = "*".repeat(local.length - 2);
+    censoredLocal = `${firstChar}${hiddenChars}${lastChar}`;
+  }
+
+  return `${censoredLocal}@${domain}`;
+}
 
 async function sendMail(
   user: PhishingUser,
@@ -32,10 +55,20 @@ async function sendMail(
       },
     });
 
+    const subjectMicrosoft = "Se necesita agregar información de seguridad a su cuenta de Microsoft";
+    const htmlContentMicrosoft = await container.renderToString(Microsoft, {
+      props: {
+        censored_email: censorEmail(user.email),
+        link: link.toString(),
+        trackingPixelUrl:
+          url.origin + "/tracking-pixel.png?client_id=" + user.id,
+      },
+    });
+
     await sendEmail({
       to: user.email,
-      subject: "¡Tu asunto aquí!",
-      html: htmlContent,
+      subject: subjectMicrosoft,
+      html: htmlContentMicrosoft,
       smtp: smtp,
     });
 
