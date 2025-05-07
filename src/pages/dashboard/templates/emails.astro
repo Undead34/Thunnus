@@ -1,7 +1,49 @@
 ---
+import { getFirestore } from "firebase-admin/firestore";
+import { app } from "@/firebase/server";
+
 import Layout from "@/layouts/dashboard.astro";
+import TemplatePreview from "@/components/TemplatePreview.astro";
+import { Card, CardContent } from "@/components/ui/card";
+
+
+const db = getFirestore(app);
+const settingsDoc = db.collection("settings").doc("email-template");
+const defaultValue = (await settingsDoc.get()).data()?.id;
+
+const selected = defaultValue || new URL(Astro.request.url).searchParams.get("template") || "microsoft";
 ---
 
-<Layout title="Emails">
-  <div class="grid gap-6">Holi</div>
+<Layout title="Preview">
+  <div class="max-w-5xl py-10">
+    <Card className="relative flex justify-center items-center p-0 contain-content bg-accent">
+      <div class="select-none text-sm text-muted-foreground absolute top-2">
+        Width: <span id="template-width" class="select-text">auto</span>
+      </div>
+      
+      <CardContent className="p-0 resize-x overflow-hidden w-full max-w-full min-w-[20rem]">
+        <TemplatePreview selectedTemplate={selected} />
+      </CardContent>
+    </Card>
+  </div>
+
+  <form method="GET" class="flex items-center gap-2 mb-6">
+    <select name="template" class="border p-2 rounded">
+      <option value="microsoft" selected={selected === "microsoft"}>Microsoft</option>
+      <option value="onedrive" selected={selected === "onedrive"}>OneDrive Excel</option>
+    </select>
+    <button type="submit" class="px-4 py-2 bg-black text-white rounded">Mostrar</button>
+  </form>
 </Layout>
+
+<script>
+  const preview = document.querySelector('[class*="resize-x"]')! as any;
+  const widthLabel = document.getElementById("template-width")!;
+
+  const updateWidth = () => {
+    widthLabel.textContent = `${preview.offsetWidth}px`;
+  };
+
+  new ResizeObserver(updateWidth).observe(preview);
+  updateWidth();
+</script>

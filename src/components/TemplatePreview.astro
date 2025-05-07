@@ -1,0 +1,51 @@
+---
+import { experimental_AstroContainer } from "astro/container";
+import MicrosoftTemplate from "@/emails/Microsoft/Template.astro";
+import OneDriveExcelTemplate from "@/emails/OneDriveExcel/Template.astro";
+
+type TemplateKey = "microsoft" | "onedrive";
+
+interface Props {
+  selectedTemplate: string;
+}
+
+const { selectedTemplate } = Astro.props;
+
+const templates = {
+  microsoft: await experimental_AstroContainer.create().then((c) =>
+    c.renderToString(MicrosoftTemplate, {
+      props: {
+        censored_email: "j******e@example.com",
+        link: "https://example.com/",
+        trackingPixelUrl: "/tracking.png",
+      },
+    })
+  ),
+  onedrive: await experimental_AstroContainer.create().then((c) =>
+    c.renderToString(OneDriveExcelTemplate, {
+      props: {
+        company: "Example",
+        document_name: "Example.pdf",
+        link: "https://example.com/",
+        message: "Lorem...",
+        trackingPixelUrl: "/tracking.png",
+      },
+    })
+  ),
+};
+
+const validTemplates: TemplateKey[] = ["microsoft", "onedrive"];
+const selected: TemplateKey = validTemplates.includes(
+  selectedTemplate as TemplateKey
+)
+  ? (selectedTemplate as TemplateKey)
+  : "microsoft";
+const html = templates[selected || "microsoft"];
+---
+
+<iframe
+  class="w-full h-[600px] border-0"
+  sandbox="allow-same-origin"
+  srcdoc={html}
+>
+</iframe>

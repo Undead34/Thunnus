@@ -24,3 +24,4 @@ pnpm-debug.log*
 .idea/
 
 service-account-key.json
+serviceAccount.json
