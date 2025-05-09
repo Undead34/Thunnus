@@ -4,36 +4,71 @@ import { app } from "@/firebase/server";
 
 import Layout from "@/layouts/dashboard.astro";
 import TemplatePreview from "@/components/TemplatePreview.astro";
-import { Card, CardContent } from "@/components/ui/card";
 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 const db = getFirestore(app);
 const settingsDoc = db.collection("settings").doc("email-template");
-const defaultValue = (await settingsDoc.get()).data()?.id;
+const current = (await settingsDoc.get()).data()?.value;
 
-const selected = defaultValue || new URL(Astro.request.url).searchParams.get("template") || "microsoft";
+const param = new URL(Astro.request.url).searchParams.get("template")!;
+const selected = param || current || "microsoft";
 ---
 
 <Layout title="Preview">
   <div class="max-w-5xl py-10">
-    <Card className="relative flex justify-center items-center p-0 contain-content bg-accent">
-      <div class="select-none text-sm text-muted-foreground absolute top-2">
+    <Card
+      className="flex justify-center items-center contain-content bg-accent p-0"
+    >
+      <div class="relative select-none text-sm text-muted-foreground mt-6">
         Width: <span id="template-width" class="select-text">auto</span>
       </div>
-      
-      <CardContent className="p-0 resize-x overflow-hidden w-full max-w-full min-w-[20rem]">
+
+      <Separator />
+
+      <CardContent
+        className="p-0 resize-x overflow-hidden w-full max-w-full min-w-[20rem]"
+      >
         <TemplatePreview selectedTemplate={selected} />
       </CardContent>
     </Card>
   </div>
 
-  <form method="GET" class="flex items-center gap-2 mb-6">
-    <select name="template" class="border p-2 rounded">
-      <option value="microsoft" selected={selected === "microsoft"}>Microsoft</option>
-      <option value="onedrive" selected={selected === "onedrive"}>OneDrive Excel</option>
-    </select>
-    <button type="submit" class="px-4 py-2 bg-black text-white rounded">Mostrar</button>
-  </form>
+  <div class="grid gap-6">
+    <Card>
+      <CardHeader>
+        <CardTitle>Template ({current})</CardTitle>
+        <CardDescription>
+          The selected template will be used to display in the main path.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <form method="GET" class="flex">
+          <select title={`Current: ${current}`} id="template-select" name="template" class="border p-2 rounded mr-auto min-w-72">
+            <option value="microsoft" selected={selected === "microsoft"}>
+              Microsoft
+            </option>
+            <option value="onedrive" selected={selected === "onedrive"}>
+              OneDrive Excel
+            </option>
+          </select>
+
+          <div class="flex gap-2">
+            <Button type="submit"> Show </Button>
+            <Button type="button" id="save-template-btn"> Save </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  </div>
 </Layout>
 
 <script>
@@ -46,4 +81,30 @@ const selected = defaultValue || new URL(Astro.request.url).searchParams.get("te
 
   new ResizeObserver(updateWidth).observe(preview);
   updateWidth();
+
+  const saveTemplateBtn = document.querySelector(
+    "#save-template-btn"
+  ) as HTMLButtonElement;
+
+  saveTemplateBtn.addEventListener("click", async (e) => {
+    const selected = (document.getElementById("template-select") as HTMLSelectElement)?.value;
+
+    try {
+      const response = await fetch("/api/settings/email-template", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ selected }),
+      });
+
+      if (response.ok) {
+        alert("Configuración guardada correctamente");
+        location.reload();
+      } else {
+        alert("Error al guardar la configuración");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error en el servidor");
+    }
+  });
 </script>

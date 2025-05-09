@@ -57,7 +57,7 @@ export default function TemplateSelector({ id, defaultValue }: { id: string, def
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." className="h-9" />
+          <CommandInput placeholder="Search..." className="h-9" />
           <CommandList>
             <CommandEmpty>No template found.</CommandEmpty>
             <CommandGroup>

@@ -1,0 +1,132 @@
+---
+interface Props {
+    id?: string;
+    class?: string;
+}
+
+const { id, class: className } = Astro.props;
+---
+
+<form method="post" id={id} class:list={[className]}>
+    <span>
+        <section class="Em2Ord">
+            <header class="vYeFie" aria-hidden="true"></header>
+            <div class="yTaH4c">
+                <div>
+                    <div class="AFTWye vEQsqe">
+                        <div
+                            id="container-input"
+                            class="rFrNMe X3mtXb UOsO2 ToAxb zKHdkd sdJrJc Tyc9J"
+                        >
+                            <div class="aCsJod oJeWuf">
+                                <div class="aXBtI Wic03c">
+                                    <div class="Xb9hP">
+                                        <input
+                                            type="email"
+                                            class="whsOnd zHQkBf"
+                                            autocomplete="username webauthn"
+                                            spellcheck="false"
+                                            tabindex="0"
+                                            aria-label="Correo electrónico o teléfono"
+                                            name="identifier"
+                                            value=""
+                                            aria-disabled="false"
+                                            autocapitalize="none"
+                                            id="username"
+                                            dir="ltr"
+                                            data-initial-dir="ltr"
+                                            data-initial-value=""
+                                        />
+                                        <div
+                                            class="AxOyFc snByac"
+                                            aria-hidden="true"
+                                        >
+                                            Correo electrónico o teléfono
+                                        </div>
+                                    </div>
+                                    <div class="i9lrp mIZh1c"></div>
+                                    <div class="OabDMe cXrdqd Y2Zypf"></div>
+                                </div>
+                            </div>
+                            <div class="LXRPh">
+                                <div class="ovnfwe Is7Fhb"></div>
+                                <div
+                                    class="dEOOab RxsGPe"
+                                    aria-atomic="true"
+                                    aria-live="assertive"
+                                >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dMNVAe" aria-live="assertive"></div>
+                    <div class="dMNVAe">
+                        <button type="button">
+                            ¿Has olvidado tu correo electrónico?
+                        </button>
+                    </div>
+                    <input
+                        type="password"
+                        name="hiddenPassword"
+                        class="Hvu6D"
+                        tabindex="-1"
+                        aria-hidden="true"
+                        spellcheck="false"
+                    />
+                    <div class="lbFS4d eLNT1d">
+                        <div class="AFTWye">
+                            <div
+                                class="rFrNMe X3mtXb UOsO2 zKHdkd sdJrJc Tyc9J"
+                            >
+                                <div class="LXRPh">
+                                    <div class="ovnfwe Is7Fhb"></div>
+                                    <div
+                                        class="dEOOab RxsGPe"
+                                        aria-atomic="true"
+                                        aria-live="assertive"
+                                    >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input
+                        type="hidden"
+                        name="usi"
+                        value="S-1995070372:1746750228082790"
+                    />
+                    <input type="hidden" name="domain" />
+                    <input type="hidden" name="region" value="US" />
+                    <input type="hidden" id="fidoUserHandle" />
+                    <c-wiz jsmodel="hc6Ubd"><c-data id="i7"></c-data></c-wiz>
+                    <c-wiz jsmodel="hc6Ubd"><c-data id="i8"></c-data></c-wiz>
+                    <c-wiz jsmodel="hc6Ubd"><c-data id="i9"></c-data></c-wiz>
+                </div>
+            </div>
+        </section>
+    </span>
+</form>
+
+<script>
+    const emailInput = document.getElementById("username") as any;
+    const emailContainer = document.getElementById("container-input") as any;
+
+    function updateEmailFieldClass() {
+        if (emailContainer) {
+            if (emailInput && emailInput.value.trim() !== "") {
+                emailContainer.classList.add("CDELXb");
+            } else {
+                emailContainer.classList.remove("CDELXb");
+            }
+        }
+    }
+
+    // Verificar al cargar la página
+    updateEmailFieldClass();
+
+    // Agregar listener para el evento input
+    if (emailInput) {
+        emailInput.addEventListener("input", updateEmailFieldClass);
+    }
+
+</script>
