@@ -2,8 +2,9 @@
 import { experimental_AstroContainer } from "astro/container";
 import MicrosoftTemplate from "@/emails/Microsoft/Template.astro";
 import OneDriveExcelTemplate from "@/emails/OneDriveExcel/Template.astro";
+import GoogleDriveTemplate from "@/emails/GoogleDrive/Template.astro";
 
-type TemplateKey = "microsoft" | "onedrive";
+type TemplateKey = "microsoft" | "onedrive" | "google-drive";
 
 interface Props {
   selectedTemplate: string;
@@ -19,7 +20,7 @@ const templates = {
         link: "https://example.com/",
         trackingPixelUrl: "/tracking.png",
       },
-    })
+    }),
   ),
   onedrive: await experimental_AstroContainer.create().then((c) =>
     c.renderToString(OneDriveExcelTemplate, {
@@ -30,13 +31,24 @@ const templates = {
         message: "Lorem...",
         trackingPixelUrl: "/tracking.png",
       },
-    })
+    }),
+  ),
+  "google-drive": await experimental_AstroContainer.create().then((c) =>
+    c.renderToString(GoogleDriveTemplate, {
+      props: {
+        company: "Example",
+        document_name: "Example.pdf",
+        link: "https://example.com/",
+        message: "Lorem...",
+        trackingPixelUrl: "/tracking.png",
+      },
+    }),
   ),
 };
 
 const validTemplates: TemplateKey[] = ["microsoft", "onedrive"];
 const selected: TemplateKey = validTemplates.includes(
-  selectedTemplate as TemplateKey
+  selectedTemplate as TemplateKey,
 )
   ? (selectedTemplate as TemplateKey)
   : "microsoft";
@@ -45,7 +57,7 @@ const html = templates[selected || "microsoft"];
 
 <iframe
   title="Email Preview"
-  class="w-full h-[600px] border-0"
+  class="w-full h-[50vh] xl:h-[66vh] border-0"
   sandbox="allow-same-origin"
   srcdoc={html}
 >

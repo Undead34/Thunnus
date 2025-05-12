@@ -24,7 +24,7 @@ const selected = param || current || "microsoft";
 ---
 
 <Layout title="Preview">
-  <div class="max-w-5xl py-10">
+  <div class="py-10">
     <Card
       className="flex justify-center items-center contain-content bg-accent p-0"
     >
@@ -52,12 +52,20 @@ const selected = param || current || "microsoft";
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <form method="GET" class="flex">
-          <select title={`Current: ${current}`} id="template-select" name="template" class="border p-2 rounded mr-auto min-w-72">
+          <select
+            title={`Current: ${current}`}
+            id="template-select"
+            name="template"
+            class="border p-2 rounded mr-auto min-w-72"
+          >
             <option value="microsoft" selected={selected === "microsoft"}>
               Microsoft
             </option>
             <option value="onedrive" selected={selected === "onedrive"}>
               OneDrive Excel
+            </option>
+            <option value="google-drive" selected={selected === "google-drive"}>
+              Google Drive Shared File
             </option>
           </select>
 
@@ -83,11 +91,13 @@ const selected = param || current || "microsoft";
   updateWidth();
 
   const saveTemplateBtn = document.querySelector(
-    "#save-template-btn"
+    "#save-template-btn",
   ) as HTMLButtonElement;
 
   saveTemplateBtn.addEventListener("click", async (e) => {
-    const selected = (document.getElementById("template-select") as HTMLSelectElement)?.value;
+    const selected = (
+      document.getElementById("template-select") as HTMLSelectElement
+    )?.value;
 
     try {
       const response = await fetch("/api/settings/email-template", {
