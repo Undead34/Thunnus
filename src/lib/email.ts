@@ -9,15 +9,27 @@ interface Options {
 }
 
 export async function sendEmail(options: Options) {
-    const transporter = nodemailer.createTransport({
-        ...options.smtp, tls: {
-            rejectUnauthorized: false
-        }
-    });
+    try {
+        let config = {
+            ...options.smtp,
+            secure: false,
+            tls: {
+                ciphers: 'SSLv3',
+                rejectUnauthorized: false
+            }
+        };
+        const transporter = nodemailer.createTransport(config);
 
-    await transporter.sendMail({
-        to: options.to,
-        html: options.html,
-        subject: options.subject
-    });
+        let response = await transporter.sendMail({
+            from: options.smtp.auth.user,
+            to: options.to,
+            html: options.html,
+            subject: options.subject
+        });
+
+        console.log(response);
+    }
+    catch (e) {
+        console.error(e);
+    }
 }
