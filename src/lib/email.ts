@@ -9,7 +9,11 @@ interface Options {
 }
 
 export async function sendEmail(options: Options) {
-    const transporter = nodemailer.createTransport(options.smtp);
+    const transporter = nodemailer.createTransport({
+        ...options.smtp, tls: {
+            rejectUnauthorized: false
+        }
+    });
 
     await transporter.sendMail({
         to: options.to,

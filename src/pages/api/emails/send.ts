@@ -7,7 +7,6 @@ import { createBatch, updateBatchProgress } from "@/lib/batches";
 import type { PhishingUser, SMTP } from "@/types";
 
 import Sitca from "@/emails/Sitca/Template.astro";
-import Microsoft from "@/emails/Microsoft/Template.astro";
 
 const db = getFirestore(app);
 const CONCURRENCY_LIMIT = 5;
