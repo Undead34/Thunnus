@@ -3,9 +3,10 @@ import "@/styles/templates/google.css";
 
 interface Props {
   title: string;
+  favicon?: string;
 }
 
-const { title }: Props = Astro.props;
+const { title, favicon }: Props = Astro.props;
 ---
 
 <!doctype html>
@@ -15,6 +16,7 @@ const { title }: Props = Astro.props;
     <meta name="chrome" content="nointentdetection" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="preconnect" href="//www.gstatic.com" />
+    <link rel="shortcut icon" href={favicon || "favicon.ico"} type="image/x-icon">
     <title>{title}</title>
   </head>
   <body class="jR8x9d nyoS7c UzCXuf EIlDfe">
