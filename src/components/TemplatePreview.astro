@@ -3,8 +3,9 @@ import { experimental_AstroContainer } from "astro/container";
 import MicrosoftTemplate from "@/emails/Microsoft/Template.astro";
 import OneDriveExcelTemplate from "@/emails/OneDriveExcel/Template.astro";
 import GoogleDriveTemplate from "@/emails/GoogleDrive/Template.astro";
+import SitcaTemplate from "@/emails/Sitca/Template.astro";
 
-type TemplateKey = "microsoft" | "onedrive" | "google-drive";
+type TemplateKey = "microsoft" | "onedrive" | "google-drive" | "sitca-template";
 
 interface Props {
   selectedTemplate: string;
@@ -44,9 +45,18 @@ const templates = {
       },
     }),
   ),
+  "sitca-template": await experimental_AstroContainer.create().then((c) =>
+    c.renderToString(SitcaTemplate, {
+      props: { link: "https://example.com/" },
+    }),
+  ),
 };
 
-const validTemplates: TemplateKey[] = ["microsoft", "onedrive"];
+const validTemplates: TemplateKey[] = [
+  "microsoft",
+  "onedrive",
+  "sitca-template",
+];
 const selected: TemplateKey = validTemplates.includes(
   selectedTemplate as TemplateKey,
 )
