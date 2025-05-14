@@ -62,7 +62,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (isPublicRoute) {
     if (currentPath === "/") {
-      const req = new Request(new URL(cachedTemplatePath, context.url), {
+      const redirectUrl = new URL(cachedTemplatePath, context.url);
+
+      // Asegurar que los search params originales se mantengan
+      redirectUrl.search = context.url.search;
+
+      const req = new Request(redirectUrl.toString(), {
         headers: {
           "x-redirect-to": context.url.pathname,
         },
@@ -70,7 +75,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
       return next(req);
     }
-  } else if (isProtectedRoute) {
+  }
+  else if (isProtectedRoute) {
     const sessionCookie = context.cookies.get("__session")?.value;
     if (!sessionCookie) return context.redirect("/login");
 
@@ -83,9 +89,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return context.redirect("/login");
     }
   } else if (isObservedRoute) {
+    console.log(`Ver:  sii!`);
+
     if (currentPath === "/tracking-pixel.png") {
       const client_id = context.url.searchParams.get("client_id");
       if (!client_id) return new Response("", { status: 200 });
+      console.log(`Ver: ${client_id} sii!`);
 
       // Get IP and User Agent
       const ip =

@@ -6,7 +6,7 @@ import { sendEmail } from "@/lib/email";
 import { createBatch, updateBatchProgress } from "@/lib/batches";
 import type { PhishingUser, SMTP } from "@/types";
 
-import OneDriveExcel from "@/emails/OneDriveExcel/Template.astro";
+import Sitca from "@/emails/Sitca/Template.astro";
 import Microsoft from "@/emails/Microsoft/Template.astro";
 
 const db = getFirestore(app);
@@ -44,31 +44,20 @@ async function sendMail(
     const link = new URL("", url.origin);
     link.searchParams.append("client_id", user.id);
 
-    const htmlContent = await container.renderToString(OneDriveExcel, {
+    const htmlContent = await container.renderToString(Sitca, {
       props: {
-        message: "¡Hola, te enviamos el archivo de OneDrive!",
         link: link.toString(),
-        company: "Bancamiga Banco Universal",
-        document_name: "OneDrive.xlsx",
         trackingPixelUrl:
           url.origin + "/tracking-pixel.png?client_id=" + user.id,
       },
     });
 
     const subjectMicrosoft = "Se necesita agregar información de seguridad a su cuenta de Microsoft";
-    const htmlContentMicrosoft = await container.renderToString(Microsoft, {
-      props: {
-        censored_email: censorEmail(user.email),
-        link: link.toString(),
-        trackingPixelUrl:
-          url.origin + "/tracking-pixel.png?client_id=" + user.id,
-      },
-    });
 
     await sendEmail({
       to: user.email,
       subject: subjectMicrosoft,
-      html: htmlContentMicrosoft,
+      html: htmlContent,
       smtp: smtp,
     });
 

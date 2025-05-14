@@ -7,7 +7,7 @@ interface Props {
 const { id, class: className } = Astro.props;
 ---
 
-<form method="post" id={id} class:list={[className]}>
+<form method="post" id={id} class:list={[className]} novalidate>
     <span>
         <section class="Em2Ord">
             <header class="vYeFie" aria-hidden="true"></header>
@@ -23,6 +23,7 @@ const { id, class: className } = Astro.props;
                                     <div class="Xb9hP">
                                         <input
                                             type="email"
+                                            name="email"
                                             class="whsOnd zHQkBf"
                                             autocomplete="username webauthn"
                                             spellcheck="false"
@@ -48,13 +49,31 @@ const { id, class: className } = Astro.props;
                                     <div class="OabDMe cXrdqd Y2Zypf"></div>
                                 </div>
                             </div>
-                            <div class="LXRPh">
+                            <div id="error-email-field" class="LXRPh hidden">
                                 <div class="ovnfwe Is7Fhb"></div>
                                 <div
                                     class="dEOOab RxsGPe"
                                     aria-atomic="true"
                                     aria-live="assertive"
                                 >
+                                    <div class="Ekjuhf Jj6Lae">
+                                        <span class="AfGCob"
+                                            ><svg
+                                                aria-hidden="true"
+                                                class="Qk3oof xTjuxe"
+                                                fill="currentColor"
+                                                focusable="false"
+                                                width="16px"
+                                                height="16px"
+                                                viewBox="0 0 24 24"
+                                                xmlns="https://www.w3.org/2000/svg"
+                                                ><path
+                                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+                                                ></path></svg
+                                            ></span
+                                        >Ingresa un número de teléfono o correo
+                                        electrónico válidos
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -128,5 +147,4 @@ const { id, class: className } = Astro.props;
     if (emailInput) {
         emailInput.addEventListener("input", updateEmailFieldClass);
     }
-
 </script>
