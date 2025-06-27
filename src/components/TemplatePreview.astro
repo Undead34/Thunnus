@@ -4,8 +4,14 @@ import MicrosoftTemplate from "@/emails/Microsoft/Template.astro";
 import OneDriveExcelTemplate from "@/emails/OneDriveExcel/Template.astro";
 import GoogleDriveTemplate from "@/emails/GoogleDrive/Template.astro";
 import SitcaTemplate from "@/emails/Sitca/Template.astro";
+import MicrosoftENTemplate from "@/emails/Microsoft (EN)/Template.astro";
 
-type TemplateKey = "microsoft" | "onedrive" | "google-drive" | "sitca-template";
+type TemplateKey =
+  | "microsoft"
+  | "microsoft-en"
+  | "onedrive"
+  | "google-drive"
+  | "sitca-template";
 
 interface Props {
   selectedTemplate: string;
@@ -21,7 +27,16 @@ const templates = {
         link: "https://example.com/",
         trackingPixelUrl: "/tracking.png",
       },
-    }),
+    })
+  ),
+  "microsoft-en": await experimental_AstroContainer.create().then((c) =>
+    c.renderToString(MicrosoftENTemplate, {
+      props: {
+        censored_email: "j******e@example.com",
+        link: "https://example.com/",
+        trackingPixelUrl: "/api/tracking-pixel",
+      },
+    })
   ),
   onedrive: await experimental_AstroContainer.create().then((c) =>
     c.renderToString(OneDriveExcelTemplate, {
@@ -30,9 +45,9 @@ const templates = {
         document_name: "Example.pdf",
         link: "https://example.com/",
         message: "Lorem...",
-        trackingPixelUrl: "/tracking.png",
+        trackingPixelUrl: "/api/tracking-pixel",
       },
-    }),
+    })
   ),
   "google-drive": await experimental_AstroContainer.create().then((c) =>
     c.renderToString(GoogleDriveTemplate, {
@@ -43,12 +58,12 @@ const templates = {
         message: "Lorem...",
         trackingPixelUrl: "/tracking.png",
       },
-    }),
+    })
   ),
   "sitca-template": await experimental_AstroContainer.create().then((c) =>
     c.renderToString(SitcaTemplate, {
       props: { link: "https://example.com/" },
-    }),
+    })
   ),
 };
 
@@ -56,9 +71,11 @@ const validTemplates: TemplateKey[] = [
   "microsoft",
   "onedrive",
   "sitca-template",
+  "microsoft-en",
+  "google-drive"
 ];
 const selected: TemplateKey = validTemplates.includes(
-  selectedTemplate as TemplateKey,
+  selectedTemplate as TemplateKey
 )
   ? (selectedTemplate as TemplateKey)
   : "microsoft";

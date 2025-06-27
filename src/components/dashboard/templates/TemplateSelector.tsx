@@ -25,12 +25,22 @@ const templates = [
     label: "Microsoft Account",
   },
   {
+    value: "microsoft-account-en",
+    label: "Microsoft Account (EN)",
+  },
+  {
     value: "google-account",
     label: "Google Account",
   },
 ];
 
-export default function TemplateSelector({ id, defaultValue }: { id: string, defaultValue?: string }) {
+export default function TemplateSelector({
+  id,
+  defaultValue,
+}: {
+  id: string;
+  defaultValue?: string;
+}) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(defaultValue || "");
 
