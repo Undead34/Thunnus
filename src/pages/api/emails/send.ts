@@ -8,6 +8,7 @@ import { createBatch, updateBatchProgress } from "@/lib/batches";
 import SITCA, { CONFIG as SitcaConfig } from "@/emails/Sitca/Template.astro";
 import GoogleDrive, { CONFIG as GoogleDriveConfig } from "@/emails/GoogleDrive/Template.astro";
 import Microsoft, { CONFIG as MicrosoftConfig } from "@/emails/Microsoft/Template.astro";
+import MicrosoftEN, { CONFIG as MicrosoftENConfig } from "@/emails/Microsoft (EN)/Template.astro";
 import OneDriveExcel, { CONFIG as OneDriveExcelConfig } from "@/emails/OneDriveExcel/Template.astro";
 
 import type { PhishingUser, SMTP } from "@/types";
@@ -28,10 +29,17 @@ interface TemplateEntry {
   };
 }
 
+// | "microsoft"
+// | "microsoft-en"
+// | "onedrive"
+// | "google-drive"
+// | "sitca-template";
+
 export const TemplateMapper: Record<string, TemplateEntry> = {
   sitca: { component: SITCA, config: SitcaConfig },
   googleDrive: { component: GoogleDrive, config: GoogleDriveConfig },
   microsoft: { component: Microsoft, config: MicrosoftConfig },
+  "microsoft-en": { component: MicrosoftEN, config: MicrosoftENConfig },
   oneDriveExcel: { component: OneDriveExcel, config: OneDriveExcelConfig },
 } as const;
 
