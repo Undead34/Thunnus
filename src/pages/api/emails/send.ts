@@ -105,7 +105,7 @@ async function sendMail(pkg: MailPackage) {
   };
 
   if (flags?.tracking_pixel) {
-    props.tracking_pixel = `${url.origin}/tracking-pixel.png?client_id=${user.id}`;
+    props.tracking_pixel = `${url.origin}/api/tracking-pixel?client_id=${user.id}`;
   }
   if (flags?.email) {
     props.email = user.email;

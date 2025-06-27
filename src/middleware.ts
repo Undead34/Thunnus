@@ -39,7 +39,7 @@ interface Matcher {
 const matcher: Matcher = {
   public: ["/"],
   protected: ["/dashboard", "/dashboard/*path"],
-  observed: ["/public/tracking-pixel.png", "/tracking-pixel.png"],
+  observed: ["/api/tracking-pixel"],
 };
 
 // Middleware
@@ -89,12 +89,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return context.redirect("/login");
     }
   } else if (isObservedRoute) {
-    console.log(`Ver:  sii!`);
-
-    if (currentPath === "/tracking-pixel.png") {
+    if (currentPath === "/api/tracking-pixel") {
       const client_id = context.url.searchParams.get("client_id");
       if (!client_id) return new Response("", { status: 200 });
-      console.log(`Ver: ${client_id} sii!`);
 
       // Get IP and User Agent
       const ip =
@@ -113,15 +110,20 @@ export const onRequest = defineMiddleware(async (context, next) => {
         },
       };
 
-      const userRef = db.collection("phishingUsers").doc(client_id);
-      await userRef.update({
-        "status.emailOpened": true,
-        "status.emailOpenedAt": new Date(),
-        "status.lastActivityAt": new Date(),
-        events: FieldValue.arrayUnion(event),
-      });
 
-      return new Response("", { status: 200 });
+      const userRef = db.collection("phishingUsers").doc(client_id);
+      const docSnapshot = await userRef.get();
+
+      if (docSnapshot.exists) {
+        await userRef.update({
+          "status.emailOpened": true,
+          "status.emailOpenedAt": new Date(),
+          "status.lastActivityAt": new Date(),
+          events: FieldValue.arrayUnion(event),
+        });
+      } else {
+        console.log(`Intento de tracking ignorado: El usuario con client_id "${client_id}" no existe.`);
+      }
     }
 
     return next();
