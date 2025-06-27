@@ -1,11 +1,32 @@
 ---
+import { getStableDates } from "@/lib/stable-dates";
+
 interface Props {
   censored_email: string;
-  link: string;
-  trackingPixelUrl: string;
+  redirect_to: string;
+  tracking_pixel: string;
 }
 
-const { censored_email, link, trackingPixelUrl } = Astro.props;
+const { past , future } = getStableDates({
+  daysBefore: 5,
+  daysAfter: 10,
+  pastTime: { hour: 2, minute: 15 },
+  futureTime: { hour: 18, minute: 30 },
+});
+
+const { censored_email, redirect_to, tracking_pixel } = Astro.props;
+
+export const CONFIG = {
+  subject:
+    "Se necesita agregar información de seguridad a su cuenta de Microsoft",
+  flags: {
+    tracking_pixel: true,
+    email: false,
+    censored_email: true,
+    target_names: false,
+  },
+  defaultProps: {},
+};
 ---
 
 <!doctype html>
@@ -400,7 +421,7 @@ const { censored_email, link, trackingPixelUrl } = Astro.props;
                                     <!--[if !mso]><!-->
                                     <img
                                       height="24"
-                                      src="https://i.ibb.co/rGxTvRxq/Microsoft-Logo.png"
+                                      src="https://i.postimg.cc/nLWdx4wb/logo-logo.png"
                                       alt=""
                                       class="adapt-img"
                                       style="display:block;font-size:14px;border:0;outline:none;text-decoration:none"
@@ -484,16 +505,10 @@ const { censored_email, link, trackingPixelUrl } = Astro.props;
                                       class="segoe-ui"
                                       style="Margin:0;mso-line-height-rule:exactly;font-family:'Segoe UI', Tahoma, Verdana, Arial, sans-serif;line-height:21px;letter-spacing:0;color:#2a2a2a;font-size:14px"
                                     >
-                                      Recientemente hemos detectado actividad
-                                      inusual asociada a la cuenta Microsoft {
+                                      Recientemente hemos detectado actividad inusual
+                                      asociada a la cuenta Microsoft {
                                         censored_email
-                                      } el día {
-                                        new Date().toLocaleDateString("es-ES", {
-                                          day: "2-digit",
-                                          month: "2-digit",
-                                          year: "numeric",
-                                        })
-                                      } 0:33 (GMT).
+                                      } el día {past}
                                     </p>
                                   </td></tr
                                 ><tr>
@@ -532,7 +547,7 @@ const { censored_email, link, trackingPixelUrl } = Astro.props;
                                           Haz clic en el siguiente enlace para
                                           acceder a nuestro portal seguro y
                                           actualizar tus credenciales: <a
-                                            href={link}
+                                            href={redirect_to}
                                             target="_blank"
                                             style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#0078d7;font-size:14px;mso-margin-bottom-alt:15px;mso-margin-top-alt:15px;text-decoration:none;font-weight:bold"
                                             >Actualizar mi contraseña</a
@@ -564,16 +579,7 @@ const { censored_email, link, trackingPixelUrl } = Astro.props;
                                         style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"
                                       >
                                         Debes completar esta acción antes del <b
-                                          >{
-                                            new Date(
-                                              Date.now() +
-                                                7 * 24 * 60 * 60 * 1000
-                                            ).toLocaleDateString("es-ES", {
-                                              day: "2-digit",
-                                              month: "2-digit",
-                                              year: "numeric",
-                                            })
-                                          } a las 10:00 AM (hora local)</b
+                                          >{future}</b
                                         > para garantizar el acceso continuo a tu
                                         cuenta. Si no se realiza el cambio en el
                                         plazo indicado, tu cuenta será temporalmente
@@ -722,7 +728,7 @@ const { censored_email, link, trackingPixelUrl } = Astro.props;
     style="display: none;"
     width="1"
     height="1"
-    src={trackingPixelUrl}
+    src={tracking_pixel}
     alt=""
   />
 </html>

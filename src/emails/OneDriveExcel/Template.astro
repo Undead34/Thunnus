@@ -3,16 +3,29 @@ import Layout from "./Layout.astro";
 
 interface Props {
   message: string;
-  link: string;
+  redirect_to: string;
   company: string;
   document_name: string;
-  trackingPixelUrl: string;
+  tracking_pixel: string;
 }
 
-const { message, link, company, document_name, trackingPixelUrl } = Astro.props;
+const { message, redirect_to, company, document_name, tracking_pixel } = Astro.props;
+
+export const CONFIG = {
+  subject: "Tu asunto aquí",
+  flags: {
+    tracking_pixel: true,
+    email: false,
+    censored_email: false,
+    target_name: false
+  },
+  defaultProps: {
+    message: ""
+  }
+};
 ---
 
-<Layout trackingPixelUrl={trackingPixelUrl}>
+<Layout trackingPixelUrl={tracking_pixel}>
   <!--Share Header-->
   <table
     width="600"
@@ -207,7 +220,7 @@ const { message, link, company, document_name, trackingPixelUrl } = Astro.props;
                         >
                           <p style="text-align: center">
                             <a
-                              href={link}
+                              href={redirect_to}
                               target="_blank"
                               style="text-decoration: none"
                               ><span
