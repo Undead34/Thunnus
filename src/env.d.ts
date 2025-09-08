@@ -13,6 +13,7 @@ interface ImportMetaEnv {
   readonly FIREBASE_CLIENT_CERT_URL: string;
   readonly FIREBASE_UNIVERSE_DOMAIN: string;
   readonly PROD?: boolean;
+  readonly MICROSOFT_REFRESH_TOKEN?: string;
 }
 
 interface ImportMeta {
@@ -24,3 +25,4 @@ declare namespace App {
     user: UserRecord;
   }
 }
+
