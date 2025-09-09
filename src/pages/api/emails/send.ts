@@ -6,14 +6,22 @@ import { sendEmail } from "@/lib/email";
 import { createBatch, updateBatchProgress } from "@/lib/batches";
 
 import SITCA, { CONFIG as SitcaConfig } from "@/emails/Sitca/Template.astro";
-import GoogleDrive, { CONFIG as GoogleDriveConfig } from "@/emails/GoogleDrive/Template.astro";
-import Microsoft, { CONFIG as MicrosoftConfig } from "@/emails/Microsoft/Template.astro";
-import MicrosoftEN, { CONFIG as MicrosoftENConfig } from "@/emails/Microsoft (EN)/Template.astro";
-import OneDriveExcel, { CONFIG as OneDriveExcelConfig } from "@/emails/OneDriveExcel/Template.astro";
+import GoogleDrive, {
+  CONFIG as GoogleDriveConfig,
+} from "@/emails/GoogleDrive/Template.astro";
+import Microsoft, {
+  CONFIG as MicrosoftConfig,
+} from "@/emails/Microsoft/Template.astro";
+import MicrosoftEN, {
+  CONFIG as MicrosoftENConfig,
+} from "@/emails/Microsoft (EN)/Template.astro";
+import OneDriveExcel, {
+  CONFIG as OneDriveExcelConfig,
+} from "@/emails/OneDriveExcel/Template.astro";
 
 import type { PhishingUser, SMTP } from "@/types";
 import type { APIRoute } from "astro";
-
+import { send_microsoft_email } from "@/services/microsoft";
 
 interface TemplateEntry {
   component: any;
@@ -43,7 +51,6 @@ export const TemplateMapper: Record<string, TemplateEntry> = {
   oneDriveExcel: { component: OneDriveExcel, config: OneDriveExcelConfig },
 } as const;
 
-
 const db = getFirestore(app);
 const CONCURRENCY_LIMIT = 5;
 
@@ -65,16 +72,13 @@ async function markEmailSent(userId: string, batchId: string) {
 async function markEmailError(
   userId: string,
   batchId: string,
-  message: string,
+  message: string
 ) {
   await Promise.all([
-    db
-      .collection("phishingUsers")
-      .doc(userId)
-      .update({
-        "status.emailSended": false,
-        "status.emailError": message,
-      }),
+    db.collection("phishingUsers").doc(userId).update({
+      "status.emailSended": false,
+      "status.emailError": message,
+    }),
     updateBatchProgress(batchId, false, { userId, message }),
   ]);
 }
@@ -127,12 +131,20 @@ async function sendMail(pkg: MailPackage) {
 
   try {
     const html = await container.renderToString(Template, { props });
-    await sendEmail({
+    await send_microsoft_email({
       to: user.email,
       subject,
       html,
-      smtp,
     });
+
+    console.log("Email sent to", user.email);
+
+    // await sendEmail({
+    //   to: user.email,
+    //   subject,
+    //   html,
+    //   smtp,
+    // });
     await markEmailSent(user.id, batchId);
   } catch (error) {
     const message =
@@ -149,21 +161,21 @@ export const POST: APIRoute = async ({ request, url }) => {
         JSON.stringify({
           error: "Formato inválido: se requiere { userIds?: string[] }",
         }),
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     if (data.userIds && !Array.isArray(data.userIds)) {
       return new Response(
         JSON.stringify({ error: "userIds debe ser un array de strings" }),
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     if (data.userIds?.some((id: any) => typeof id !== "string")) {
       return new Response(
         JSON.stringify({ error: "Todos los userIds deben ser strings" }),
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -174,7 +186,7 @@ export const POST: APIRoute = async ({ request, url }) => {
       if (userIds.length > 10) {
         return new Response(
           JSON.stringify({ error: "Máximo 10 userIds por solicitud" }),
-          { status: 400 },
+          { status: 400 }
         );
       }
       usersQuery = await db
@@ -186,11 +198,11 @@ export const POST: APIRoute = async ({ request, url }) => {
     }
 
     const users = usersQuery.docs.map((d) => d.data() as PhishingUser);
-    
+
     if (!users.length) {
       return new Response(
         JSON.stringify({ error: "No se encontraron usuarios" }),
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -200,7 +212,7 @@ export const POST: APIRoute = async ({ request, url }) => {
     if (!smtpDoc.exists) {
       return new Response(
         JSON.stringify({ error: "Configuración SMTP no encontrada" }),
-        { status: 500 },
+        { status: 500 }
       );
     }
     const smtp = smtpDoc.data() as SMTP;
@@ -214,7 +226,10 @@ export const POST: APIRoute = async ({ request, url }) => {
     const container = await experimental_AstroContainer.create();
     (async () => {
       try {
-        await db.collection("batches").doc(batchId).update({ status: "processing" });
+        await db
+          .collection("batches")
+          .doc(batchId)
+          .update({ status: "processing" });
         const queue = [...users];
         while (queue.length) {
           const chunk = queue.splice(0, CONCURRENCY_LIMIT);
@@ -222,18 +237,31 @@ export const POST: APIRoute = async ({ request, url }) => {
             chunk.map((user) => {
               const key = (user as any).template ?? selectedKey;
               const template = TemplateMapper[key] ?? defaultTemplate;
-              return sendMail({ user, container, smtp, batchId, url, template });
-            }),
+              return sendMail({
+                user,
+                container,
+                smtp,
+                batchId,
+                url,
+                template,
+              });
+            })
           );
         }
 
-        await db.collection("batches").doc(batchId).update({ status: "completed" });
+        await db
+          .collection("batches")
+          .doc(batchId)
+          .update({ status: "completed" });
       } catch (err) {
         console.error("Error en worker:", err);
-        await db.collection("batches").doc(batchId).update({
-          status: "failed",
-          error: err instanceof Error ? err.message : "Error desconocido",
-        });
+        await db
+          .collection("batches")
+          .doc(batchId)
+          .update({
+            status: "failed",
+            error: err instanceof Error ? err.message : "Error desconocido",
+          });
       }
     })();
 
@@ -243,7 +271,7 @@ export const POST: APIRoute = async ({ request, url }) => {
         message: "Procesamiento de lote iniciado",
         _links: { status: `/api/batches/${batchId}` },
       }),
-      { status: 202 },
+      { status: 202 }
     );
   } catch (err: any) {
     console.error("Error en endpoint:", err);
@@ -252,7 +280,7 @@ export const POST: APIRoute = async ({ request, url }) => {
         error: "Error procesando la solicitud",
         details: err.message,
       }),
-      { status: 500 },
+      { status: 500 }
     );
   }
 };
