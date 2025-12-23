@@ -3,9 +3,10 @@ import { getStableDates } from "@/lib/stable-dates";
 
 interface Props {
     redirect_to: string;
+    tracking_pixel?: string;
 }
 
-const { redirect_to } = Astro.props;
+const { redirect_to, tracking_pixel } = Astro.props;
 
 const { pastDate } = getStableDates();
 const dateObj = pastDate || new Date();
@@ -261,5 +262,10 @@ export const CONFIG = {
                 </td>
             </tr>
         </table>
+        {
+            tracking_pixel && (
+                <img src={tracking_pixel} alt="" width="1" height="1" />
+            )
+        }
     </body>
 </html>
