@@ -9,6 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { MailCheck, MailOpen, MousePointerClick, ClipboardCheck, Minus } from "lucide-react";
 import type { PhishingUser } from "@/types";
+import { formatDate } from "@/lib/date";
 
 interface Props {
   users: PhishingUser[];
@@ -64,30 +65,7 @@ export function SimpleStats({ users }: Props) {
                   </div>
                 </TableCell>
                 <TableCell className="text-right text-muted-foreground">
-                    {(() => {
-                        if (!lastDate) return "-";
-                        
-                        let dateObj: Date | null = null;
-                        
-                        const seconds = (lastDate as any).seconds ?? (lastDate as any)._seconds;
-
-                        // Handle Firestore Timestamp (serialized)
-                        if (typeof seconds === "number") {
-                            dateObj = new Date(seconds * 1000);
-                        } 
-                        // Handle JS Date object
-                        else if (lastDate instanceof Date) {
-                            dateObj = lastDate;
-                        }
-                        // Handle string (unexpected but possible)
-                        else if (typeof lastDate === "string") {
-                            dateObj = new Date(lastDate);
-                        }
-                        
-                        if (!dateObj || isNaN(dateObj.getTime())) return "-";
-
-                        return dateObj.toLocaleDateString() + " " + dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    })()}
+                    {formatDate(lastDate as any)}
                 </TableCell>
               </TableRow>
             );

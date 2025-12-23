@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { PhishingUserSchema } from "@/lib/typesValidator";
 import { InputPassword } from "./input-password";
+import { formatDate } from "@/lib/date";
 
 export const columns: ColumnDef<PhishingUser>[] = [
   {
@@ -140,13 +141,7 @@ export const columns: ColumnDef<PhishingUser>[] = [
             {variants[state].icon}
             {variants[state].label}
           </Badge>
-          {state === "clicked" && status.firstClickAt && (
-            <span className="ml-2 text-sm text-muted-foreground">
-              {new Date(
-                status.firstClickAt.seconds * 1000
-              ).toLocaleDateString()}
-            </span>
-          )}
+              {formatDate(status.firstClickAt as any)}
         </div>
       );
     },
@@ -306,13 +301,6 @@ export const columnsUser: ColumnDef<PhishingUser>[] = [
             {variants[state].icon}
             {variants[state].label}
           </Badge>
-          {state === "clicked" && status.firstClickAt && (
-            <span className="ml-2 text-sm text-muted-foreground">
-              {new Date(
-                status.firstClickAt.seconds * 1000
-              ).toLocaleDateString()}
-            </span>
-          )}
         </div>
       );
     },

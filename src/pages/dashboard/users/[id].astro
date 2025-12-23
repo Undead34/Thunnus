@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { InputPassword } from "@/components/dashboard/campaigns/input-password";
 import KeyValueCard from "@/components/dashboard/users/KeyValueCard";
 import PopoverEmail from "@/components/dashboard/users/PopoverEmail";
+import { formatDate } from "@/lib/date";
 
 const id = Astro.params.id;
 
@@ -30,7 +31,7 @@ const formatDate = (timestamp: { _seconds: number; _nanoseconds: number }) => {
   if (!timestamp) return "N/A";
 
   const venezuelaTime = new Date(timestamp._seconds * 1000);
-  return venezuelaTime.toLocaleString('es-VE', { timeZone: 'America/Caracas' });
+  return venezuelaTime.toLocaleString("es-VE", { timeZone: "America/Caracas" });
 };
 
 // Recolectar y ordenar eventos
@@ -41,14 +42,13 @@ const sessionEvents = user.sessionData?.events || [];
 const allEvents = [...events, ...sessionEvents].sort((a, b) => {
   const timestampA = new Date(a.timestamp).getTime();
   const timestampB = new Date(b.timestamp).getTime();
-  
+
   // Si alguna fecha es inválida, moverla al final
   if (isNaN(timestampA)) return 1;
   if (isNaN(timestampB)) return -1;
-  
+
   return timestampB - timestampA; // Orden descendente (más reciente primero)
 });
-
 ---
 
 <Layout title={`Usuario - ${user.name}`}>
@@ -68,7 +68,9 @@ const allEvents = [...events, ...sessionEvents].sort((a, b) => {
             </div>
             <div>
               <p class="text-sm font-medium text-muted-foreground">Email</p>
-              <p class="text-wrap text-ellipsis contain-content">{user.email}</p>
+              <p class="text-wrap text-ellipsis contain-content">
+                {user.email}
+              </p>
             </div>
           </div>
         </div>
@@ -215,7 +217,7 @@ const allEvents = [...events, ...sessionEvents].sort((a, b) => {
                 <div>
                   <p class="font-medium">{event.type}</p>
                   <p class="text-sm text-muted-foreground">
-                    {new Date(event.timestamp).toLocaleString()}
+                    {formatDate(event.timestamp)}
                   </p>
                 </div>
                 <div>

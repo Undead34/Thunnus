@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Settings2, ShieldAlert, FileCode } from "lucide-react";
+import { Settings2, ShieldAlert, FileCode, LayoutDashboard } from "lucide-react";
 
 import { NavUser } from "./nav-user";
 import { NavMain } from "./nav-main";
@@ -21,22 +21,16 @@ const data = {
   },
   navMain: [
     {
+        title: "Dashboard",
+        url: "/dashboard",
+        icon: LayoutDashboard,
+        isActive: true,
+    },
+    {
       title: "Campañas",
       url: "/dashboard/campaigns",
       icon: ShieldAlert,
       isActive: true,
-      items: [
-        {
-          title: "Campañas activas",
-          url: "/dashboard/campaigns",
-          badge: 3,
-        },
-        {
-          title: "Campañas programadas",
-          url: "/dashboard/campaigns/scheduled",
-          disabled: true,
-        },
-      ],
     },
     {
       title: "Plantillas y páginas",
@@ -52,39 +46,12 @@ const data = {
           title: "Plantillas de correo",
           url: "/dashboard/templates/emails",
         },
-        {
-          title: "Archivos adjuntos",
-          url: "/dashboard/templates/attachments",
-          disabled: true,
-        },
       ],
     },
     {
       title: "Configuración",
       url: "/dashboard/settings",
       icon: Settings2,
-      isActive: true,
-      items: [
-        {
-          title: "Configuración SMTP",
-          url: "/dashboard/settings#smtp",
-        },
-        {
-          title: "Gestión de usuarios",
-          url: "/dashboard/settings/users",
-          disabled: true,
-        },
-        {
-          title: "Reglas de seguridad",
-          url: "/dashboard/settings/security",
-          disabled: true,
-        },
-        {
-          title: "Claves API",
-          url: "/dashboard/settings/api",
-          disabled: true,
-        },
-      ],
     },
   ],
 };
