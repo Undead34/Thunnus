@@ -1,8 +1,7 @@
 import { app } from "@/firebase/server";
 import type { APIRoute } from "astro";
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
-import { parseUserAgent } from "@/lib/user-agent";
-import { getGeoLocation } from "@/lib/geoip";
+import { getFirestore } from "firebase-admin/firestore";
+import { getTrackingMetadata, logTrackingEvent, type EventType } from "@/lib/tracking";
 
 const db = getFirestore(app);
 
@@ -14,6 +13,21 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     }: { client_id: string; status: "submit" | "clicked" | "opened" | "sent" } =
       await request.json();
 
+    // Map legacy status strings to EventType
+    const statusMap: Record<string, EventType> = {
+      "submit": "SUBMIT",
+      "clicked": "CLICKED",
+      "opened": "OPENED",
+      "sent": "SENT"
+    };
+
+    const eventType = statusMap[status];
+
+    if (!eventType) {
+      return new Response(JSON.stringify({ error: "Invalid status" }), { status: 400 });
+    }
+
+    // Verify user exists first
     const userRef = db.collection("phishingUsers").doc(client_id);
     const userSnapshot = await userRef.get();
 
@@ -23,47 +37,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       });
     }
 
-    // Capture Metadata
-    const ip = clientAddress || request.headers.get("x-forwarded-for") || "unknown";
-    const userAgent = request.headers.get("user-agent") || "unknown";
-    const { os, browser } = parseUserAgent(userAgent);
-
-    const metadataUpdate = {
-      "metadata.ip": ip,
-      "metadata.userAgent": userAgent,
-      "metadata.device.os": os,
-      "metadata.device.browser": browser,
-      // We can't get accurate screen resolution from server side, defaulting or leaving as is if existing
-    };
-
-    if (status === "clicked") {
-      await userRef.update({
-        clickCount: FieldValue.increment(1),
-        ...metadataUpdate
-      });
-    }
-
-    // Actualizar solo los campos específicos sin afectar otros campos
-    const updateData: Record<string, any> = {};
-
-    if (status === "submit") {
-      updateData["status.formSubmitted"] = true;
-      // Also update metadata on submit as it's a strong signal
-      updateData["metadata.ip"] = ip;
-      updateData["metadata.userAgent"] = userAgent;
-      updateData["metadata.device.os"] = os;
-      updateData["metadata.device.browser"] = browser;
-    } else if (status === "clicked") {
-      updateData["status.linkClicked"] = true;
-    } else if (status === "opened") {
-      updateData["status.emailOpened"] = true;
-    } else if (status === "sent") {
-      updateData["status.emailSended"] = true;
-    }
-
-    if (Object.keys(updateData).length > 0) {
-      await userRef.update(updateData);
-    }
+    const metadata = await getTrackingMetadata(request.headers, clientAddress);
+    await logTrackingEvent(db, client_id, eventType, metadata);
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {

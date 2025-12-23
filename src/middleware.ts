@@ -5,8 +5,7 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 
 import { pathToRegexp } from "path-to-regexp";
-import { parseUserAgent } from "./lib/user-agent";
-import { getGeoLocation } from "./lib/geoip";
+import { getTrackingMetadata, logTrackingEvent } from "./lib/tracking";
 
 const db = getFirestore(app);
 
@@ -173,12 +172,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const docSnapshot = await userRef.get();
 
       if (docSnapshot.exists) {
-        await userRef.update({
-          "status.emailOpened": true,
-          "status.emailOpenedAt": new Date(),
-          "status.lastActivityAt": new Date(),
-          events: FieldValue.arrayUnion(event),
-        });
+        const metadata = await getTrackingMetadata(context.request.headers, context.clientAddress);
+        // Fire and forget log
+        logTrackingEvent(db, client_id, "OPENED", metadata).catch(err => console.error("Error logging pixel open:", err));
       } else {
         console.log(`Intento de tracking ignorado: El usuario con client_id "${client_id}" no existe.`);
       }
