@@ -1,0 +1,45 @@
+---
+const links = [
+    { href: "/dashboard", label: "Overview", icon: "LayoutDashboard" },
+    { href: "/dashboard/campaigns", label: "Campañas", icon: "Mail" },
+    { href: "/dashboard/groups", label: "Grupos", icon: "Tags" },
+    { href: "/dashboard/templates", label: "Plantillas", icon: "FileText" },
+    { href: "/dashboard/settings", label: "Configuración", icon: "Settings" },
+];
+
+import { LayoutDashboard, Mail, FileText, Settings, Tags } from "lucide-react";
+
+// Map string icon names to components
+const iconMap = {
+    LayoutDashboard,
+    Mail,
+    FileText,
+    Settings,
+    Tags,
+};
+
+const { pathname } = Astro.url;
+---
+
+<nav class="grid items-start gap-2 p-4 text-sm font-medium">
+    {
+        links.map((link) => {
+            const Icon = iconMap[link.icon as keyof typeof iconMap];
+            const isActive = pathname === link.href;
+            return (
+                <a
+                    href={link.href}
+                    class:list={[
+                        "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary",
+                        isActive
+                            ? "bg-muted text-primary"
+                            : "text-muted-foreground",
+                    ]}
+                >
+                    <Icon className="h-4 w-4" />
+                    {link.label}
+                </a>
+            );
+        })
+    }
+</nav>

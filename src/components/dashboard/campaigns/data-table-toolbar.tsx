@@ -4,11 +4,9 @@ import type { Table } from "@tanstack/react-table";
 import {
   CircleSlash,
   ClipboardCheck,
-  Mail,
   MailCheck,
   MailOpen,
   MousePointerClick,
-  RotateCw,
   X,
 } from "lucide-react";
 
@@ -19,7 +17,8 @@ import { DataTableViewOptions } from "./data-table-view-options";
 import type { PhishingUser } from "@/types";
 import React from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
+import { AdvancedSendDialog } from "./advanced-send-dialog";
+import { AssignTagDialog } from "./assign-tag-dialog";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -62,7 +61,10 @@ export function DataTableToolbar<TData>({
   const hasSelection = table.getSelectedRowModel().rows.length > 0;
   const hasRows = table.getCoreRowModel().rows.length > 0;
 
-  const handleSendEmails = async () => {
+  const handleSendEmails = async (config: {
+    batchSize: number;
+    waitInterval: number;
+  }) => {
     setIsSending(true);
     try {
       const selectedIds = hasSelection
@@ -74,24 +76,32 @@ export function DataTableToolbar<TData>({
       const response = await fetch("/api/emails/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userIds: selectedIds }),
+        body: JSON.stringify({
+          userIds: selectedIds,
+          batchSize: config.batchSize,
+          waitInterval: config.waitInterval,
+        }),
       });
 
       if (!response.ok) throw new Error("Error en el servidor");
 
       toast.success(
         hasSelection
-          ? "Correos enviados a seleccionados"
-          : "Todos los correos enviados"
+          ? "Envío iniciado para seleccionados"
+          : "Envío iniciado para todos"
       );
 
       table.resetRowSelection();
     } catch (error) {
-      toast.error("Error al enviar correos");
+      toast.error("Error al iniciar el envío");
     } finally {
       setIsSending(false);
     }
   };
+
+  const count = hasSelection
+    ? table.getSelectedRowModel().rows.length
+    : table.getCoreRowModel().rows.length;
 
   return (
     <div className="flex items-center justify-between">
@@ -122,28 +132,21 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
 
-        <Button
-          variant="ghost"
-          className="h-8 px-2 lg:px-3"
-          onClick={handleSendEmails}
-          disabled={isSending || !hasRows}
-        >
-          {isSending ? (
-            <RotateCw className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Mail className="mr-2 h-4 w-4" />
-          )}
-          {hasSelection ? (
-            <>
-              Enviar seleccionados
-              <Badge variant={"secondary"} className="rounded-full">
-                {table.getSelectedRowModel().rows.length}
-              </Badge>
-            </>
-          ) : (
-            "Enviar a todos"
-          )}
-        </Button>
+        <AdvancedSendDialog
+          onSend={handleSendEmails}
+          isLoading={isSending}
+          count={count}
+        />
+
+        {hasSelection && (
+          <AssignTagDialog
+            userIds={table
+              .getSelectedRowModel()
+              .rows.map((row) => (row.original as PhishingUser).id)}
+            onSuccess={() => table.resetRowSelection()} // Simplification: actual data refresh might be needed
+          />
+        )}
+
         <DataTableViewOptions
           table={table}
           onDeleteComplete={() => {

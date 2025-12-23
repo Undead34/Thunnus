@@ -70,6 +70,29 @@ export async function updateBatchProgress(
     await batchRef.update(updates);
 }
 
+export async function updateBatchChunk(
+    batchId: string,
+    successCount: number,
+    failureCount: number,
+    errors: Array<{ userId: string; error: string }>
+): Promise<void> {
+    if (successCount === 0 && failureCount === 0) return;
+
+    const batchRef = db.collection("batches").doc(batchId);
+    const updates: UpdateData<EmailBatch> = {
+        updatedAt: FieldValue.serverTimestamp(),
+        processed: FieldValue.increment(successCount + failureCount),
+        successes: FieldValue.increment(successCount),
+        failures: FieldValue.increment(failureCount),
+    };
+
+    if (errors.length > 0) {
+        updates.errors = FieldValue.arrayUnion(...errors);
+    }
+
+    await batchRef.update(updates);
+}
+
 export async function getBatchStatus(batchId: string): Promise<EmailBatchWithId> {
     const snapshot = await db.collection("batches").doc(batchId).get();
 

@@ -3,24 +3,20 @@ import { promises as fs } from 'fs';
 import path from 'path';
 
 export async function GET({ request }: APIContext): Promise<Response> {
-    
-    const filePath = path.join(process.cwd(), 'src/assets/tracking-pixel.png');
+    // 1x1 Transparent GIF
+    const transparentGif = Buffer.from(
+        "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+        "base64"
+    );
 
-    try {
-        const fileBuffer = await fs.readFile(filePath);
-
-        return new Response(fileBuffer, {
-            status: 200,
-            headers: {
-                'Content-Type': 'image/png',
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0',
-            }
-        });
-
-    } catch (error) {
-        console.error('No se pudo encontrar el píxel:', error);
-        return new Response('Pixel no encontrado', { status: 404 });
-    }
+    return new Response(transparentGif, {
+        status: 200,
+        headers: {
+            "Content-Type": "image/gif",
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Surrogate-Control": "no-store",
+        },
+    });
 }

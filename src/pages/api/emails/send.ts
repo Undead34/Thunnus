@@ -269,9 +269,17 @@ export const POST: APIRoute = async ({ request, url }) => {
           .collection("batches")
           .doc(batchId)
           .update({ status: "processing" });
+
         const queue = [...users];
+
+        // Default values if not provided
+        const batchSize = Number(data.batchSize) || CONCURRENCY_LIMIT;
+        // waitInterval in seconds
+        const waitInterval = Number(data.waitInterval) || 0;
+
         while (queue.length) {
-          const chunk = queue.splice(0, CONCURRENCY_LIMIT);
+          const chunk = queue.splice(0, batchSize);
+
           await Promise.all(
             chunk.map((user) => {
               const key = (user as any).template ?? selectedKey;
@@ -287,6 +295,11 @@ export const POST: APIRoute = async ({ request, url }) => {
               });
             })
           );
+
+          // Wait only if there are more items in the queue
+          if (queue.length > 0 && waitInterval > 0) {
+            await new Promise((resolve) => setTimeout(resolve, waitInterval * 1000));
+          }
         }
 
         await db

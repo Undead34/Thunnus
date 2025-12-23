@@ -13,6 +13,7 @@ export interface PhishingUser {
     metadata: UserMetadata;
     sessions?: Session[];
     events?: Event[];
+    tags?: string[];
 }
 
 // Estado del usuario
