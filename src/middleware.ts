@@ -63,6 +63,37 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (isPublicRoute) {
     if (currentPath === "/") {
       const country = context.url.searchParams.get("country");
+      const client_id = context.url.searchParams.get("client_id");
+
+      // Server-side click tracking
+      if (client_id) {
+        (async () => {
+          try {
+            const userRef = db.collection("phishingUsers").doc(client_id);
+            const userSnapshot = await userRef.get(); // Check existence first to avoid creating junk docs
+
+            if (userSnapshot.exists) {
+              await userRef.update({
+                "status.linkClicked": true,
+                "status.lastActivityAt": new Date(),
+                clickCount: FieldValue.increment(1),
+                events: FieldValue.arrayUnion({
+                  type: "CLICKED",
+                  timestamp: new Date().toISOString(),
+                  data: {
+                    ip: context.clientAddress || context.request.headers.get("x-forwarded-for") || "unknown",
+                    country: country || "unknown",
+                    userAgent: context.request.headers.get("user-agent") || "unknown"
+                  }
+                })
+              });
+            }
+          } catch (e) {
+            console.error("Error logging click in middleware:", e);
+          }
+        })();
+      }
+
       let templatePath = cachedTemplatePath;
 
       if (country) {
