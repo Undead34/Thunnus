@@ -322,6 +322,11 @@ export const columnsUser: ColumnDef<PhishingUser>[] = [
           <div>
             Device: {device?.os}, {device?.browser}
           </div>
+          {metadata.geolocation?.country && (
+            <div>
+                 Loc: {metadata.geolocation.city}, {metadata.geolocation.country}
+            </div>
+          )}
         </div>
       );
     },

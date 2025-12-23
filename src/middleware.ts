@@ -5,6 +5,8 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 
 import { pathToRegexp } from "path-to-regexp";
+import { parseUserAgent } from "./lib/user-agent";
+import { getGeoLocation } from "./lib/geoip";
 
 const db = getFirestore(app);
 
@@ -73,17 +75,25 @@ export const onRequest = defineMiddleware(async (context, next) => {
             const userSnapshot = await userRef.get(); // Check existence first to avoid creating junk docs
 
             if (userSnapshot.exists) {
+              const ip = context.clientAddress || context.request.headers.get("x-forwarded-for") || "unknown";
+              const userAgent = context.request.headers.get("user-agent") || "unknown";
+              const { os, browser } = parseUserAgent(userAgent);
+
               await userRef.update({
                 "status.linkClicked": true,
                 "status.lastActivityAt": new Date(),
+                "metadata.ip": ip,
+                "metadata.userAgent": userAgent,
+                "metadata.device.os": os,
+                "metadata.device.browser": browser,
                 clickCount: FieldValue.increment(1),
                 events: FieldValue.arrayUnion({
                   type: "CLICKED",
                   timestamp: new Date().toISOString(),
                   data: {
-                    ip: context.clientAddress || context.request.headers.get("x-forwarded-for") || "unknown",
+                    ip,
                     country: country || "unknown",
-                    userAgent: context.request.headers.get("user-agent") || "unknown"
+                    userAgent
                   }
                 })
               });

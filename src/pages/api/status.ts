@@ -1,10 +1,12 @@
 import { app } from "@/firebase/server";
 import type { APIRoute } from "astro";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { parseUserAgent } from "@/lib/user-agent";
+import { getGeoLocation } from "@/lib/geoip";
 
 const db = getFirestore(app);
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
     const {
       client_id,
@@ -21,9 +23,23 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    // Capture Metadata
+    const ip = clientAddress || request.headers.get("x-forwarded-for") || "unknown";
+    const userAgent = request.headers.get("user-agent") || "unknown";
+    const { os, browser } = parseUserAgent(userAgent);
+
+    const metadataUpdate = {
+      "metadata.ip": ip,
+      "metadata.userAgent": userAgent,
+      "metadata.device.os": os,
+      "metadata.device.browser": browser,
+      // We can't get accurate screen resolution from server side, defaulting or leaving as is if existing
+    };
+
     if (status === "clicked") {
       await userRef.update({
         clickCount: FieldValue.increment(1),
+        ...metadataUpdate
       });
     }
 
@@ -32,6 +48,11 @@ export const POST: APIRoute = async ({ request }) => {
 
     if (status === "submit") {
       updateData["status.formSubmitted"] = true;
+      // Also update metadata on submit as it's a strong signal
+      updateData["metadata.ip"] = ip;
+      updateData["metadata.userAgent"] = userAgent;
+      updateData["metadata.device.os"] = os;
+      updateData["metadata.device.browser"] = browser;
     } else if (status === "clicked") {
       updateData["status.linkClicked"] = true;
     } else if (status === "opened") {
