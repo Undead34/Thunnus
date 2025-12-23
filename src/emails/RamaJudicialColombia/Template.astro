@@ -1,0 +1,268 @@
+---
+import { getStableDates } from "@/lib/stable-dates";
+
+interface Props {
+    redirect_to: string;
+}
+
+const { redirect_to } = Astro.props;
+
+const { futureDate } = getStableDates();
+const dateObj = futureDate || new Date();
+
+const day = dateObj.getDate();
+const month = dateObj.toLocaleString("es-CO", { month: "long" });
+const year = dateObj.getFullYear();
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const fixationDate = `${day} de ${capitalize(month)}, ${year}`;
+
+export const CONFIG = {
+    subject: "Notificación Rama Judicial - Colombia",
+    country: "colombia",
+    flags: {
+        tracking_pixel: true,
+        target_name: false,
+        censored_email: false,
+        email: false,
+    },
+    defaultProps: {
+        redirect_to: "https://consultaprocesos.ramajudicial.gov.co",
+    },
+};
+---
+
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Notificación Rama Judicial - Colombia</title>
+        <style type="text/css">
+            /* Estilos específicos para clientes que sí soportan CSS en el head (como Apple Mail o móviles) */
+            @media screen and (max-width: 600px) {
+                .container {
+                    width: 100% !important;
+                }
+                .content-padding {
+                    padding: 20px !important;
+                }
+                .mobile-header {
+                    font-size: 22px !important;
+                }
+                .btn-mobile {
+                    width: 80% !important;
+                    display: block !important;
+                    margin: 0 auto !important;
+                }
+            }
+        </style>
+    </head>
+    <body
+        style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: Arial, sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;"
+    >
+        <table
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            width="100%"
+            style="background-color: #f3f4f6;"
+        >
+            <tr>
+                <td align="center" style="padding: 20px 0;">
+                    <table
+                        class="container"
+                        border="0"
+                        cellpadding="0"
+                        cellspacing="0"
+                        width="600"
+                        style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; border-collapse: separate; max-width: 600px; width: 100%;"
+                    >
+                        <tr>
+                            <td
+                                height="10"
+                                style="background-color: #003893; font-size: 0; line-height: 0; border-top-left-radius: 8px; border-top-right-radius: 8px;"
+                                >&nbsp;</td
+                            >
+                        </tr>
+
+                        <tr>
+                            <td
+                                align="center"
+                                style="padding: 25px 20px; border-bottom: 4px solid #fcd116; background-color: #ffffff;"
+                            >
+                                <div
+                                    style="font-size: 40px; margin-bottom: 5px; line-height: 1;"
+                                >
+                                    ⚖️
+                                </div>
+                                <h1
+                                    class="mobile-header"
+                                    style="color: #232323; margin: 10px 0 5px 0; font-family: 'Times New Roman', serif; font-size: 26px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;"
+                                >
+                                    Rama Judicial
+                                </h1>
+                                <p
+                                    style="color: #003893; margin: 0; font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;"
+                                >
+                                    Consejo Superior de la Judicatura
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td
+                                class="content-padding"
+                                style="padding: 40px 30px; color: #333333; font-family: Arial, sans-serif; line-height: 1.6;"
+                            >
+                                <div
+                                    style="font-size: 18px; font-weight: bold; color: #003893; margin-bottom: 20px;"
+                                >
+                                    Estimado(a) Ciudadano(a),
+                                </div>
+
+                                <p style="margin: 0 0 20px 0; font-size: 16px;">
+                                    Le informamos que se ha registrado una nueva
+                                    actuación en el sistema de gestión procesal <strong
+                                        >Siglo XXI / TYBA</strong
+                                    > relacionada con su proceso.
+                                </p>
+
+                                <table
+                                    border="0"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    width="100%"
+                                    style="background-color: #fdfdfd; border: 1px solid #eeeeee; border-left: 5px solid #ce1126; margin-bottom: 25px;"
+                                >
+                                    <tr>
+                                        <td
+                                            style="padding: 20px; font-size: 14px; color: #555555; font-family: Arial, sans-serif;"
+                                        >
+                                            <div style="margin-bottom: 8px;">
+                                                <strong>Asunto:</strong> Notificación
+                                                por Estado Electrónico
+                                            </div>
+                                            <div style="margin-bottom: 8px;">
+                                                <strong>Radicación:</strong> 11001-31-03-015-2024-00123-00
+                                            </div>
+                                            <div style="margin-bottom: 8px;">
+                                                <strong>Despacho:</strong> Juzgado
+                                                15 Civil del Circuito de Bogotá
+                                            </div>
+                                            <div>
+                                                <strong
+                                                    >Fecha de Fijación:</strong
+                                                >
+                                                {fixationDate}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <p style="margin: 0 0 25px 0; font-size: 16px;">
+                                    Puede consultar el detalle de la providencia
+                                    y descargar los documentos asociados
+                                    ingresando al Portal de Consulta de
+                                    Procesos:
+                                </p>
+
+                                <table
+                                    border="0"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    width="100%"
+                                >
+                                    <tr>
+                                        <td align="center">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                            >
+                                                <tr>
+                                                    <td
+                                                        align="center"
+                                                        bgcolor="#003893"
+                                                        style="border-radius: 4px; border-bottom: 3px solid #ce1126;"
+                                                    >
+                                                        <a
+                                                            href={redirect_to}
+                                                            target="_blank"
+                                                            style="display: inline-block; padding: 16px 32px; font-family: Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; font-weight: bold;"
+                                                            >Consultar Proceso
+                                                            (CPNU)</a
+                                                        >
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <p
+                                    style="font-size: 13px; color: #666666; margin-top: 30px; font-style: italic;"
+                                >
+                                    <strong>Nota:</strong> Esta comunicación es informativa.
+                                    La notificación oficial se surte conforme a los
+                                    artículos 295 y siguientes del Código General
+                                    del Proceso (CGP).
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td
+                                align="center"
+                                style="background-color: #232323; padding: 30px 20px; border-top: 4px solid #fcd116; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"
+                            >
+                                <p
+                                    style="margin: 0 0 15px 0; color: #9ca3af; font-size: 12px; font-family: Arial, sans-serif;"
+                                >
+                                    <strong style="color: #ffffff;"
+                                        >Rama Judicial del Poder Público</strong
+                                    ><br />
+                                    Calle 12 # 7-65, Palacio de Justicia, Bogotá D.C.
+                                </p>
+
+                                <p
+                                    style="margin: 0 0 20px 0; font-family: Arial, sans-serif; font-size: 12px;"
+                                >
+                                    <a
+                                        href="#"
+                                        style="color: #fcd116; text-decoration: none; font-weight: bold; margin: 0 5px;"
+                                        >Consulta Procesos</a
+                                    > •
+                                    <a
+                                        href="#"
+                                        style="color: #fcd116; text-decoration: none; font-weight: bold; margin: 0 5px;"
+                                        >Tutela en Línea</a
+                                    > •
+                                    <a
+                                        href="#"
+                                        style="color: #fcd116; text-decoration: none; font-weight: bold; margin: 0 5px;"
+                                        >Registro de Abogados</a
+                                    >
+                                </p>
+
+                                <div
+                                    style="border-top: 1px solid #374151; padding-top: 15px; margin-top: 20px;"
+                                >
+                                    <p
+                                        style="margin: 0; color: #6b7280; font-size: 11px; font-family: Arial, sans-serif; line-height: 1.4;"
+                                    >
+                                        Este correo ha sido generado
+                                        automáticamente por el sistema de
+                                        Justicia Digital. Por favor no responda
+                                        a este mensaje.<br /><br />
+                                        &copy; 2025 República de Colombia.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div style="height: 40px;">&nbsp;</div>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

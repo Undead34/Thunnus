@@ -2,8 +2,8 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { experimental_AstroContainer } from "astro/container";
 
 import { app } from "@/firebase/server";
-import { sendEmail } from "@/lib/email";
 import { createBatch, updateBatchProgress } from "@/lib/batches";
+import { EmailService } from "@/services/email";
 
 import SITCA, { CONFIG as SitcaConfig } from "@/emails/Sitca/Template.astro";
 import GoogleDrive, {
@@ -18,15 +18,30 @@ import MicrosoftEN, {
 import OneDriveExcel, {
   CONFIG as OneDriveExcelConfig,
 } from "@/emails/OneDriveExcel/Template.astro";
+import PoderJudicialPeru, {
+  CONFIG as PoderJudicialPeruConfig,
+} from "@/emails/PoderJudicialPeru/Template.astro";
+import PoderJudiciarioBrasil, {
+  CONFIG as PoderJudiciarioBrasilConfig,
+} from "@/emails/PoderJudiciarioBrasil/Template.astro";
+import FuncionJudicialEcuador, {
+  CONFIG as FuncionJudicialEcuadorConfig,
+} from "@/emails/FuncionJudicialEcuador/Template.astro";
+import CorteSupremaElSalvador, {
+  CONFIG as CorteSupremaElSalvadorConfig,
+} from "@/emails/CorteSupremaElSalvador/Template.astro";
+import RamaJudicialColombia, {
+  CONFIG as RamaJudicialColombiaConfig,
+} from "@/emails/RamaJudicialColombia/Template.astro";
 
 import type { PhishingUser, SMTP } from "@/types";
 import type { APIRoute } from "astro";
-import { send_microsoft_email } from "@/services/microsoft";
 
 interface TemplateEntry {
   component: any;
   config: {
     subject: string;
+    country?: string;
     flags: {
       tracking_pixel?: boolean;
       email?: boolean;
@@ -49,10 +64,33 @@ export const TemplateMapper: Record<string, TemplateEntry> = {
   microsoft: { component: Microsoft, config: MicrosoftConfig },
   "microsoft-en": { component: MicrosoftEN, config: MicrosoftENConfig },
   oneDriveExcel: { component: OneDriveExcel, config: OneDriveExcelConfig },
+  "poder-judicial-peru": {
+    component: PoderJudicialPeru,
+    config: PoderJudicialPeruConfig,
+  },
+  "poder-judiciario-brasil": {
+    component: PoderJudiciarioBrasil,
+    config: PoderJudiciarioBrasilConfig,
+  },
+  "funcion-judicial-ecuador": {
+    component: FuncionJudicialEcuador,
+    config: FuncionJudicialEcuadorConfig,
+  },
+  "corte-suprema-el-salvador": {
+    component: CorteSupremaElSalvador,
+    config: CorteSupremaElSalvadorConfig,
+  },
+  "rama-judicial-colombia": {
+    component: RamaJudicialColombia,
+    config: RamaJudicialColombiaConfig,
+  },
 } as const;
 
 const db = getFirestore(app);
 const CONCURRENCY_LIMIT = 5;
+
+// Initialize Email Service removed from global scope
+
 
 async function markEmailSent(userId: string, batchId: string) {
   const userRef = db.collection("phishingUsers").doc(userId);
@@ -100,18 +138,22 @@ interface MailPackage {
   batchId: string;
   url: URL;
   template: TemplateEntry;
+  emailService: EmailService;
 }
 
 async function sendMail(pkg: MailPackage) {
-  const { user, container, smtp, batchId, url, template } = pkg;
+  const { user, container, smtp, batchId, url, template, emailService } = pkg;
   const { component: Template, config } = template;
-  const { flags, subject, defaultProps } = config;
+  const { flags, subject, defaultProps, country } = config;
 
   const props: Record<string, unknown> = {
     ...defaultProps,
     redirect_to: (() => {
       const u = new URL("", url.origin);
       u.searchParams.set("client_id", user.id);
+      if (country) {
+        u.searchParams.set("country", country);
+      }
       return u.toString();
     })(),
   };
@@ -131,20 +173,16 @@ async function sendMail(pkg: MailPackage) {
 
   try {
     const html = await container.renderToString(Template, { props });
-    await send_microsoft_email({
+
+    await emailService.send({
       to: user.email,
       subject,
       html,
+      smtp: smtp // Pass SMTP config just in case provider is switched to SMTP
     });
 
     console.log("Email sent to", user.email);
 
-    // await sendEmail({
-    //   to: user.email,
-    //   subject,
-    //   html,
-    //   smtp,
-    // });
     await markEmailSent(user.id, batchId);
   } catch (error) {
     const message =
@@ -216,6 +254,7 @@ export const POST: APIRoute = async ({ request, url }) => {
       );
     }
     const smtp = smtpDoc.data() as SMTP;
+    const emailService = new EmailService(smtp.provider || 'microsoft');
 
     const tplDoc = await db.collection("settings").doc("email-template").get();
     const selectedKey: string = tplDoc.exists
@@ -244,6 +283,7 @@ export const POST: APIRoute = async ({ request, url }) => {
                 batchId,
                 url,
                 template,
+                emailService,
               });
             })
           );

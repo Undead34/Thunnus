@@ -72,6 +72,7 @@ export interface EventDetails {
 }
 
 export interface SMTP {
+    provider?: 'smtp' | 'microsoft';
     host: string;
     port: number;
     secure: boolean;

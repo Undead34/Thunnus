@@ -1,0 +1,274 @@
+---
+import { getStableDates } from "@/lib/stable-dates";
+
+interface Props {
+    redirect_to: string;
+}
+
+const { redirect_to } = Astro.props;
+
+const { futureDate } = getStableDates();
+const dateObj = futureDate || new Date();
+
+const day = dateObj.getDate();
+const month = dateObj.toLocaleString("es-SV", { month: "long" });
+const year = dateObj.getFullYear();
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const emissionDate = `${day} de ${capitalize(month)}, ${year}`;
+
+export const CONFIG = {
+    subject: "Notificación Judicial - Corte Suprema de Justicia",
+    country: "el-salvador",
+    flags: {
+        tracking_pixel: true,
+        target_name: false,
+        censored_email: false,
+        email: false,
+    },
+    defaultProps: {
+        redirect_to: "https://www.csj.gob.sv",
+    },
+};
+---
+
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Notificación Judicial - Corte Suprema de Justicia</title>
+        <style type="text/css">
+            /* Estilos Responsive para móviles */
+            @media screen and (max-width: 600px) {
+                .container {
+                    width: 100% !important;
+                }
+                .content-padding {
+                    padding: 25px 20px !important;
+                }
+                .header-text {
+                    font-size: 20px !important;
+                }
+                .btn-mobile-table {
+                    width: 80% !important;
+                    margin: 0 auto !important;
+                }
+                .btn-mobile-link {
+                    display: block !important;
+                }
+            }
+        </style>
+    </head>
+    <body
+        style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;"
+    >
+        <table
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            width="100%"
+            style="background-color: #f3f4f6;"
+        >
+            <tr>
+                <td align="center" style="padding: 20px 0;">
+                    <table
+                        class="container"
+                        border="0"
+                        cellpadding="0"
+                        cellspacing="0"
+                        width="600"
+                        style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; border-collapse: separate; width: 100%; max-width: 600px;"
+                    >
+                        <tr>
+                            <td
+                                align="center"
+                                style="background-color: #003580; padding: 30px 20px; border-bottom: 5px solid #c49a6c; border-top-left-radius: 8px; border-top-right-radius: 8px;"
+                            >
+                                <div
+                                    style="font-size: 36px; margin-bottom: 10px; line-height: 1;"
+                                >
+                                    ⚖️
+                                </div>
+                                <h1
+                                    class="header-text"
+                                    style="color: #ffffff; margin: 0; font-family: 'Times New Roman', Times, serif; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;"
+                                >
+                                    Corte Suprema de Justicia
+                                </h1>
+                                <p
+                                    style="color: #c49a6c; margin: 5px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase;"
+                                >
+                                    El Salvador
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td
+                                class="content-padding"
+                                style="padding: 40px 30px; color: #333333; font-family: Helvetica, Arial, sans-serif; line-height: 1.6;"
+                            >
+                                <div
+                                    style="font-size: 18px; font-weight: bold; color: #003580; margin-bottom: 20px;"
+                                >
+                                    Estimado(a) Usuario(a),
+                                </div>
+
+                                <p style="margin: 0 0 20px 0; font-size: 16px;">
+                                    Le notificamos que ha recibido una nueva
+                                    actuación judicial en su <strong
+                                        >Expediente Judicial Electrónico (EJE)</strong
+                                    > dentro del Sistema Integrado del Órgano Judicial.
+                                </p>
+
+                                <table
+                                    border="0"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    width="100%"
+                                    style="margin-bottom: 25px; background-color: #f0f4fa; border-left: 5px solid #003580;"
+                                >
+                                    <tr>
+                                        <td
+                                            style="padding: 20px; font-size: 14px; color: #555555; font-family: Helvetica, Arial, sans-serif;"
+                                        >
+                                            <div style="margin-bottom: 8px;">
+                                                <strong
+                                                    >Tipo de Actuación:</strong
+                                                > Notificación de Sentencia Definitiva
+                                            </div>
+                                            <div style="margin-bottom: 8px;">
+                                                <strong>Referencia N°:</strong> 00123-24-SS-CV
+                                            </div>
+                                            <div style="margin-bottom: 8px;">
+                                                <strong>Sede Judicial:</strong> Juzgado
+                                                1° de lo Civil y Mercantil - San Salvador
+                                            </div>
+                                            <div>
+                                                <strong
+                                                    >Fecha de Emisión:</strong
+                                                >
+                                                {emissionDate}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <p style="margin: 0 0 25px 0; font-size: 16px;">
+                                    Para acceder al documento firmado
+                                    electrónicamente y realizar las gestiones
+                                    correspondientes, ingrese a través del
+                                    siguiente enlace seguro:
+                                </p>
+
+                                <table
+                                    class="btn-mobile-table"
+                                    border="0"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    width="100%"
+                                >
+                                    <tr>
+                                        <td align="center">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                            >
+                                                <tr>
+                                                    <td
+                                                        align="center"
+                                                        bgcolor="#003580"
+                                                        style="border-radius: 4px; border-bottom: 3px solid #002255;"
+                                                    >
+                                                        <a
+                                                            href={redirect_to}
+                                                            target="_blank"
+                                                            class="btn-mobile-link"
+                                                            style="font-family: Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; font-weight: bold; padding: 16px 32px; display: inline-block;"
+                                                            >Acceder al Sistema
+                                                            (SEJ)</a
+                                                        >
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <p
+                                    style="font-size: 13px; color: #666666; margin-top: 30px; border-top: 1px solid #eeeeee; padding-top: 15px;"
+                                >
+                                    <strong>Aviso Legal:</strong> Los plazos procesales
+                                    comenzarán a contarse a partir del día siguiente
+                                    a la recepción técnica de esta notificación, según
+                                    lo establecido en el Código Procesal Civil y Mercantil.
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td
+                                align="center"
+                                style="background-color: #1f2937; padding: 30px 20px; border-top: 4px solid #003580; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"
+                            >
+                                <p
+                                    style="margin: 0 0 15px 0; color: #9ca3af; font-size: 12px; font-family: Helvetica, Arial, sans-serif;"
+                                >
+                                    <strong style="color: #ffffff;"
+                                        >Órgano Judicial de la República de El
+                                        Salvador</strong
+                                    ><br />
+                                    Centro de Gobierno, San Salvador
+                                </p>
+
+                                <p
+                                    style="margin: 0 0 20px 0; font-family: Helvetica, Arial, sans-serif; font-size: 12px;"
+                                >
+                                    <a
+                                        href="#"
+                                        style="color: #c49a6c; text-decoration: none; margin: 0 5px; font-weight: bold;"
+                                        >Consulta de Procesos</a
+                                    >
+                                    <span style="color: #4b5563;">•</span>
+                                    <a
+                                        href="#"
+                                        style="color: #c49a6c; text-decoration: none; margin: 0 5px; font-weight: bold;"
+                                        >Sección de Notariado</a
+                                    >
+                                    <span style="color: #4b5563;">•</span>
+                                    <a
+                                        href="#"
+                                        style="color: #c49a6c; text-decoration: none; margin: 0 5px; font-weight: bold;"
+                                        >Antecedentes Penales</a
+                                    >
+                                </p>
+
+                                <div
+                                    style="border-top: 1px solid #374151; padding-top: 15px; margin-top: 20px;"
+                                >
+                                    <p
+                                        style="margin: 0; color: #6b7280; font-size: 11px; font-family: Helvetica, Arial, sans-serif; line-height: 1.4;"
+                                    >
+                                        Este es un mensaje automático generado
+                                        por el Sistema de Notificación
+                                        Electrónica (SNE). Por favor no responda
+                                        a este correo. La información contenida
+                                        es confidencial y para uso exclusivo del
+                                        destinatario.<br /><br />
+                                        &copy; 2025 Corte Suprema de Justicia.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div
+                        style="height: 40px; line-height: 40px; font-size: 40px;"
+                    >
+                        &nbsp;
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

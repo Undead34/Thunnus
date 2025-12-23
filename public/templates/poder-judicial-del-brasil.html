@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poder Judiciário do Brasil - Justiça 4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gov: {
+                            blue: '#003399',    // Azul oficial profundo
+                            green: '#009C3B',   // Verde bandeira
+                            yellow: '#FEDD00',  // Amarelo bandeira
+                            light: '#F8F9FA',
+                            dark: '#1C1C1C'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Roboto', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-bg {
+            background-image: linear-gradient(rgba(0, 51, 153, 0.85), rgba(0, 30, 90, 0.9)), url('https://images.unsplash.com/photo-1575505586569-646b2ca898fc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pulse-soft {
+            animation: pulseSoft 2s infinite;
+        }
+
+        @keyframes pulseSoft {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 156, 59, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 156, 59, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 156, 59, 0);
+            }
+        }
+
+        /* Franja Brasil Decorativa */
+        .brazil-stripe {
+            background: linear-gradient(90deg, #009C3B 33%, #FEDD00 33%, #FEDD00 66%, #003399 66%);
+            height: 4px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body class="font-sans text-gray-800 bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Barra Brasil (Simulação Gov.br) -->
+    <div class="bg-gray-100 py-2 px-4 text-xs border-b border-gray-200">
+        <div class="container mx-auto flex justify-between items-center text-gray-600">
+            <div class="flex items-center">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Brazil.svg"
+                    alt="Bandeira do Brasil" class="h-4 w-auto mr-2 shadow-sm rounded-sm">
+                <span class="font-bold text-gray-700 tracking-wide">BRASIL</span>
+            </div>
+            <div class="flex space-x-4">
+                <a href="#" class="hover:text-gov-blue font-medium">Acesso à Informação</a>
+                <a href="#" class="hover:text-gov-blue font-medium">Participe</a>
+                <a href="#" class="hover:text-gov-blue font-medium">Legislação</a>
+                <a href="#" class="hover:text-gov-blue font-medium">Canais</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Principal -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <!-- Ícone Simbólico Balança -->
+                <div class="text-gov-blue text-4xl">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <div class="leading-tight border-l-2 border-gray-200 pl-4">
+                    <h1 class="text-xl md:text-2xl font-serif font-bold text-gov-blue tracking-wide">Poder Judiciário
+                    </h1>
+                    <p class="text-xs text-gov-green font-bold uppercase tracking-widest flex items-center">
+                        <span class="w-2 h-2 rounded-full bg-gov-yellow mr-1"></span> Justiça Federal
+                    </p>
+                </div>
+            </div>
+
+            <!-- Navegação Desktop -->
+            <nav class="hidden lg:flex items-center space-x-8 font-medium text-sm text-gray-600">
+                <a href="#"
+                    class="hover:text-gov-blue transition border-b-2 border-transparent hover:border-gov-green py-1">Início</a>
+                <a href="#"
+                    class="hover:text-gov-blue transition border-b-2 border-transparent hover:border-gov-yellow py-1">Processos
+                    (PJe)</a>
+                <a href="#"
+                    class="hover:text-gov-blue transition border-b-2 border-transparent hover:border-gov-blue py-1">Jurisprudência</a>
+                <a href="#"
+                    class="hover:text-gov-blue transition border-b-2 border-transparent hover:border-gov-green py-1">Serviços</a>
+
+                <!-- Botão Login PJe -->
+                <button
+                    class="bg-gov-blue text-white px-5 py-2 rounded-full hover:bg-blue-800 transition shadow-lg flex items-center border-b-4 border-blue-900 active:border-b-0 active:translate-y-1">
+                    <i class="fas fa-fingerprint mr-2"></i> Entrar com Gov.br
+                </button>
+            </nav>
+
+            <!-- Menu Mobile Toggle -->
+            <button class="lg:hidden text-gov-blue text-2xl" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-t p-4 space-y-4 shadow-lg absolute w-full z-40">
+            <a href="#" class="block text-gray-700 hover:text-gov-blue font-medium">Início</a>
+            <a href="#" class="block text-gray-700 hover:text-gov-blue font-medium">Consulta Processual</a>
+            <a href="#" class="block text-gray-700 hover:text-gov-blue font-medium">Balcão Virtual</a>
+            <a href="#" class="block text-gov-blue font-bold">Acessar PJe</a>
+        </div>
+
+        <!-- Franja Colorida -->
+        <div class="brazil-stripe"></div>
+    </header>
+
+    <!-- Hero Section: Justiça 4.0 -->
+    <section class="hero-bg text-white py-20 md:py-32 relative overflow-hidden">
+        <!-- Overlay gráfico tecnológico -->
+        <div class="absolute inset-0 opacity-10"
+            style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
+        </div>
+
+        <div class="container mx-auto px-4 relative z-10 flex flex-col md:flex-row items-center">
+            <div class="md:w-2/3 slide-up">
+                <div
+                    class="inline-flex items-center bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20 mb-6">
+                    <span class="w-2 h-2 rounded-full bg-gov-green mr-2 animate-pulse"></span>
+                    <span class="text-xs font-bold tracking-wider uppercase">Plataforma Digital do Poder
+                        Judiciário</span>
+                </div>
+
+                <h2 class="text-4xl md:text-6xl font-serif font-bold mb-6 leading-tight">
+                    A Justiça brasileira <br>
+                    <span class="text-gov-yellow drop-shadow-md">100% Digital e Acessível</span>
+                </h2>
+
+                <p class="text-lg md:text-xl mb-10 text-gray-200 max-w-2xl font-light">
+                    Conheça o Programa Justiça 4.0. Inteligência Artificial, Balcão Virtual e processos mais rápidos na
+                    palma da sua mão.
+                </p>
+
+                <!-- Barra de Busca Rápida de Processos -->
+                <div
+                    class="bg-white p-2 rounded-lg shadow-2xl max-w-xl flex flex-col sm:flex-row gap-2 border-t-4 border-gov-yellow">
+                    <div class="flex-1 flex items-center bg-gray-50 rounded px-3 border border-gray-200">
+                        <i class="fas fa-search text-gray-400 mr-2"></i>
+                        <input type="text" placeholder="Digite o número do processo (CNJ)..."
+                            class="w-full py-3 bg-transparent outline-none text-gray-700">
+                    </div>
+                    <button onclick="searchProcess()"
+                        class="bg-gov-green hover:bg-green-700 text-white font-bold py-3 px-6 rounded transition flex items-center justify-center shadow-md">
+                        Consultar
+                    </button>
+                </div>
+                <p class="mt-3 text-sm text-gray-300 flex items-center"><i
+                        class="fas fa-check-circle text-gov-green mr-2 bg-white rounded-full"></i> Consulta unificada em
+                    todos os tribunais.</p>
+            </div>
+
+            <!-- Cards Flutuantes (Decorativo) -->
+            <div class="md:w-1/3 mt-12 md:mt-0 hidden md:block relative">
+                <div
+                    class="glass-effect p-6 rounded-xl absolute top-0 right-0 transform -rotate-3 hover:rotate-0 transition duration-500 border-l-4 border-gov-yellow">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-gov-blue p-2 rounded-lg text-white mr-3"><i class="fas fa-robot"></i></div>
+                        <div>
+                            <p class="text-xs text-gray-300">IA Judiciária</p>
+                            <p class="font-bold text-sm">Sinapses</p>
+                        </div>
+                    </div>
+                    <div class="h-2 w-32 bg-white/20 rounded-full overflow-hidden">
+                        <div class="h-full bg-gov-green w-3/4"></div>
+                    </div>
+                    <p class="text-xs mt-2 text-right">Análise em andamento...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Serviços Rápidos -->
+    <section class="py-10 bg-white -mt-10 relative z-20 container mx-auto px-4">
+        <!-- Added top borders with Brazil colors -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 shadow-xl rounded-xl bg-white p-6 border border-gray-100">
+            <a href="#"
+                class="flex flex-col items-center justify-center p-4 hover:bg-gov-light rounded-lg transition group border-t-4 border-gov-green pt-6">
+                <i class="fas fa-file-contract text-3xl text-gov-blue mb-3 group-hover:scale-110 transition"></i>
+                <span class="font-medium text-center text-gray-700">Certidões Negativas</span>
+            </a>
+            <a href="#"
+                class="flex flex-col items-center justify-center p-4 hover:bg-gov-light rounded-lg transition group border-t-4 border-gov-yellow pt-6">
+                <i class="fas fa-video text-3xl text-gov-blue mb-3 group-hover:scale-110 transition"></i>
+                <span class="font-medium text-center text-gray-700">Balcão Virtual</span>
+            </a>
+            <a href="#"
+                class="flex flex-col items-center justify-center p-4 hover:bg-gov-light rounded-lg transition group border-t-4 border-gov-blue pt-6">
+                <i class="fas fa-gavel text-3xl text-gov-blue mb-3 group-hover:scale-110 transition"></i>
+                <span class="font-medium text-center text-gray-700">Leilões Judiciais</span>
+            </a>
+            <a href="#"
+                class="flex flex-col items-center justify-center p-4 hover:bg-gov-light rounded-lg transition group border-t-4 border-gov-green pt-6">
+                <i class="fas fa-check-double text-3xl text-gov-blue mb-3 group-hover:scale-110 transition"></i>
+                <span class="font-medium text-center text-gray-700">Validar Documentos</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Seção Inovação & IA -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <div class="flex items-center mb-2">
+                        <span class="w-8 h-1 bg-gov-yellow mr-2"></span>
+                        <span class="text-gov-green font-bold tracking-widest text-sm uppercase">Tecnologia &
+                            Inovação</span>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-gov-dark mb-6">Plataforma Sinapses: <br>A
+                        IA a favor da Celeridade</h2>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        O Judiciário brasileiro utiliza inteligência artificial para classificar processos, sugerir
+                        minutas de decisão e identificar casos repetitivos. O modelo Sinapses treina algoritmos para
+                        otimizar o tempo dos magistrados e servidores.
+                    </p>
+
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-gov-green mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Triagem Automatizada</h4>
+                                <p class="text-sm text-gray-500">Classificação de petições iniciais com 92% de precisão.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-gov-green mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Transcrição de Audiências</h4>
+                                <p class="text-sm text-gray-500">Conversão automática de voz para texto em audiências
+                                    gravadas.</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <a href="#" class="text-gov-blue font-bold hover:underline inline-flex items-center">
+                        Conhecer o Programa Justiça 4.0 <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+
+                <div class="md:w-1/2">
+                    <!-- Demo Visual da IA -->
+                    <div class="bg-white rounded-2xl shadow-2xl p-6 border border-gray-100 relative overflow-hidden">
+                        <div
+                            class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gov-blue via-gov-green to-gov-yellow">
+                        </div>
+                        <div class="flex justify-between items-center mb-6 border-b pb-4">
+                            <h3 class="font-bold text-gray-700"><i class="fas fa-network-wired mr-2 text-gov-blue"></i>
+                                Análise de Jurisprudência</h3>
+                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-bold">Online</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="h-2 bg-gray-200 rounded w-full"></div>
+                            <div class="h-2 bg-gray-200 rounded w-5/6"></div>
+                            <div class="h-2 bg-gray-200 rounded w-4/6"></div>
+                        </div>
+
+                        <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-lightbulb text-gov-yellow text-xl mr-2"></i>
+                                <span class="font-bold text-gov-blue text-sm">Sugestão da IA</span>
+                            </div>
+                            <p class="text-xs text-gray-600">Com base em 15.000 precedentes, há uma probabilidade de 85%
+                                deste caso se enquadrar no Tema 1032 do STF.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Estatísticas -->
+    <section class="bg-gov-blue py-16 text-white relative overflow-hidden">
+        <!-- Abstract Brazil flag circle bg -->
+        <div class="absolute -right-20 -top-20 w-96 h-96 bg-gov-yellow rounded-full opacity-10 blur-3xl"></div>
+        <div class="absolute -left-20 -bottom-20 w-96 h-96 bg-gov-green rounded-full opacity-10 blur-3xl"></div>
+
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h2 class="text-2xl font-serif font-bold mb-12 flex items-center justify-center">
+                <span class="border-b-2 border-gov-yellow pb-2">Justiça em Números</span>
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="text-4xl font-bold text-gov-yellow mb-2">80 mi</div>
+                    <div class="text-sm opacity-80">Processos em Tramitação</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-gov-yellow mb-2">100%</div>
+                    <div class="text-sm opacity-80">Processos Eletrônicos</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-gov-yellow mb-2">90</div>
+                    <div class="text-sm opacity-80">Tribunais Integrados</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-gov-yellow mb-2">24h</div>
+                    <div class="text-sm opacity-80">Disponibilidade do PJe</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gov-dark text-gray-400 py-12 mt-auto border-t-4 border-gov-green">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8 mb-8 border-b border-gray-700 pb-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Brazil.svg" alt="Brasil"
+                            class="h-6 w-auto mr-3">
+                        <h4 class="text-white text-lg font-serif font-bold">Poder Judiciário</h4>
+                    </div>
+                    <p class="text-sm mb-4 max-w-sm">
+                        Garantindo a cidadania e a justiça para todos os brasileiros. O portal unificado para acesso aos
+                        serviços de todos os tribunais do país.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-gov-yellow"><i class="fab fa-instagram text-xl"></i></a>
+                        <a href="#" class="hover:text-gov-yellow"><i class="fab fa-youtube text-xl"></i></a>
+                        <a href="#" class="hover:text-gov-yellow"><i class="fab fa-twitter text-xl"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h5 class="text-white font-bold mb-4 uppercase text-xs tracking-wider">Links Úteis</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">CNJ</a></li>
+                        <li><a href="#" class="hover:text-white transition">Supremo Tribunal Federal</a></li>
+                        <li><a href="#" class="hover:text-white transition">Diário da Justiça</a></li>
+                        <li><a href="#" class="hover:text-white transition">Transparência</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-white font-bold mb-4 uppercase text-xs tracking-wider">Contato</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center"><i class="fas fa-phone-alt mr-2 text-gray-500"></i> 0800 123 4567
+                        </li>
+                        <li class="flex items-center"><i class="fas fa-envelope mr-2 text-gray-500"></i>
+                            contato@cnj.jus.br</li>
+                        <li class="flex items-start mt-2"><i class="fas fa-map-marker-alt mr-2 mt-1 text-gray-500"></i>
+                            Praça dos Três Poderes, Brasília - DF</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs">
+                <p>&copy; 2024 Conselho Nacional de Justiça. Todos os direitos reservados.</p>
+                <div class="flex items-center gap-2 mt-2 md:mt-0">
+                    <span>Desenvolvido com tecnologia</span>
+                    <i class="fab fa-python text-gov-yellow"></i>
+                    <i class="fab fa-js text-gov-yellow"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chatbot Button -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button onclick="toggleChat()"
+            class="bg-gov-blue hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-2xl transition transform hover:scale-110 pulse-soft border-2 border-white">
+            <i class="fas fa-comment-dots"></i>
+        </button>
+    </div>
+
+    <!-- Chat Window (Hidden) -->
+    <div id="chat-window"
+        class="fixed bottom-24 right-6 w-80 bg-white rounded-lg shadow-2xl border border-gray-200 hidden flex-col overflow-hidden z-50">
+        <div class="bg-gov-blue text-white p-4 flex justify-between items-center relative overflow-hidden">
+            <!-- Decorative circle inside chat header -->
+            <div class="absolute -right-4 -top-4 w-16 h-16 bg-gov-yellow rounded-full opacity-20"></div>
+
+            <div class="flex items-center relative z-10">
+                <div
+                    class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-gov-blue mr-2 font-bold">
+                    IA</div>
+                <span class="font-bold text-sm">Assistente Virtual</span>
+            </div>
+            <button onclick="toggleChat()" class="hover:text-gray-300 relative z-10"><i
+                    class="fas fa-times"></i></button>
+        </div>
+        <div class="p-4 bg-gray-50 h-64 overflow-y-auto space-y-3 text-sm">
+            <div
+                class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm border border-gray-100 text-gray-700 border-l-2 border-gov-green">
+                Olá! Sou a assistente virtual do Judiciário. Posso te ajudar a consultar processos ou emitir certidões.
+            </div>
+            <div
+                class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm border border-gray-100 text-gray-700 border-l-2 border-gov-yellow">
+                Como posso ajudar você hoje?
+            </div>
+        </div>
+        <div class="p-3 bg-white border-t border-gray-200">
+            <div class="flex">
+                <input type="text" placeholder="Digite sua dúvida..."
+                    class="flex-1 bg-gray-100 rounded-l px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-gov-blue">
+                <button class="bg-gov-blue text-white px-3 rounded-r hover:bg-blue-800"><i
+                        class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Resultado (Demo) -->
+    <div id="modal-result" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-md p-6 relative border-t-8 border-gov-blue">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i
+                    class="fas fa-times"></i></button>
+            <div class="text-center mb-6">
+                <div
+                    class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gov-blue">Buscando Processo</h3>
+                <p class="text-gray-500 text-sm mt-2">Conectando à base de dados nacional (DataJud)...</p>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                <div class="bg-gov-blue h-2.5 rounded-full" style="width: 70%"></div>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-gray-400">Esta é apenas uma demonstração visual.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function toggleChat() {
+            document.getElementById('chat-window').classList.toggle('hidden');
+            document.getElementById('chat-window').classList.toggle('flex');
+        }
+
+        function searchProcess() {
+            const modal = document.getElementById('modal-result');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // Simula loading e fecha
+            setTimeout(() => {
+                closeModal();
+                alert('Demonstração: Em um sistema real, você seria redirecionado para os detalhes do processo.');
+            }, 2000);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal-result');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    </script>
+</body>
+
+</html>

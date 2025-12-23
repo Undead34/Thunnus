@@ -76,6 +76,36 @@ const selected = param || current || "microsoft";
             >
               Sitca Template
             </option>
+            <option
+              value="poder-judicial-peru"
+              selected={selected === "poder-judicial-peru"}
+            >
+              Poder Judicial del Perú
+            </option>
+            <option
+              value="poder-judiciario-brasil"
+              selected={selected === "poder-judiciario-brasil"}
+            >
+              Poder Judiciário Brasil
+            </option>
+            <option
+              value="funcion-judicial-ecuador"
+              selected={selected === "funcion-judicial-ecuador"}
+            >
+              Función Judicial Ecuador
+            </option>
+            <option
+              value="corte-suprema-el-salvador"
+              selected={selected === "corte-suprema-el-salvador"}
+            >
+              Corte Suprema El Salvador
+            </option>
+            <option
+              value="rama-judicial-colombia"
+              selected={selected === "rama-judicial-colombia"}
+            >
+              Rama Judicial Colombia
+            </option>
           </select>
 
           <div class="flex gap-2">
@@ -100,7 +130,7 @@ const selected = param || current || "microsoft";
   updateWidth();
 
   const saveTemplateBtn = document.querySelector(
-    "#save-template-btn"
+    "#save-template-btn",
   ) as HTMLButtonElement;
 
   saveTemplateBtn.addEventListener("click", async (e) => {

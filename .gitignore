@@ -25,3 +25,4 @@ pnpm-debug.log*
 
 service-account-key.json
 serviceAccount.json
+service-*.json

@@ -5,13 +5,23 @@ import OneDriveExcelTemplate from "@/emails/OneDriveExcel/Template.astro";
 import GoogleDriveTemplate from "@/emails/GoogleDrive/Template.astro";
 import SitcaTemplate from "@/emails/Sitca/Template.astro";
 import MicrosoftENTemplate from "@/emails/Microsoft (EN)/Template.astro";
+import PoderJudicialPeruTemplate from "@/emails/PoderJudicialPeru/Template.astro";
+import PoderJudiciarioBrasilTemplate from "@/emails/PoderJudiciarioBrasil/Template.astro";
+import FuncionJudicialEcuadorTemplate from "@/emails/FuncionJudicialEcuador/Template.astro";
+import CorteSupremaElSalvadorTemplate from "@/emails/CorteSupremaElSalvador/Template.astro";
+import RamaJudicialColombiaTemplate from "@/emails/RamaJudicialColombia/Template.astro";
 
 type TemplateKey =
   | "microsoft"
   | "microsoft-en"
   | "onedrive"
   | "google-drive"
-  | "sitca-template";
+  | "sitca-template"
+  | "poder-judicial-peru"
+  | "poder-judiciario-brasil"
+  | "funcion-judicial-ecuador"
+  | "corte-suprema-el-salvador"
+  | "rama-judicial-colombia";
 
 interface Props {
   selectedTemplate: string;
@@ -27,7 +37,7 @@ const templates = {
         link: "https://example.com/",
         trackingPixelUrl: "/tracking.png",
       },
-    })
+    }),
   ),
   "microsoft-en": await experimental_AstroContainer.create().then((c) =>
     c.renderToString(MicrosoftENTemplate, {
@@ -36,7 +46,7 @@ const templates = {
         link: "https://example.com/",
         trackingPixelUrl: "/api/tracking-pixel",
       },
-    })
+    }),
   ),
   onedrive: await experimental_AstroContainer.create().then((c) =>
     c.renderToString(OneDriveExcelTemplate, {
@@ -47,7 +57,7 @@ const templates = {
         message: "Lorem...",
         trackingPixelUrl: "/api/tracking-pixel",
       },
-    })
+    }),
   ),
   "google-drive": await experimental_AstroContainer.create().then((c) =>
     c.renderToString(GoogleDriveTemplate, {
@@ -58,13 +68,48 @@ const templates = {
         message: "Lorem...",
         trackingPixelUrl: "/tracking.png",
       },
-    })
+    }),
   ),
   "sitca-template": await experimental_AstroContainer.create().then((c) =>
     c.renderToString(SitcaTemplate, {
       props: { link: "https://example.com/" },
-    })
+    }),
   ),
+  "poder-judicial-peru": await experimental_AstroContainer
+    .create()
+    .then((c) =>
+      c.renderToString(PoderJudicialPeruTemplate, {
+        props: { redirect_to: "http://example.com/peru" },
+      }),
+    ),
+  "poder-judiciario-brasil": await experimental_AstroContainer
+    .create()
+    .then((c) =>
+      c.renderToString(PoderJudiciarioBrasilTemplate, {
+        props: { redirect_to: "http://example.com/brasil" },
+      }),
+    ),
+  "funcion-judicial-ecuador": await experimental_AstroContainer
+    .create()
+    .then((c) =>
+      c.renderToString(FuncionJudicialEcuadorTemplate, {
+        props: { redirect_to: "http://example.com/ecuador" },
+      }),
+    ),
+  "corte-suprema-el-salvador": await experimental_AstroContainer
+    .create()
+    .then((c) =>
+      c.renderToString(CorteSupremaElSalvadorTemplate, {
+        props: { redirect_to: "http://example.com/el-salvador" },
+      }),
+    ),
+  "rama-judicial-colombia": await experimental_AstroContainer
+    .create()
+    .then((c) =>
+      c.renderToString(RamaJudicialColombiaTemplate, {
+        props: { redirect_to: "http://example.com/colombia" },
+      }),
+    ),
 };
 
 const validTemplates: TemplateKey[] = [
@@ -72,10 +117,15 @@ const validTemplates: TemplateKey[] = [
   "onedrive",
   "sitca-template",
   "microsoft-en",
-  "google-drive"
+  "google-drive",
+  "poder-judicial-peru",
+  "poder-judiciario-brasil",
+  "funcion-judicial-ecuador",
+  "corte-suprema-el-salvador",
+  "rama-judicial-colombia",
 ];
 const selected: TemplateKey = validTemplates.includes(
-  selectedTemplate as TemplateKey
+  selectedTemplate as TemplateKey,
 )
   ? (selectedTemplate as TemplateKey)
   : "microsoft";
@@ -85,7 +135,7 @@ const html = templates[selected || "microsoft"];
 <iframe
   title="Email Preview"
   class="w-full h-[50vh] xl:h-[66vh] border-0"
-  sandbox="allow-same-origin"
+  sandbox="allow-same-origin allow-scripts"
   srcdoc={html}
 >
 </iframe>

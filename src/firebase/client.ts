@@ -1,15 +1,10 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-
-// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAsitua4DbaewrPVsCn5AmeR3cLUjTrF_4",
-  authDomain: "fkp-25-06-2025.firebaseapp.com",
-  projectId: "fkp-25-06-2025",
-  storageBucket: "fkp-25-06-2025.firebasestorage.app",
-  messagingSenderId: "360657194917",
-  appId: "1:360657194917:web:c56b027bbc4d65fd6da24c"
+  apiKey: "AIzaSyA6Nz4MoB0Z0klFeSgr3DKjD3TiWJOy-xM",
+  authDomain: "fkp-atun.firebaseapp.com",
+  projectId: "fkp-atun",
+  storageBucket: "fkp-atun.firebasestorage.app",
+  messagingSenderId: "689285075914",
+  appId: "1:689285075914:web:4a71dca23de3c45520b533"
 };
-
-// Initialize Firebase
 export const app = initializeApp(firebaseConfig);

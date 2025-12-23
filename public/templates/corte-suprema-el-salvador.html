@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corte Suprema de Justicia - El Salvador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sv: {
+                            blue: '#003580',    // Azul profundo institucional (Escudo)
+                            light: '#009CDC',   // Azul bandera más claro
+                            gold: '#C49A6C',    // Dorado institucional
+                            dark: '#1F2937',
+                            gray: '#F3F4F6'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Lato', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-bg {
+            /* Imagen alusiva a San Salvador o Palacio Judicial */
+            background-image: linear-gradient(rgba(0, 53, 128, 0.9), rgba(0, 30, 80, 0.9)), url('https://images.unsplash.com/photo-1569408032742-53a5d8481283?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Franja Azul y Blanco El Salvador */
+        .sv-stripe {
+            background: linear-gradient(90deg, #003580 0%, #FFFFFF 50%, #003580 100%);
+            height: 4px;
+            width: 100%;
+        }
+
+        /* Animación suave para el sello */
+        .seal-spin:hover {
+            transform: rotate(15deg);
+            transition: transform 0.5s ease;
+        }
+    </style>
+</head>
+
+<body class="font-sans text-gray-800 bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Barra Superior Gobierno -->
+    <div class="bg-gray-100 py-2 px-4 text-xs border-b border-gray-200 text-sv-blue">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center font-bold tracking-wide">
+                <i class="fas fa-flag mr-2"></i> REPÚBLICA DE EL SALVADOR
+            </div>
+            <div class="flex space-x-4">
+                <a href="#" class="hover:underline">Portal de Transparencia</a>
+                <a href="#" class="hover:underline">Diario Oficial</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Principal -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <!-- Escudo CSJ (Simulado) -->
+                <div class="relative w-14 h-14 flex items-center justify-center seal-spin">
+                    <!-- Usando bandera SVG como placeholder visual fuerte -->
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/Flag_of_El_Salvador.svg"
+                        class="w-full h-auto shadow-md rounded border border-gray-100" alt="Bandera El Salvador">
+                </div>
+                <div class="leading-tight border-l-2 border-sv-gold pl-4">
+                    <h1 class="text-xl md:text-2xl font-serif font-bold text-sv-blue tracking-wide">Corte Suprema</h1>
+                    <p class="text-xs text-sv-light font-bold uppercase tracking-widest">
+                        de Justicia
+                    </p>
+                </div>
+            </div>
+
+            <!-- Navegación Desktop -->
+            <nav class="hidden lg:flex items-center space-x-8 font-medium text-sm text-gray-600">
+                <a href="#"
+                    class="hover:text-sv-blue transition border-b-2 border-transparent hover:border-sv-blue py-1">Inicio</a>
+                <a href="#"
+                    class="hover:text-sv-blue transition border-b-2 border-transparent hover:border-sv-light py-1">Consulta
+                    de Procesos</a>
+                <a href="#"
+                    class="hover:text-sv-blue transition border-b-2 border-transparent hover:border-sv-blue py-1">Sección
+                    Notariado</a>
+                <a href="#"
+                    class="hover:text-sv-blue transition border-b-2 border-transparent hover:border-sv-light py-1">Antecedentes
+                    Penales</a>
+
+                <!-- Botón SEJ -->
+                <button
+                    class="bg-sv-blue text-white px-5 py-2 rounded shadow-md hover:bg-blue-900 transition flex items-center border border-blue-800">
+                    <i class="fas fa-folder-open mr-2"></i> Acceso SEJ
+                </button>
+            </nav>
+
+            <!-- Menu Mobile Toggle -->
+            <button class="lg:hidden text-sv-blue text-2xl" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-t p-4 space-y-4 shadow-lg absolute w-full z-40">
+            <a href="#" class="block text-gray-700 hover:text-sv-blue font-medium">Inicio</a>
+            <a href="#" class="block text-gray-700 hover:text-sv-blue font-medium">Consulta Judicial</a>
+            <a href="#" class="block text-gray-700 hover:text-sv-blue font-medium">Antecedentes</a>
+            <a href="#" class="block text-sv-blue font-bold">Ingresar al SEJ</a>
+        </div>
+
+        <!-- Franja El Salvador -->
+        <div class="sv-stripe"></div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-bg text-white py-20 md:py-32 relative overflow-hidden">
+        <div class="container mx-auto px-4 relative z-10 flex flex-col md:flex-row items-center">
+            <div class="md:w-2/3 slide-up">
+                <div
+                    class="inline-flex items-center bg-white/10 backdrop-blur-sm px-3 py-1 rounded border-l-4 border-sv-light mb-6">
+                    <span class="text-xs font-bold tracking-wider uppercase">Transformación Digital Judicial</span>
+                </div>
+
+                <h2 class="text-4xl md:text-6xl font-serif font-bold mb-6 leading-tight">
+                    Una Justicia Moderna <br>
+                    <span class="text-sv-light drop-shadow-md">Cercana y Eficiente</span>
+                </h2>
+
+                <p class="text-lg md:text-xl mb-10 text-gray-200 max-w-2xl font-light">
+                    Plataforma única de servicios del Órgano Judicial. Gestione su Expediente Judicial Electrónico (EJE)
+                    y realice trámites en línea.
+                </p>
+
+                <!-- Barra de Búsqueda -->
+                <div
+                    class="bg-white p-2 rounded shadow-2xl max-w-xl flex flex-col sm:flex-row gap-2 border-t-4 border-sv-blue">
+                    <div class="flex-1 flex items-center bg-gray-50 rounded px-3 border border-gray-200">
+                        <i class="fas fa-search text-gray-400 mr-2"></i>
+                        <input type="text" placeholder="N° de Expediente Único o DUI..."
+                            class="w-full py-3 bg-transparent outline-none text-gray-700">
+                    </div>
+                    <button onclick="searchProcess()"
+                        class="bg-sv-blue hover:bg-blue-900 text-white font-bold py-3 px-6 rounded transition flex items-center justify-center shadow-md">
+                        Consultar
+                    </button>
+                </div>
+                <p class="mt-3 text-sm text-gray-300 flex items-center"><i
+                        class="fas fa-check-circle text-sv-light mr-2"></i> Búsqueda en Sistema Integrado.</p>
+            </div>
+
+            <!-- Card Flotante -->
+            <div class="md:w-1/3 mt-12 md:mt-0 hidden md:block relative">
+                <div
+                    class="glass-effect p-6 rounded-xl absolute top-0 right-0 transform hover:scale-105 transition duration-500 border-l-4 border-sv-gold">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-sv-blue p-3 rounded-full text-white mr-3 border border-white/30"><i
+                                class="fas fa-balance-scale"></i></div>
+                        <div>
+                            <p class="text-xs text-gray-300">Nuevos Juzgados</p>
+                            <p class="font-bold text-sm">Especializados</p>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-200 mt-2">
+                        Atención prioritaria y digitalizada en San Salvador, Santa Ana y San Miguel.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Servicios Rápidos -->
+    <section class="py-10 bg-white -mt-10 relative z-20 container mx-auto px-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 shadow-xl rounded-lg bg-white p-6 border border-gray-100">
+            <a href="#"
+                class="flex flex-col items-center justify-center p-4 hover:bg-sv-gray rounded transition group border-t-4 border-sv-blue pt-6">
+                <i class="fas fa-id-card text-3xl text-sv-blue mb-3 group-hover:scale-110 transition"></i>
+                <span class="font-medium text-center text-gray-700 text-sm">Antecedentes Penales</span>
+            </a>
+            <a href="#"
+                class="flex flex-col items-center justify-center p-4 hover:bg-sv-gray rounded transition group border-t-4 border-sv-light pt-6">
+                <i class="fas fa-user-tie text-3xl text-sv-blue mb-3 group-hover:scale-110 transition"></i>
+                <span class="font-medium text-center text-gray-700 text-sm">Sección de Notariado</span>
+            </a>
+            <a href="#"
+                class="flex flex-col items-center justify-center p-4 hover:bg-sv-gray rounded transition group border-t-4 border-sv-blue pt-6">
+                <i class="fas fa-gavel text-3xl text-sv-blue mb-3 group-hover:scale-110 transition"></i>
+                <span class="font-medium text-center text-gray-700 text-sm">Consulta de Edictos</span>
+            </a>
+            <a href="#"
+                class="flex flex-col items-center justify-center p-4 hover:bg-sv-gray rounded transition group border-t-4 border-sv-light pt-6">
+                <i class="fas fa-bell text-3xl text-sv-blue mb-3 group-hover:scale-110 transition"></i>
+                <span class="font-medium text-center text-gray-700 text-sm">Notificaciones (SNE)</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Sección Innovación & IA -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <div class="flex items-center mb-2">
+                        <span class="w-8 h-1 bg-sv-blue mr-2"></span>
+                        <span class="text-sv-light font-bold tracking-widest text-sm uppercase">Innovación
+                            Judicial</span>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-sv-dark mb-6">Expediente Judicial
+                        Electrónico (EJE)</h2>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        El Salvador avanza en la implementación del Sistema EJE, permitiendo la presentación de demandas
+                        y escritos de forma 100% digital, reduciendo tiempos y aumentando la transparencia procesal.
+                    </p>
+
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-sv-blue mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Firma Electrónica Certificada</h4>
+                                <p class="text-sm text-gray-500">Validez legal en todos los actos procesales digitales.
+                                </p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-sv-blue mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Audiencias Virtuales</h4>
+                                <p class="text-sm text-gray-500">Salas equipadas para comparecencias remotas seguras.
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <a href="#" class="text-sv-blue font-bold hover:underline inline-flex items-center">
+                        Conocer más sobre el proyecto <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+
+                <div class="md:w-1/2">
+                    <!-- Demo Visual -->
+                    <div class="bg-white rounded-lg shadow-2xl p-6 border border-gray-100 relative overflow-hidden">
+                        <div
+                            class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sv-blue via-sv-light to-sv-blue">
+                        </div>
+                        <div class="flex justify-between items-center mb-6 border-b pb-4">
+                            <h3 class="font-bold text-gray-700"><i class="fas fa-robot mr-2 text-sv-blue"></i> Asistente
+                                Jurisprudencial</h3>
+                            <span class="bg-blue-100 text-sv-blue text-xs px-2 py-1 rounded font-bold">IA Beta</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="h-2 bg-gray-200 rounded w-full"></div>
+                            <div class="h-2 bg-gray-200 rounded w-5/6"></div>
+                            <div class="h-2 bg-gray-200 rounded w-4/6"></div>
+                        </div>
+
+                        <div class="mt-6 bg-blue-50 p-4 rounded border-l-4 border-sv-blue">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-info-circle text-sv-blue text-xl mr-2"></i>
+                                <span class="font-bold text-gray-800 text-sm">Resultado del Análisis</span>
+                            </div>
+                            <p class="text-xs text-gray-600">El escrito cumple con los requisitos formales del Código
+                                Procesal Civil y Mercantil de El Salvador.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-sv-dark text-gray-400 py-12 mt-auto border-t-4 border-sv-blue">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8 mb-8 border-b border-gray-700 pb-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/Flag_of_El_Salvador.svg"
+                            alt="El Salvador" class="h-5 w-auto mr-3 border border-gray-600">
+                        <h4 class="text-white text-lg font-serif font-bold">Corte Suprema de Justicia</h4>
+                    </div>
+                    <p class="text-sm mb-4 max-w-sm">
+                        Garantizando la pronta y cumplida justicia para fortalecer el Estado de Derecho en El Salvador.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-white"><i class="fab fa-facebook-f text-xl"></i></a>
+                        <a href="#" class="hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h5 class="text-white font-bold mb-4 uppercase text-xs tracking-wider">Enlaces Relacionados</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">Consejo Nacional de la Judicatura</a></li>
+                        <li><a href="#" class="hover:text-white transition">Fiscalía General de la República</a></li>
+                        <li><a href="#" class="hover:text-white transition">Procuraduría General</a></li>
+                        <li><a href="#" class="hover:text-white transition">Instituto de Medicina Legal</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-white font-bold mb-4 uppercase text-xs tracking-wider">Contacto</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center"><i class="fas fa-phone-alt mr-2 text-sv-light"></i> (503)
+                            2271-8888</li>
+                        <li class="flex items-center"><i class="fas fa-envelope mr-2 text-sv-light"></i>
+                            comunicaciones@csj.gob.sv</li>
+                        <li class="flex items-start mt-2"><i class="fas fa-map-marker-alt mr-2 mt-1 text-sv-light"></i>
+                            Centro de Gobierno, San Salvador.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs">
+                <p>&copy; 2025 Órgano Judicial de El Salvador. Todos los derechos reservados.</p>
+                <div class="flex items-center gap-2 mt-2 md:mt-0">
+                    <span>Versión Demo IA</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chatbot Button -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button onclick="toggleChat()"
+            class="bg-sv-blue hover:bg-blue-900 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-2xl transition transform hover:scale-110 border-2 border-white">
+            <i class="fas fa-comment-alt"></i>
+        </button>
+    </div>
+
+    <!-- Chat Window (Hidden) -->
+    <div id="chat-window"
+        class="fixed bottom-24 right-6 w-80 bg-white rounded shadow-2xl border border-gray-200 hidden flex-col overflow-hidden z-50">
+        <div class="bg-sv-blue text-white p-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-sv-blue mr-2 font-bold">
+                    <i class="fas fa-robot"></i></div>
+                <span class="font-bold text-sm">Asistente Virtual</span>
+            </div>
+            <button onclick="toggleChat()" class="hover:text-gray-300"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="p-4 bg-gray-50 h-64 overflow-y-auto space-y-3 text-sm">
+            <div
+                class="bg-white p-3 rounded rounded-tl-none shadow-sm border border-gray-100 text-gray-700 border-l-2 border-sv-light">
+                ¡Hola! Bienvenido al portal de la CSJ. ¿Necesita ayuda con la ubicación de un Juzgado o requisitos para
+                antecedentes penales?
+            </div>
+        </div>
+        <div class="p-3 bg-white border-t border-gray-200">
+            <div class="flex">
+                <input type="text" placeholder="Escriba su consulta..."
+                    class="flex-1 bg-gray-100 rounded-l px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-sv-blue">
+                <button class="bg-sv-blue text-white px-3 rounded-r hover:bg-blue-900"><i
+                        class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Resultado (Demo) -->
+    <div id="modal-result" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded shadow-2xl w-full max-w-md p-6 relative border-t-8 border-sv-blue">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i
+                    class="fas fa-times"></i></button>
+            <div class="text-center mb-6">
+                <div
+                    class="w-16 h-16 bg-blue-100 text-sv-blue rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="text-xl font-bold text-sv-blue">Consultando SEJ</h3>
+                <p class="text-gray-500 text-sm mt-2">Accediendo al Sistema de Expediente Judicial...</p>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                <div class="bg-sv-light h-2.5 rounded-full" style="width: 70%"></div>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-gray-400">Simulación de búsqueda en tiempo real.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function toggleChat() {
+            document.getElementById('chat-window').classList.toggle('hidden');
+            document.getElementById('chat-window').classList.toggle('flex');
+        }
+
+        function searchProcess() {
+            const modal = document.getElementById('modal-result');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // Simula loading e fecha
+            setTimeout(() => {
+                closeModal();
+                alert('Redirigiendo al sistema de consulta de procesos...');
+            }, 2000);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal-result');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    </script>
+</body>
+
+</html>

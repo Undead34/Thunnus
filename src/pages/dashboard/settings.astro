@@ -7,64 +7,154 @@ import { Button } from "@/components/ui/button";
 import Layout from "@/layouts/dashboard.astro";
 
 let smtpConfig = null;
+let msConfig = null;
 
 try {
-  const response = await fetch(`${Astro.url.origin}/api/settings/smtp`);
-  if (response.ok) {
-    smtpConfig = await response.json();
-  }
+  const [smtpRes, msRes] = await Promise.all([
+    fetch(`${Astro.url.origin}/api/settings/smtp`),
+    fetch(`${Astro.url.origin}/api/settings/microsoft`)
+  ]);
+
+  if (smtpRes.ok) smtpConfig = await smtpRes.json();
+  if (msRes.ok) msConfig = await msRes.json();
+
 } catch (error) {
-  console.error("Error al obtener la configuración SMTP:", error);
+  console.error("Error al obtener configuraciones:", error);
 }
 ---
 
-<Layout title="Configuración SMTP">
-  <Card id="smtp">
+<Layout title="Configuración de Correo">
+  <Card id="email-settings">
     <CardHeader>
-      <CardTitle>Configuración SMTP</CardTitle>
+      <CardTitle>Configuración de Correo</CardTitle>
     </CardHeader>
     <CardContent>
-      <form id="configForm" class="flex flex-col gap-2">
-        <Label htmlFor="host">Host y Puerto</Label>
-        <div class="flex gap-2">
-          <Input
-            className=""
-            id="host"
-            type="text"
-            placeholder="smtp.example.com"
-            defaultValue={smtpConfig?.host || ""}
-            autoComplete="off"
-          />
-          <Input
-            className="flex-1/4 md:flex-1/6 lg:flex-1/11"
-            id="port"
-            type="number"
-            placeholder="Puerto"
-            min={0}
-            max={65535}
-            defaultValue={smtpConfig?.port || "587"}
-            autoComplete="off"
-          />
-        </div>
-
-        <Label htmlFor="username">Usuario SMTP</Label>
-        <Input
-          id="username"
-          type="text"
-          placeholder="Ingrese el nombre de usuario"
-          defaultValue={smtpConfig?.auth?.user || ""}
-          autoComplete="off"
-        />
-        <Label htmlFor="password">Contraseña</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder="Ingrese la contraseña"
-          autoComplete="off"
-        />
+      <form id="configForm" class="flex flex-col gap-4">
 
         <div>
-          <Button type="submit">Guardar cambios</Button>
+          <Label className="mb-2 block">Proveedor de Correo</Label>
+          <div class="flex gap-4">
+            <label class="flex items-center gap-2 cursor-pointer p-3 border rounded-md hover:bg-gray-50 transition-colors has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+              <input 
+                type="radio" 
+                name="provider" 
+                value="microsoft" 
+                class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                checked={!smtpConfig?.provider || smtpConfig?.provider === 'microsoft'} 
+              />
+              <div class="flex flex-col">
+                <span class="font-medium text-sm">Microsoft 365</span>
+                <span class="text-xs text-muted-foreground">Graph API (Recomendado)</span>
+              </div>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer p-3 border rounded-md hover:bg-gray-50 transition-colors has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+              <input 
+                type="radio" 
+                name="provider" 
+                value="smtp" 
+                class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                checked={smtpConfig?.provider === 'smtp'} 
+              />
+              <div class="flex flex-col">
+                <span class="font-medium text-sm">SMTP Genérico</span>
+                <span class="text-xs text-muted-foreground">Cualquier servidor de correo</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div id="microsoft-settings" class="space-y-4 border-l-2 border-blue-100 pl-4 py-2 hidden">
+            <h3 class="font-semibold text-sm text-blue-900">Configuración Microsoft Graph</h3>
+            
+            <div>
+                <Label htmlFor="clientId">Client ID (Application ID)</Label>
+                <Input
+                id="clientId"
+                type="text"
+                placeholder="Ej: 58e9fe71-..."
+                defaultValue={msConfig?.clientId || ""}
+                autoComplete="off"
+                />
+                <p class="text-[0.8rem] text-muted-foreground mt-1">El ID de la aplicación registrada en Azure AD.</p>
+            </div>
+
+            <div>
+                <Label htmlFor="tenantId">Tenant ID</Label>
+                <Input
+                id="tenantId"
+                type="text"
+                placeholder="Ej: common, organizations, o UUID"
+                defaultValue={msConfig?.tenantId || ""}
+                autoComplete="off"
+                />
+                <p class="text-[0.8rem] text-muted-foreground mt-1">El ID del inquilino o 'common' para multi-tenant.</p>
+            </div>
+
+             <div>
+                <Label htmlFor="refreshToken">Refresh Token</Label>
+                <Input
+                id="refreshToken"
+                type="password"
+                placeholder="Opcional: Token inicial"
+                defaultValue={msConfig?.refreshToken || ""}
+                autoComplete="off"
+                />
+                <p class="text-[0.8rem] text-muted-foreground mt-1">Si ya tienes un refresh token válido, ingrésalo aquí para evitar re-autenticar manualmente si el sistema lo requiere.</p>
+            </div>
+        </div>
+
+        <div id="smtp-settings" class="space-y-4 border-l-2 border-gray-100 pl-4 py-2 hidden">
+             <h3 class="font-semibold text-sm text-gray-900">Configuración SMTP</h3>
+
+             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                 <div class="md:col-span-3">
+                    <Label htmlFor="host">Host</Label>
+                    <Input
+                        id="host"
+                        type="text"
+                        placeholder="smtp.example.com"
+                        defaultValue={smtpConfig?.host || ""}
+                        autoComplete="off"
+                    />
+                 </div>
+                 <div>
+                    <Label htmlFor="port">Puerto</Label>
+                    <Input
+                        id="port"
+                        type="number"
+                        placeholder="587"
+                        min={0}
+                        max={65535}
+                        defaultValue={smtpConfig?.port || "587"}
+                        autoComplete="off"
+                    />
+                 </div>
+             </div>
+
+            <div>
+                <Label htmlFor="username">Usuario SMTP</Label>
+                <Input
+                id="username"
+                type="text"
+                placeholder="user@example.com"
+                defaultValue={smtpConfig?.auth?.user || ""}
+                autoComplete="off"
+                />
+            </div>
+            
+            <div>
+                <Label htmlFor="password">Contraseña</Label>
+                <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="off"
+                />
+            </div>
+        </div>
+
+        <div class="pt-4">
+          <Button type="submit">Guardar configuración</Button>
         </div>
       </form>
     </CardContent>
@@ -72,46 +162,94 @@ try {
 </Layout>
 
 <script>
-  let config = document.getElementById("configForm")!;
+  const form = document.getElementById("configForm") as HTMLFormElement;
+  const msSettings = document.getElementById("microsoft-settings")!;
+  const smtpSettings = document.getElementById("smtp-settings")!;
+  const providerInputs = document.querySelectorAll('input[name="provider"]');
 
-  config.addEventListener("submit", async (e) => {
+  function updateVisibility() {
+    const selected = (document.querySelector('input[name="provider"]:checked') as HTMLInputElement)?.value;
+    if (selected === 'microsoft') {
+        msSettings.classList.remove('hidden');
+        smtpSettings.classList.add('hidden');
+    } else {
+        msSettings.classList.add('hidden');
+        smtpSettings.classList.remove('hidden');
+    }
+  }
+
+  // Initial check
+  updateVisibility();
+
+  // Listen for changes
+  providerInputs.forEach(input => {
+      input.addEventListener('change', updateVisibility);
+  });
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const host = (document.getElementById("host") as HTMLInputElement)?.value;
-    const port = parseInt(
-      (document.getElementById("port") as HTMLInputElement)?.value
-    );
-    const username = (document.getElementById("username") as HTMLInputElement)
-      ?.value;
-    const password = (document.getElementById("password") as HTMLInputElement)
-      ?.value;
-
-    const data = {
-      host,
-      port,
-      secure: false,
-      auth: {
-        user: username,
-        pass: password,
-      },
-    };
+    const provider = (document.querySelector('input[name="provider"]:checked') as HTMLInputElement)?.value;
+    const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const originalText = submitBtn.innerText;
+    
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Guardando...";
 
     try {
-      const response = await fetch("/api/settings/smtp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+        const promises = [];
 
-      if (response.ok) {
-        alert("Configuración guardada correctamente");
-        location.reload();
-      } else {
-        alert("Error al guardar la configuración");
-      }
+        // Always save the provider preference to SMTP settings endpoint (it acts as main config for now)
+        // Check implementation plan: we decided to save "provider" to smtp endpoint.
+        // For SMTP, we send all fields. For Microsoft, we just need to send "provider: microsoft".
+        
+        let smtpData: any = { provider };
+
+        if (provider === 'smtp') {
+            smtpData.host = (document.getElementById("host") as HTMLInputElement)?.value;
+            smtpData.port = parseInt((document.getElementById("port") as HTMLInputElement)?.value);
+            smtpData.secure = false; // TODO: Add secure toggle if needed
+            smtpData.auth = {
+                user: (document.getElementById("username") as HTMLInputElement)?.value,
+                pass: (document.getElementById("password") as HTMLInputElement)?.value,
+            };
+        }
+
+        promises.push(fetch("/api/settings/smtp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(smtpData),
+        }));
+
+        if (provider === 'microsoft') {
+            const msData = {
+                clientId: (document.getElementById("clientId") as HTMLInputElement)?.value,
+                tenantId: (document.getElementById("tenantId") as HTMLInputElement)?.value,
+                refreshToken: (document.getElementById("refreshToken") as HTMLInputElement)?.value,
+            };
+            promises.push(fetch("/api/settings/microsoft", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(msData),
+            }));
+        }
+
+        const results = await Promise.all(promises);
+        const allOk = results.every(r => r.ok);
+
+        if (allOk) {
+            alert("Configuración guardada correctamente");
+            // location.reload(); // Reload to reflect changes if needed
+        } else {
+            console.error(await Promise.all(results.map(r => r.text())));
+            alert("Error al guardar una o más configuraciones");
+        }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Error en el servidor");
+        console.error("Error:", error);
+        alert("Error de red o servidor");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalText;
     }
   });
 </script>

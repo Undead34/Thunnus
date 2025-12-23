@@ -26,6 +26,8 @@ interface StableDatesOptions {
 interface StableDates {
     past: string;   // Ej: "24/06/2025 00:33 (GMT)"
     future: string; // Ej: "04/07/2025 a las 10:00 AM (hora local)"
+    pastDate?: Date;
+    futureDate?: Date;
 }
 
 /**
@@ -92,5 +94,5 @@ export function getStableDates(
         pad2(futureDate.getMinutes()) +
         ` ${ampm} (hora local)`;
 
-    return { past: pastStr, future: futureStr };
+    return { past: pastStr, future: futureStr, pastDate, futureDate };
 }

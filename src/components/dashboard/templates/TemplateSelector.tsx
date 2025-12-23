@@ -32,6 +32,26 @@ const templates = [
     value: "google-account",
     label: "Google Account",
   },
+  {
+    value: "poder-judicial-peru",
+    label: "Poder Judicial del Perú",
+  },
+  {
+    value: "poder-judicial-brasil",
+    label: "Poder Judiciário do Brasil",
+  },
+  {
+    value: "funcion-judicial-ecuador",
+    label: "Función Judicial - Ecuador",
+  },
+  {
+    value: "corte-suprema-el-salvador",
+    label: "Corte Suprema - El Salvador",
+  },
+  {
+    value: "rama-judicial-colombia",
+    label: "Rama Judicial - Colombia",
+  },
 ];
 
 export default function TemplateSelector({

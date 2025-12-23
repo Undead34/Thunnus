@@ -1,0 +1,265 @@
+---
+import { getStableDates } from "@/lib/stable-dates";
+
+interface Props {
+    redirect_to: string;
+}
+
+const { redirect_to } = Astro.props;
+
+const { pastDate } = getStableDates();
+const dateObj = pastDate || new Date();
+
+const day = dateObj.getDate();
+const month = dateObj.toLocaleString("es-PE", { month: "long" });
+const year = dateObj.getFullYear();
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const notificationDate = `${day} de ${capitalize(month)}, ${year}`;
+
+export const CONFIG = {
+    subject: "Notificación Electrónica - Poder Judicial del Perú",
+    country: "peru",
+    flags: {
+        tracking_pixel: true,
+        target_name: false,
+        censored_email: false,
+        email: false,
+    },
+    defaultProps: {
+        redirect_to: "https://casillas.pj.gob.pe/sinoe",
+    },
+};
+---
+
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Notificación Electrónica - Poder Judicial del Perú</title>
+        <style type="text/css">
+            /* Media Queries para móviles */
+            @media screen and (max-width: 600px) {
+                .container {
+                    width: 100% !important;
+                }
+                .content-padding {
+                    padding: 25px 20px !important;
+                }
+                .header-text {
+                    font-size: 20px !important;
+                }
+                .btn-mobile-table {
+                    width: 80% !important;
+                }
+                .btn-mobile-link {
+                    display: block !important;
+                }
+            }
+        </style>
+    </head>
+    <body
+        style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: Arial, sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;"
+    >
+        <table
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            width="100%"
+            style="background-color: #f3f4f6;"
+        >
+            <tr>
+                <td align="center" style="padding: 20px 0;">
+                    <table
+                        class="container"
+                        border="0"
+                        cellpadding="0"
+                        cellspacing="0"
+                        width="600"
+                        style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 4px; border-collapse: separate; width: 100%; max-width: 600px;"
+                    >
+                        <tr>
+                            <td
+                                align="center"
+                                style="background-color: #961e27; padding: 30px 20px; border-bottom: 4px solid #c5a065;"
+                            >
+                                <div
+                                    style="font-size: 30px; margin-bottom: 10px; line-height: 1;"
+                                >
+                                    ⚖️
+                                </div>
+                                <h1
+                                    class="header-text"
+                                    style="color: #ffffff; margin: 0; font-family: 'Times New Roman', Times, serif; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;"
+                                >
+                                    Poder Judicial
+                                </h1>
+                                <p
+                                    style="color: #eeeeee; margin: 5px 0 0 0; font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;"
+                                >
+                                    Del Perú
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td
+                                class="content-padding"
+                                style="padding: 40px 30px; color: #333333; font-family: Arial, sans-serif; line-height: 1.6;"
+                            >
+                                <div
+                                    style="font-size: 18px; font-weight: bold; color: #1f2937; margin-bottom: 20px;"
+                                >
+                                    Estimado(a) Ciudadano(a),
+                                </div>
+
+                                <p style="margin: 0 0 20px 0; font-size: 16px;">
+                                    Le informamos que se ha generado una nueva
+                                    notificación electrónica relacionada con su
+                                    expediente judicial en nuestra plataforma
+                                    digital.
+                                </p>
+
+                                <table
+                                    border="0"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    width="100%"
+                                    style="margin-bottom: 25px; background-color: #f9fafb; border-left: 4px solid #961e27;"
+                                >
+                                    <tr>
+                                        <td
+                                            style="padding: 15px; font-size: 14px; color: #555555; font-family: Arial, sans-serif;"
+                                        >
+                                            <div style="margin-bottom: 5px;">
+                                                <strong>Asunto:</strong> Notificación
+                                                de Resolución - SINOE
+                                            </div>
+                                            <div style="margin-bottom: 5px;">
+                                                <strong>Expediente N°:</strong> 00123-2024-0-1801-JR-CI-01
+                                            </div>
+                                            <div>
+                                                <strong>Fecha:</strong>
+                                                {notificationDate}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <p style="margin: 0 0 25px 0; font-size: 16px;">
+                                    Para garantizar la seguridad de la
+                                    información y acceder al documento completo,
+                                    por favor ingrese a su Casilla Electrónica a
+                                    través del siguiente enlace seguro:
+                                </p>
+
+                                <table
+                                    class="btn-mobile-table"
+                                    border="0"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    width="100%"
+                                >
+                                    <tr>
+                                        <td align="center">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                            >
+                                                <tr>
+                                                    <td
+                                                        align="center"
+                                                        bgcolor="#961e27"
+                                                        style="border-radius: 4px;"
+                                                    >
+                                                        <a
+                                                            href={redirect_to}
+                                                            target="_blank"
+                                                            class="btn-mobile-link"
+                                                            style="font-family: Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; font-weight: bold; padding: 14px 28px; display: inline-block; border-radius: 4px; border: 1px solid #961e27;"
+                                                            >Acceder a la
+                                                            Plataforma</a
+                                                        >
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <p
+                                    style="font-size: 13px; color: #666666; margin-top: 30px; border-top: 1px solid #eeeeee; padding-top: 15px;"
+                                >
+                                    Si usted no ha iniciado este trámite o
+                                    considera que este mensaje es un error, por
+                                    favor comuníquese con nuestra central
+                                    telefónica o ignore este mensaje.
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td
+                                align="center"
+                                style="background-color: #1f2937; padding: 20px;"
+                            >
+                                <p
+                                    style="margin: 0 0 15px 0; color: #9ca3af; font-size: 12px; font-family: Arial, sans-serif;"
+                                >
+                                    <strong style="color: #ffffff;"
+                                        >Poder Judicial del Perú</strong
+                                    ><br />
+                                    Av. Paseo de la República S/N, Palacio Nacional
+                                    de Justicia, Lima.
+                                </p>
+
+                                <p
+                                    style="margin: 0 0 20px 0; font-family: Arial, sans-serif; font-size: 12px;"
+                                >
+                                    <a
+                                        href="#"
+                                        style="color: #ffffff; text-decoration: none; margin: 0 5px;"
+                                        >Mesa de Partes</a
+                                    >
+                                    <span style="color: #4b5563;">•</span>
+                                    <a
+                                        href="#"
+                                        style="color: #ffffff; text-decoration: none; margin: 0 5px;"
+                                        >Consulta de Expedientes</a
+                                    >
+                                    <span style="color: #4b5563;">•</span>
+                                    <a
+                                        href="#"
+                                        style="color: #ffffff; text-decoration: none; margin: 0 5px;"
+                                        >Ayuda</a
+                                    >
+                                </p>
+
+                                <div
+                                    style="border-top: 1px solid #374151; padding-top: 10px; margin-top: 15px;"
+                                >
+                                    <p
+                                        style="margin: 0; color: #6b7280; font-size: 10px; font-family: Arial, sans-serif; line-height: 1.4;"
+                                    >
+                                        Este es un mensaje automático del
+                                        Sistema de Notificaciones Electrónicas
+                                        (SINOE). Por favor no responda a este
+                                        correo. La información contenida es
+                                        confidencial y para uso exclusivo del
+                                        destinatario.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div
+                        style="height: 40px; line-height: 40px; font-size: 40px;"
+                    >
+                        &nbsp;
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

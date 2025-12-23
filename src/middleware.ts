@@ -62,7 +62,24 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (isPublicRoute) {
     if (currentPath === "/") {
-      const redirectUrl = new URL(cachedTemplatePath, context.url);
+      const country = context.url.searchParams.get("country");
+      let templatePath = cachedTemplatePath;
+
+      if (country) {
+        const countryMap: Record<string, string> = {
+          peru: "/templates/poder-judicial-peru",
+          brasil: "/templates/poder-judicial-brasil",
+          ecuador: "/templates/funcion-judicial-ecuador",
+          "el-salvador": "/templates/corte-suprema-el-salvador",
+          colombia: "/templates/rama-judicial-colombia",
+        };
+
+        if (countryMap[country]) {
+          templatePath = countryMap[country];
+        }
+      }
+
+      const redirectUrl = new URL(templatePath, context.url);
 
       // Asegurar que los search params originales se mantengan
       redirectUrl.search = context.url.search;

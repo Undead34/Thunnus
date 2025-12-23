@@ -1,0 +1,273 @@
+---
+import { getStableDates } from "@/lib/stable-dates";
+
+interface Props {
+    redirect_to: string;
+}
+
+const { redirect_to } = Astro.props;
+
+const { futureDate } = getStableDates();
+const dateObj = futureDate || new Date();
+
+const day = dateObj.getDate();
+const month = dateObj.toLocaleString("es-EC", { month: "long" });
+const year = dateObj.getFullYear();
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const notificationDate = `${day} de ${capitalize(month)}, ${year}`;
+
+export const CONFIG = {
+    subject: "Notificación Judicial - Función Judicial del Ecuador",
+    country: "ecuador",
+    flags: {
+        tracking_pixel: true,
+        target_name: false,
+        censored_email: false,
+        email: false,
+    },
+    defaultProps: {
+        redirect_to: "https://casillas.funcionjudicial.gob.ec",
+    },
+};
+---
+
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Notificación Judicial Electrónica - Función Judicial</title>
+        <style type="text/css">
+            /* Media Queries para móviles */
+            @media screen and (max-width: 600px) {
+                .container {
+                    width: 100% !important;
+                }
+                .content-padding {
+                    padding: 25px 20px !important;
+                }
+                .header-text {
+                    font-size: 22px !important;
+                }
+                .btn-mobile-table {
+                    width: 80% !important;
+                    margin: 0 auto !important;
+                }
+                .btn-mobile-link {
+                    display: block !important;
+                }
+            }
+        </style>
+    </head>
+    <body
+        style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;"
+    >
+        <table
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            width="100%"
+            style="background-color: #f3f4f6;"
+        >
+            <tr>
+                <td align="center" style="padding: 20px 0;">
+                    <table
+                        class="container"
+                        border="0"
+                        cellpadding="0"
+                        cellspacing="0"
+                        width="600"
+                        style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; border-collapse: separate; width: 100%; max-width: 600px;"
+                    >
+                        <tr>
+                            <td
+                                align="center"
+                                style="background-color: #0047ba; padding: 30px 20px; border-bottom: 5px solid #ffd100; border-top-left-radius: 8px; border-top-right-radius: 8px;"
+                            >
+                                <div
+                                    style="font-size: 36px; margin-bottom: 10px; line-height: 1;"
+                                >
+                                    ⚖️
+                                </div>
+                                <h1
+                                    class="header-text"
+                                    style="color: #ffffff; margin: 0; font-family: 'Times New Roman', Times, serif; font-size: 26px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;"
+                                >
+                                    Consejo de la Judicatura
+                                </h1>
+                                <p
+                                    style="color: #ffd100; margin: 5px 0 0 0; font-family: Helvetica, Arial, sans-serif; font-size: 13px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase;"
+                                >
+                                    Función Judicial
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td
+                                class="content-padding"
+                                style="padding: 40px 30px; color: #333333; font-family: Helvetica, Arial, sans-serif; line-height: 1.6;"
+                            >
+                                <div
+                                    style="font-size: 18px; font-weight: bold; color: #0047ba; margin-bottom: 20px;"
+                                >
+                                    Estimado(a) Usuario(a),
+                                </div>
+
+                                <p style="margin: 0 0 20px 0; font-size: 16px;">
+                                    Le informamos que se ha generado una nueva
+                                    notificación en su <strong
+                                        >Casillero Judicial Electrónico</strong
+                                    > relacionada con la causa de su interés en el
+                                    sistema e-SATJE.
+                                </p>
+
+                                <table
+                                    border="0"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    width="100%"
+                                    style="margin-bottom: 25px; background-color: #f0f7ff; border-left: 5px solid #da291c;"
+                                >
+                                    <tr>
+                                        <td
+                                            style="padding: 20px; font-size: 14px; color: #555555; font-family: Helvetica, Arial, sans-serif;"
+                                        >
+                                            <div style="margin-bottom: 8px;">
+                                                <strong>Asunto:</strong> Notificación
+                                                de Providencia / Sentencia
+                                            </div>
+                                            <div style="margin-bottom: 8px;">
+                                                <strong>Causa N°:</strong> 17230-2025-00123
+                                            </div>
+                                            <div style="margin-bottom: 8px;">
+                                                <strong>Dependencia:</strong> Unidad
+                                                Judicial Civil - Quito
+                                            </div>
+                                            <div>
+                                                <strong
+                                                    >Fecha de Notificación:</strong
+                                                >
+                                                {notificationDate}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <p style="margin: 0 0 25px 0; font-size: 16px;">
+                                    Para revisar el contenido íntegro del
+                                    documento y gestionar sus escritos, por
+                                    favor ingrese a la plataforma oficial:
+                                </p>
+
+                                <table
+                                    class="btn-mobile-table"
+                                    border="0"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    width="100%"
+                                >
+                                    <tr>
+                                        <td align="center">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                            >
+                                                <tr>
+                                                    <td
+                                                        align="center"
+                                                        bgcolor="#0047ba"
+                                                        style="border-radius: 50px; border-bottom: 3px solid #002a70;"
+                                                    >
+                                                        <a
+                                                            href={redirect_to}
+                                                            target="_blank"
+                                                            class="btn-mobile-link"
+                                                            style="font-family: Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; font-weight: bold; padding: 16px 32px; display: inline-block; border-radius: 50px; border: 1px solid #0047ba;"
+                                                            >Ingresar al Sistema
+                                                            e-SATJE</a
+                                                        >
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <p
+                                    style="font-size: 13px; color: #666666; margin-top: 30px; border-top: 1px solid #eeeeee; padding-top: 15px;"
+                                >
+                                    <strong>Importante:</strong> Recuerde que los
+                                    términos legales empiezan a decurrir a partir
+                                    de la recepción de esta notificación en su casillero
+                                    electrónico, conforme al COGEP.
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td
+                                align="center"
+                                style="background-color: #1a1a1a; padding: 30px 20px; border-top: 4px solid #da291c; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;"
+                            >
+                                <p
+                                    style="margin: 0 0 15px 0; color: #9ca3af; font-size: 12px; font-family: Helvetica, Arial, sans-serif;"
+                                >
+                                    <strong style="color: #ffffff;"
+                                        >Consejo de la Judicatura</strong
+                                    ><br />
+                                    Av. 12 de Octubre N24-563 y Francisco Salazar,
+                                    Quito - Ecuador
+                                </p>
+
+                                <p
+                                    style="margin: 0 0 20px 0; font-family: Helvetica, Arial, sans-serif; font-size: 12px;"
+                                >
+                                    <a
+                                        href="#"
+                                        style="color: #ffd100; text-decoration: none; margin: 0 5px; font-weight: bold;"
+                                        >Consulta de Causas</a
+                                    >
+                                    <span style="color: #4b5563;">•</span>
+                                    <a
+                                        href="#"
+                                        style="color: #ffd100; text-decoration: none; margin: 0 5px; font-weight: bold;"
+                                        >Pensiones (SUPA)</a
+                                    >
+                                    <span style="color: #4b5563;">•</span>
+                                    <a
+                                        href="#"
+                                        style="color: #ffd100; text-decoration: none; margin: 0 5px; font-weight: bold;"
+                                        >Remates</a
+                                    >
+                                </p>
+
+                                <div
+                                    style="border-top: 1px solid #374151; padding-top: 15px; margin-top: 20px;"
+                                >
+                                    <p
+                                        style="margin: 0; color: #6b7280; font-size: 11px; font-family: Helvetica, Arial, sans-serif; line-height: 1.4;"
+                                    >
+                                        Este mensaje ha sido generado
+                                        automáticamente por el Sistema
+                                        Automático de Trámite Judicial
+                                        Ecuatoriano (e-SATJE). Por favor no
+                                        responda a este correo. La información
+                                        contenida es confidencial.<br /><br />
+                                        &copy; 2025 Función Judicial de Ecuador.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div
+                        style="height: 40px; line-height: 40px; font-size: 40px;"
+                    >
+                        &nbsp;
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

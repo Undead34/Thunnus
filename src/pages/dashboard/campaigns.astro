@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 
-import GroupsTable from "@/components/dashboard/campaigns/groups-table";
+import { DataExport } from "@/components/dashboard/campaigns/data-export";
+import { CampaignStats } from "@/components/dashboard/campaigns/campaign-stats";
 
 import { app } from "@/firebase/server";
 import { getFirestore } from "firebase-admin/firestore";
@@ -26,53 +27,51 @@ const users: PhishingUser[] = allUsersSnapshot.docs.map((doc: any) =>
 <Layout title="Campañas">
   <Toaster client:only />
   <main class="space-y-6">
-    <section aria-labelledby="upload-heading">
-      <form id="uploadForm" class="flex flex-col gap-4">
-        <header>
-          <h3 id="upload-heading" class="text-lg font-medium mb-2">
-            Cargar usuarios
-          </h3>
-        </header>
+    
+    <div class="grid gap-6 md:grid-cols-2">
+      <section aria-labelledby="upload-heading">
+        <form id="uploadForm" class="flex flex-col gap-4">
+          <header>
+            <h3 id="upload-heading" class="text-lg font-medium mb-2">
+              Cargar usuarios
+            </h3>
+          </header>
 
-        <div class="space-y-4">
-          <div class="gap-2 hidden">
-            <Label htmlFor="group">Grupo</Label>
-            <Input
-              id="group"
-              type="text"
-              placeholder="Ingrese el nombre del grupo"
-              className="w-full max-w-md"
-            />
-          </div>
+          <div class="space-y-4">
+            <div class="grid gap-2">
+              <Label htmlFor="usersList">Usuarios (uno por línea)</Label>
+              <Textarea
+                id="usersList"
+                name="users"
+                rows={6}
+                className="w-full"
+                placeholder={"Juan Perez,juan@example.com\nMaria Lopez,maria@example.com"}
+              />
+            </div>
 
-          <div class="grid gap-2">
-            <Label htmlFor="usersList">Usuarios (uno por línea)</Label>
-            <Textarea
-              id="usersList"
-              name="users"
-              rows={6}
-              className="w-full max-w-2xl"
-              placeholder={"Juan Perez,juan@example.com\nMaria Lopez,maria@example.com"}
-            />
+            <div class="mt-2">
+              <Button type="submit">Cargar usuarios</Button>
+            </div>
           </div>
+        </form>
+      </section>
 
-          <div class="mt-2">
-            <Button type="submit">Cargar usuarios</Button>
-          </div>
-        </div>
-      </form>
-    </section>
+      <section>
+        <DataExport client:load />
+      </section>
+    </div>
 
     <Separator className="my-6" />
 
     <section class="overflow-auto" aria-labelledby="users-table-heading">
       <header class="mb-4">
         <h3 id="users-table-heading" class="text-lg font-medium">
-          Lista de Usuarios
+          Lista de Usuarios y Progreso
         </h3>
       </header>
 
-      <GroupsTable client:only="react" data={users} />
+      <CampaignStats users={users} client:only="react" />
+
     </section>
   </main>
 </Layout>

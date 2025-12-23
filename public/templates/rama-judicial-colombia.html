@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rama Judicial - República de Colombia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Merriweather:wght@700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        co: {
+                            yellow: '#FCD116',  // Amarillo Colombia (Principal)
+                            blue: '#003893',    // Azul Colombia
+                            red: '#CE1126',     // Rojo Colombia
+                            dark: '#232323',    // Gris oscuro institucional
+                            gray: '#F4F6F8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Roboto', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-bg {
+            /* Imagen alusiva al Palacio de Justicia en Bogotá o similar */
+            background-image: linear-gradient(rgba(0, 56, 147, 0.85), rgba(35, 35, 35, 0.9)), url('https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Franja Colombia (50% Amarillo, 25% Azul, 25% Rojo) */
+        .co-stripe {
+            background: linear-gradient(90deg, #FCD116 50%, #003893 50%, #003893 75%, #CE1126 75%);
+            height: 5px;
+            width: 100%;
+        }
+
+        /* Animación suave */
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="font-sans text-gray-800 bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Barra Superior Gobierno -->
+    <div class="bg-co-blue py-1 px-4 text-xs border-b border-blue-900 text-white">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center font-bold tracking-wide">
+                <span class="bg-co-yellow w-3 h-3 rounded-full mr-1 inline-block"></span>
+                <span class="bg-co-blue w-3 h-3 rounded-full mr-1 inline-block border border-white"></span>
+                <span class="bg-co-red w-3 h-3 rounded-full mr-2 inline-block"></span>
+                GOV.CO
+            </div>
+            <div class="flex space-x-4">
+                <a href="#" class="hover:text-co-yellow">Transparencia</a>
+                <a href="#" class="hover:text-co-yellow">Atención al Ciudadano</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Principal -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <!-- Escudo Colombia (Simulado con imagen externa o placeholder) -->
+                <div class="relative w-12 h-14 flex items-center justify-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Colombia.svg"
+                        class="w-full h-auto shadow-sm border border-gray-200" alt="Bandera Colombia">
+                </div>
+                <div class="leading-tight border-l-2 border-gray-300 pl-4">
+                    <h1 class="text-xl md:text-2xl font-serif font-bold text-co-dark tracking-tight">Rama Judicial</h1>
+                    <p class="text-[10px] md:text-xs text-co-blue font-bold uppercase tracking-widest">
+                        Consejo Superior de la Judicatura
+                    </p>
+                </div>
+            </div>
+
+            <!-- Navegación Desktop -->
+            <nav class="hidden lg:flex items-center space-x-6 font-medium text-sm text-gray-700">
+                <a href="#"
+                    class="hover:text-co-blue transition border-b-2 border-transparent hover:border-co-yellow py-1">Inicio</a>
+                <a href="#"
+                    class="hover:text-co-blue transition border-b-2 border-transparent hover:border-co-blue py-1">Consulta
+                    Procesos</a>
+                <a href="#"
+                    class="hover:text-co-blue transition border-b-2 border-transparent hover:border-co-red py-1">Tutela
+                    en Línea</a>
+                <a href="#"
+                    class="hover:text-co-blue transition border-b-2 border-transparent hover:border-co-yellow py-1">Directorio</a>
+
+                <!-- Botón TYBA / Justicia Digital -->
+                <button
+                    class="bg-co-blue text-white px-5 py-2 rounded hover:bg-blue-800 transition shadow-lg flex items-center border-b-4 border-co-red active:border-b-0 active:translate-y-1">
+                    <i class="fas fa-desktop mr-2"></i> Justicia XXI Web
+                </button>
+            </nav>
+
+            <!-- Menu Mobile Toggle -->
+            <button class="lg:hidden text-co-blue text-2xl" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-t p-4 space-y-4 shadow-lg absolute w-full z-40">
+            <a href="#" class="block text-gray-700 hover:text-co-blue font-medium">Inicio</a>
+            <a href="#" class="block text-gray-700 hover:text-co-blue font-medium">Consulta Procesos (CPNU)</a>
+            <a href="#" class="block text-gray-700 hover:text-co-blue font-medium">Tutelas</a>
+            <a href="#" class="block text-co-blue font-bold">Acceso Funcionarios</a>
+        </div>
+
+        <!-- Franja Colombia -->
+        <div class="co-stripe"></div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-bg text-white py-20 md:py-32 relative overflow-hidden">
+        <div class="container mx-auto px-4 relative z-10 flex flex-col md:flex-row items-center">
+            <div class="md:w-2/3 slide-up">
+                <div
+                    class="inline-flex items-center bg-white/10 backdrop-blur-sm px-3 py-1 rounded border-l-4 border-co-yellow mb-6">
+                    <span class="text-xs font-bold tracking-wider uppercase">Transformación Digital de la
+                        Justicia</span>
+                </div>
+
+                <h2 class="text-4xl md:text-6xl font-serif font-bold mb-6 leading-tight">
+                    Justicia al alcance<br>
+                    <span class="text-co-yellow drop-shadow-md">de todos los colombianos</span>
+                </h2>
+
+                <p class="text-lg md:text-xl mb-10 text-gray-200 max-w-2xl font-light">
+                    Portal Único de la Rama Judicial. Consulte el estado de sus procesos, radique tutelas y acceda a las
+                    Altas Cortes desde cualquier lugar.
+                </p>
+
+                <!-- Barra de Búsqueda -->
+                <div
+                    class="bg-white p-2 rounded shadow-2xl max-w-xl flex flex-col sm:flex-row gap-2 border-b-4 border-co-blue">
+                    <div class="flex-1 flex items-center bg-gray-50 rounded px-3 border border-gray-200">
+                        <i class="fas fa-search text-gray-400 mr-2"></i>
+                        <input type="text" placeholder="Código de Proceso (23 dígitos) o Nombre..."
+                            class="w-full py-3 bg-transparent outline-none text-gray-700">
+                    </div>
+                    <button onclick="searchProcess()"
+                        class="bg-co-red hover:bg-red-700 text-white font-bold py-3 px-6 rounded transition flex items-center justify-center shadow-md">
+                        Consultar
+                    </button>
+                </div>
+                <p class="mt-3 text-sm text-gray-300 flex items-center"><i
+                        class="fas fa-check-circle text-co-yellow mr-2"></i> Búsqueda Unificada (CPNU).</p>
+            </div>
+
+            <!-- Card Flotante -->
+            <div class="md:w-1/3 mt-12 md:mt-0 hidden md:block relative">
+                <div
+                    class="glass-effect p-6 rounded-xl absolute top-0 right-0 transform hover:rotate-1 transition duration-500 border-t-4 border-co-yellow">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-co-blue p-3 rounded text-white mr-3"><i class="fas fa-gavel"></i></div>
+                        <div>
+                            <p class="text-xs text-gray-300">Sentencias Recientes</p>
+                            <p class="font-bold text-sm">Corte Constitucional</p>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-200 mt-2 italic">
+                        "La dignidad humana es el fundamento del Estado Social de Derecho."
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Servicios Rápidos -->
+    <section class="py-10 bg-white -mt-10 relative z-20 container mx-auto px-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 shadow-xl rounded-lg bg-white p-6 border border-gray-100">
+            <a href="#"
+                class="flex flex-col items-center justify-center p-4 hover:bg-co-gray rounded transition group border-t-4 border-co-yellow pt-6 hover-lift">
+                <i class="fas fa-file-alt text-3xl text-co-blue mb-3 group-hover:scale-110 transition"></i>
+                <span class="font-medium text-center text-gray-700 text-sm">Consulta de Procesos</span>
+            </a>
+            <a href="#"
+                class="flex flex-col items-center justify-center p-4 hover:bg-co-gray rounded transition group border-t-4 border-co-blue pt-6 hover-lift">
+                <i class="fas fa-hand-holding-heart text-3xl text-co-blue mb-3 group-hover:scale-110 transition"></i>
+                <span class="font-medium text-center text-gray-700 text-sm">Tutela y Habeas Corpus</span>
+            </a>
+            <a href="#"
+                class="flex flex-col items-center justify-center p-4 hover:bg-co-gray rounded transition group border-t-4 border-co-red pt-6 hover-lift">
+                <i class="fas fa-id-badge text-3xl text-co-blue mb-3 group-hover:scale-110 transition"></i>
+                <span class="font-medium text-center text-gray-700 text-sm">Registro de Abogados</span>
+            </a>
+            <a href="#"
+                class="flex flex-col items-center justify-center p-4 hover:bg-co-gray rounded transition group border-t-4 border-co-yellow pt-6 hover-lift">
+                <i class="fas fa-globe-americas text-3xl text-co-blue mb-3 group-hover:scale-110 transition"></i>
+                <span class="font-medium text-center text-gray-700 text-sm">Notificaciones Judiciales</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Sección Innovación & IA -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <div class="flex items-center mb-2">
+                        <span class="w-8 h-1 bg-co-yellow mr-2"></span>
+                        <span class="text-co-blue font-bold tracking-widest text-sm uppercase">Justicia Digital</span>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-co-dark mb-6">Plan de Digitalización
+                        "Justicia XXI"</h2>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        Colombia implementa herramientas de inteligencia artificial para la anonimización de sentencias
+                        y la predicción de reparto. El sistema TYBA permite la gestión integral de expedientes digitales
+                        en juzgados municipales y de circuito.
+                    </p>
+
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-co-blue mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Expediente Digital</h4>
+                                <p class="text-sm text-gray-500">Acceso cero papel a través de la plataforma SAMAI.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-co-blue mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Audiencias Virtuales</h4>
+                                <p class="text-sm text-gray-500">Conectividad total mediante Lifesize y Teams.</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <a href="#" class="text-co-blue font-bold hover:underline inline-flex items-center">
+                        Acceder a TYBA <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+
+                <div class="md:w-1/2">
+                    <!-- Demo Visual -->
+                    <div class="bg-white rounded-lg shadow-2xl p-6 border border-gray-100 relative overflow-hidden">
+                        <!-- Franja Tricolor Superior -->
+                        <div
+                            class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-co-yellow via-co-blue to-co-red">
+                        </div>
+
+                        <div class="flex justify-between items-center mb-6 border-b pb-4">
+                            <h3 class="font-bold text-gray-700"><i class="fas fa-robot mr-2 text-co-blue"></i> PretorIA
+                                (Corte Constitucional)</h3>
+                            <span
+                                class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded font-bold">Activo</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="h-2 bg-gray-200 rounded w-full"></div>
+                            <div class="h-2 bg-gray-200 rounded w-5/6"></div>
+                            <div class="h-2 bg-gray-200 rounded w-4/6"></div>
+                        </div>
+
+                        <div class="mt-6 bg-blue-50 p-4 rounded border-l-4 border-co-blue">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-brain text-co-blue text-xl mr-2"></i>
+                                <span class="font-bold text-gray-800 text-sm">Análisis Automático</span>
+                            </div>
+                            <p class="text-xs text-gray-600">El sistema sugiere priorizar esta Tutela por tratarse de
+                                derechos fundamentales de salud en sujeto de especial protección.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-co-dark text-gray-400 py-12 mt-auto border-t-4 border-co-yellow">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8 mb-8 border-b border-gray-700 pb-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Colombia.svg"
+                            alt="Colombia" class="h-6 w-auto mr-3 border border-gray-600">
+                        <h4 class="text-white text-lg font-serif font-bold">Rama Judicial</h4>
+                    </div>
+                    <p class="text-sm mb-4 max-w-sm">
+                        Consejo Superior de la Judicatura. Administramos justicia con independencia, eficiencia y
+                        transparencia para todos los colombianos.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-co-yellow"><i class="fab fa-facebook-f text-xl"></i></a>
+                        <a href="#" class="hover:text-co-yellow"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="hover:text-co-yellow"><i class="fab fa-youtube text-xl"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h5 class="text-white font-bold mb-4 uppercase text-xs tracking-wider">Altas Cortes</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">Corte Suprema de Justicia</a></li>
+                        <li><a href="#" class="hover:text-white transition">Consejo de Estado</a></li>
+                        <li><a href="#" class="hover:text-white transition">Corte Constitucional</a></li>
+                        <li><a href="#" class="hover:text-white transition">Comisión Nacional de Disciplina</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-white font-bold mb-4 uppercase text-xs tracking-wider">Contacto</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center"><i class="fas fa-phone-alt mr-2 text-co-blue"></i> +57 (1) 565
+                            8500</li>
+                        <li class="flex items-center"><i class="fas fa-envelope mr-2 text-co-blue"></i>
+                            info@cendoj.ramajudicial.gov.co</li>
+                        <li class="flex items-start mt-2"><i class="fas fa-map-marker-alt mr-2 mt-1 text-co-blue"></i>
+                            Calle 12 # 7-65, Palacio de Justicia, Bogotá.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs">
+                <p>&copy; 2025 Rama Judicial de Colombia. Todos los derechos reservados.</p>
+                <div class="flex items-center gap-2 mt-2 md:mt-0">
+                    <span>GOV.CO</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chatbot Button -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button onclick="toggleChat()"
+            class="bg-co-blue hover:bg-blue-900 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-2xl transition transform hover:scale-110 border-2 border-co-yellow">
+            <i class="fas fa-comment-dots"></i>
+        </button>
+    </div>
+
+    <!-- Chat Window (Hidden) -->
+    <div id="chat-window"
+        class="fixed bottom-24 right-6 w-80 bg-white rounded shadow-2xl border border-gray-200 hidden flex-col overflow-hidden z-50">
+        <div class="bg-co-blue text-white p-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-co-blue mr-2 font-bold">
+                    <i class="fas fa-robot"></i></div>
+                <span class="font-bold text-sm">Asistente Jurídico</span>
+            </div>
+            <button onclick="toggleChat()" class="hover:text-gray-300"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="p-4 bg-gray-50 h-64 overflow-y-auto space-y-3 text-sm">
+            <div
+                class="bg-white p-3 rounded rounded-tl-none shadow-sm border border-gray-100 text-gray-700 border-l-2 border-co-yellow">
+                Bienvenido al portal de la Rama Judicial. ¿Desea consultar un proceso por número de radicación o conocer
+                el reparto de una tutela?
+            </div>
+        </div>
+        <div class="p-3 bg-white border-t border-gray-200">
+            <div class="flex">
+                <input type="text" placeholder="Escriba su consulta..."
+                    class="flex-1 bg-gray-100 rounded-l px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-co-blue">
+                <button class="bg-co-blue text-white px-3 rounded-r hover:bg-blue-900"><i
+                        class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Resultado (Demo) -->
+    <div id="modal-result" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded shadow-2xl w-full max-w-md p-6 relative border-t-8 border-co-blue">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i
+                    class="fas fa-times"></i></button>
+            <div class="text-center mb-6">
+                <div
+                    class="w-16 h-16 bg-blue-100 text-co-blue rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="text-xl font-bold text-co-blue">Consultando CPNU</h3>
+                <p class="text-gray-500 text-sm mt-2">Conectando con base de datos unificada de procesos...</p>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                <div class="bg-co-yellow h-2.5 rounded-full" style="width: 70%"></div>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-gray-400">Esta es una simulación del sistema Siglo XXI.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function toggleChat() {
+            document.getElementById('chat-window').classList.toggle('hidden');
+            document.getElementById('chat-window').classList.toggle('flex');
+        }
+
+        function searchProcess() {
+            const modal = document.getElementById('modal-result');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // Simula loading e fecha
+            setTimeout(() => {
+                closeModal();
+                alert('Redirigiendo al sistema de Consulta de Procesos Nacional Unificada...');
+            }, 2000);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal-result');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    </script>
+</body>
+
+</html>

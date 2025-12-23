@@ -8,19 +8,20 @@ const settingsRef = db.collection("settings");
 
 // Función para validar los campos del SMTP
 function validateSMTP(data: Partial<SMTP>): data is SMTP {
+    if (data.provider === 'microsoft') return true;
+
+    // If provider is 'smtp', strictly require fields
     return (
-        typeof data.host === "string" && data.host.trim() !== "" &&
-        typeof data.port === "number" && data.port > 0 &&
-        typeof data.secure === "boolean" &&
-        typeof data.auth?.user === "string" && data.auth.user.trim() !== "" &&
-        typeof data.auth?.pass === "string" && data.auth.pass.trim() !== ""
+        !!data.host &&
+        typeof data.port === "number" &&
+        typeof data.secure === "boolean"
     );
 }
 
 export const POST: APIRoute = async ({ request }) => {
     try {
         const data: Partial<SMTP> = await request.json();
-        
+
         // Validar que los campos no estén vacíos
         if (!validateSMTP(data)) {
             return new Response(
