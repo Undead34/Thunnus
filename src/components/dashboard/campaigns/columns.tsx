@@ -163,8 +163,14 @@ export const columns: ColumnDef<PhishingUser>[] = [
           icon: <MailCheck className="h-4 w-4 mr-2" />,
         },
         opened: {
-          label: "Email Abierto",
-          color: "bg-yellow-100 text-yellow-800",
+          label:
+            status.openedMethod === "click"
+              ? "Abierto por Interacción"
+              : "Email Abierto",
+          color:
+            status.openedMethod === "click"
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-green-100 text-green-800",
           icon: <MailOpen className="h-4 w-4 mr-2" />,
         },
         clicked: {

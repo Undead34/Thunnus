@@ -71,30 +71,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
         (async () => {
           try {
             const userRef = db.collection("phishingUsers").doc(client_id);
-            const userSnapshot = await userRef.get(); // Check existence first to avoid creating junk docs
+            const userSnapshot = await userRef.get();
 
             if (userSnapshot.exists) {
-              const ip = context.clientAddress || context.request.headers.get("x-forwarded-for") || "unknown";
-              const userAgent = context.request.headers.get("user-agent") || "unknown";
-              const { os, browser } = parseUserAgent(userAgent);
-
-              await userRef.update({
-                "status.linkClicked": true,
-                "status.lastActivityAt": new Date(),
-                "metadata.ip": ip,
-                "metadata.userAgent": userAgent,
-                "metadata.device.os": os,
-                "metadata.device.browser": browser,
-                clickCount: FieldValue.increment(1),
-                events: FieldValue.arrayUnion({
-                  type: "CLICKED",
-                  timestamp: new Date().toISOString(),
-                  data: {
-                    ip,
-                    country: country || "unknown",
-                    userAgent
-                  }
-                })
+              const userData = userSnapshot.data();
+              const metadata = await getTrackingMetadata(
+                context.request.headers,
+                context.clientAddress
+              );
+              await logTrackingEvent(db, client_id, "CLICKED", metadata, {
+                country: country || "unknown",
+                currentStatus: userData?.status, // Pass current status to prevent overwriting 'pixel' method
               });
             }
           } catch (e) {
@@ -132,8 +119,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
       return next(req);
     }
-  }
-  else if (isProtectedRoute) {
+  } else if (isProtectedRoute) {
     const sessionCookie = context.cookies.get("__session")?.value;
     if (!sessionCookie) return context.redirect("/login");
 
@@ -167,16 +153,22 @@ export const onRequest = defineMiddleware(async (context, next) => {
         },
       };
 
-
       const userRef = db.collection("phishingUsers").doc(client_id);
       const docSnapshot = await userRef.get();
 
       if (docSnapshot.exists) {
-        const metadata = await getTrackingMetadata(context.request.headers, context.clientAddress);
+        const metadata = await getTrackingMetadata(
+          context.request.headers,
+          context.clientAddress
+        );
         // Fire and forget log
-        logTrackingEvent(db, client_id, "OPENED", metadata).catch(err => console.error("Error logging pixel open:", err));
+        logTrackingEvent(db, client_id, "OPENED", metadata).catch((err) =>
+          console.error("Error logging pixel open:", err)
+        );
       } else {
-        console.log(`Intento de tracking ignorado: El usuario con client_id "${client_id}" no existe.`);
+        console.log(
+          `Intento de tracking ignorado: El usuario con client_id "${client_id}" no existe.`
+        );
       }
     }
 

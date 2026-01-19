@@ -25,6 +25,7 @@ export interface UserStatus {
   emailOpenedAt: Timestamp | null;
   firstClickAt: Timestamp | null;
   lastClickAt: Timestamp | null;
+  openedMethod?: "pixel" | "click";
 }
 
 // Credenciales capturadas (cifradas)
