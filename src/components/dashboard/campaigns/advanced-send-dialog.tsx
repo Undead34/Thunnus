@@ -17,12 +17,14 @@ interface AdvancedSendDialogProps {
   onSend: (config: { batchSize: number; waitInterval: number }) => void;
   isLoading: boolean;
   count: number;
+  triggerLabel?: string;
 }
 
 export function AdvancedSendDialog({
   onSend,
   isLoading,
   count,
+  triggerLabel = "Envío Avanzado",
 }: AdvancedSendDialogProps) {
   const [open, setOpen] = React.useState(false);
   const [batchSize, setBatchSize] = React.useState("5");
@@ -44,7 +46,7 @@ export function AdvancedSendDialog({
       <DialogTrigger asChild>
         <Button variant="outline" className="h-8 px-2 lg:px-3">
           <Settings2 className="mr-2 h-4 w-4" />
-          Envío Avanzado
+          {triggerLabel}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -87,7 +89,11 @@ export function AdvancedSendDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setOpen(false)}
+          >
             Cancelar
           </Button>
           <Button type="submit" onClick={handleSend} disabled={isLoading}>

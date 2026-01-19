@@ -1,6 +1,5 @@
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import type { Table } from "@tanstack/react-table";
-import { Settings2, Trash2, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,6 +13,9 @@ import React from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
+import { ManageTagsDialog } from "./manage-tags-dialog";
+import { Settings2, Trash2, RotateCw, Mail, Tags } from "lucide-react";
+
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
   onDeleteComplete: () => void;
@@ -24,7 +26,64 @@ export function DataTableViewOptions<TData>({
   onDeleteComplete,
 }: DataTableViewOptionsProps<TData>) {
   const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isSending, setIsSending] = React.useState(false);
   const hasSelection = table.getSelectedRowModel().rows.length > 0;
+
+  const handleSend = async () => {
+    if (!hasSelection) {
+      if (
+        !window.confirm("¿Estás seguro de enviar correos a TODOS los usuarios?")
+      )
+        return;
+      if (
+        !window.confirm(
+          "Esta acción enviará correos a toda la base de datos. ¿Estás realmente seguro?"
+        )
+      )
+        return;
+    } else {
+      if (
+        !window.confirm(
+          "¿Estás seguro de enviar correos a los usuarios seleccionados?"
+        )
+      )
+        return;
+    }
+
+    setIsSending(true);
+    try {
+      const userIds = hasSelection
+        ? table
+            .getSelectedRowModel()
+            .rows.map((row) => (row.original as any).id)
+        : undefined;
+
+      // Default config for quick send: Batch 5, Interval 2s
+      const response = await fetch("/api/emails/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userIds,
+          batchSize: 5,
+          waitInterval: 2,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Error del servidor");
+
+      toast.success(
+        hasSelection
+          ? "Envío iniciado para seleccionados"
+          : "Envío iniciado para todos"
+      );
+
+      table.resetRowSelection();
+    } catch (error) {
+      toast.error("Error al iniciar el envío");
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   const handleDelete = async () => {
     if (!hasSelection) {
@@ -74,6 +133,33 @@ export function DataTableViewOptions<TData>({
     }
   };
 
+  const uniqueTags = React.useMemo(() => {
+    const tagsMap = new Map<
+      string,
+      { label: string; value: string; color: string; count: number }
+    >();
+    table.getPreFilteredRowModel().rows.forEach((row) => {
+      const tags = (row.original as any).tags;
+      if (tags && Array.isArray(tags)) {
+        tags.forEach((tag: any) => {
+          if (!tagsMap.has(tag.name)) {
+            tagsMap.set(tag.name, {
+              label: tag.name,
+              value: tag.name,
+              color: tag.color,
+              count: 0,
+            });
+          }
+          const current = tagsMap.get(tag.name)!;
+          current.count += 1;
+        });
+      }
+    });
+    return Array.from(tagsMap.values()).sort((a, b) =>
+      a.label.localeCompare(b.label)
+    );
+  }, [table.getPreFilteredRowModel().rows]);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -81,9 +167,9 @@ export function DataTableViewOptions<TData>({
           variant="outline"
           size="sm"
           className="ml-auto  h-8 "
-          disabled={isDeleting}
+          disabled={isDeleting || isSending}
         >
-          {isDeleting ? (
+          {isDeleting || isSending ? (
             <RotateCw className="h-4 w-4 animate-spin" />
           ) : (
             <Settings2 className="h-4 w-4" />
@@ -98,8 +184,23 @@ export function DataTableViewOptions<TData>({
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
+          onClick={handleSend}
+          disabled={isSending || isDeleting}
+          className="flex justify-between items-center"
+        >
+          <div className="flex items-center">
+            {isSending ? (
+              <RotateCw className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Mail className="mr-2 h-4 w-4" />
+            )}
+            {hasSelection ? "Enviar seleccionados" : "Enviar a todos"}
+          </div>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
           onClick={handleDelete}
-          disabled={isDeleting}
+          disabled={isDeleting || isSending}
           className="flex justify-between items-center"
         >
           <div className="flex items-center">
@@ -116,6 +217,26 @@ export function DataTableViewOptions<TData>({
             </Badge>
           )}
         </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuLabel>Etiquetas</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <ManageTagsDialog
+          existingTags={uniqueTags}
+          onSuccess={() => window.location.reload()}
+          trigger={
+            <DropdownMenuItem
+              onSelect={(e) => e.preventDefault()} // Prevent closing menu immediately
+              className="flex justify-between items-center cursor-pointer"
+            >
+              <div className="flex items-center">
+                <Tags className="mr-2 h-4 w-4" />
+                Gestionar Etiquetas
+              </div>
+            </DropdownMenuItem>
+          }
+        />
 
         <DropdownMenuSeparator />
 

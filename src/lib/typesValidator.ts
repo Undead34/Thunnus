@@ -49,7 +49,14 @@ export const PhishingUserSchema = z.object({
       z.object({
         type: z.string(),
         timestamp: z.string(),
-        data: z.any(),
+      })
+    )
+    .optional(),
+  tags: z
+    .array(
+      z.object({
+        name: z.string(),
+        color: z.string(),
       })
     )
     .optional(),

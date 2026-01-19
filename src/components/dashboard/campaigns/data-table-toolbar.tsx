@@ -122,6 +122,33 @@ export function DataTableToolbar<TData>({
       }));
   }, [table.getPreFilteredRowModel().rows]);
 
+  const uniqueTags = React.useMemo(() => {
+    const tagsMap = new Map<
+      string,
+      { label: string; value: string; color: string; count: number }
+    >();
+    table.getPreFilteredRowModel().rows.forEach((row) => {
+      const tags = (row.original as PhishingUser).tags;
+      if (tags && Array.isArray(tags)) {
+        tags.forEach((tag) => {
+          if (!tagsMap.has(tag.name)) {
+            tagsMap.set(tag.name, {
+              label: tag.name,
+              value: tag.name,
+              color: tag.color,
+              count: 0,
+            });
+          }
+          const current = tagsMap.get(tag.name)!;
+          current.count += 1;
+        });
+      }
+    });
+    return Array.from(tagsMap.values()).sort((a, b) =>
+      a.label.localeCompare(b.label)
+    );
+  }, [table.getPreFilteredRowModel().rows]);
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
@@ -138,6 +165,13 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("domain")}
             title="Dominio"
             options={uniqueDomains}
+          />
+        )}
+        {table.getColumn("tags") && uniqueTags.length > 0 && (
+          <DataTableFacetedFilter
+            column={table.getColumn("tags")}
+            title="Etiquetas"
+            options={uniqueTags}
           />
         )}
         {table.getColumn("status") && (
@@ -162,6 +196,9 @@ export function DataTableToolbar<TData>({
           onSend={handleSendEmails}
           isLoading={isSending}
           count={count}
+          triggerLabel={
+            hasSelection ? "Enviar Seleccionados" : "Envío Avanzado"
+          }
         />
 
         {hasSelection && (
@@ -169,7 +206,8 @@ export function DataTableToolbar<TData>({
             userIds={table
               .getSelectedRowModel()
               .rows.map((row) => (row.original as PhishingUser).id)}
-            onSuccess={() => table.resetRowSelection()} // Simplification: actual data refresh might be needed
+            existingTags={uniqueTags}
+            onSuccess={() => window.location.reload()}
           />
         )}
 

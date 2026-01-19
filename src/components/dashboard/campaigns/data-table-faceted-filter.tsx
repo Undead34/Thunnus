@@ -28,6 +28,7 @@ interface DataTableFacetedFilterProps<TData, TValue> {
     label: string;
     value: string;
     icon?: React.ComponentType<{ className?: string }>;
+    count?: number;
   }[];
 }
 
@@ -81,7 +82,10 @@ export function DataTableFacetedFilter<TData, TValue>({
             <CommandGroup>
               {options.map((option) => {
                 const isSelected = selectedValues.has(option.value);
-                const count = facets?.get(option.value) || 0;
+                const count =
+                  option.count !== undefined
+                    ? option.count
+                    : facets?.get(option.value) || 0;
 
                 return (
                   <CommandItem

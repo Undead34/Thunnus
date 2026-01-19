@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Download, Loader2 } from "lucide-react";
@@ -47,12 +53,14 @@ export function DataExport() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `thunnus-export-${new Date().toISOString().split("T")[0]}.json`;
+      a.download = `thunnus-export-${
+        new Date().toISOString().split("T")[0]
+      }.json`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       a.remove();
-      
+
       toast.success("Exportación completada exitosamente.");
     } catch (error) {
       console.error(error);
@@ -63,11 +71,12 @@ export function DataExport() {
   };
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="text-lg">Exportar Datos</CardTitle>
         <CardDescription>
-          Descargue el contenido de la base de datos en formato JSON para análisis o respaldo.
+          Descargue el contenido de la base de datos en formato JSON para
+          análisis o respaldo.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -79,14 +88,20 @@ export function DataExport() {
                 checked={selectedCollections.includes(col.id)}
                 onCheckedChange={(c) => handleToggle(col.id, c as boolean)}
               />
-              <Label htmlFor={col.id} className="cursor-pointer">{col.label}</Label>
+              <Label htmlFor={col.id} className="cursor-pointer">
+                {col.label}
+              </Label>
             </div>
           ))}
         </div>
 
         <div className="pt-2">
           <Button onClick={handleExport} disabled={loading} variant="outline">
-            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+            {loading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
             Descargar JSON
           </Button>
         </div>

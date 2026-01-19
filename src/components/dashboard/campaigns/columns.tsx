@@ -72,6 +72,39 @@ export const columns: ColumnDef<PhishingUser>[] = [
     },
   },
   {
+    accessorKey: "tags",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Etiquetas" />
+    ),
+    cell: ({ row }) => {
+      const tags = row.original.tags;
+      if (!tags || tags.length === 0) return null;
+
+      return (
+        <div className="flex flex-wrap gap-1">
+          {tags.map((tag) => (
+            <Badge
+              key={tag.name}
+              variant="outline"
+              className={`${tag.color} border-current`}
+            >
+              {tag.name}
+            </Badge>
+          ))}
+        </div>
+      );
+    },
+    enableSorting: false,
+    enableHiding: true,
+    filterFn: (row, id, value) => {
+      // value is array of selected tag names (strings)
+      // row.getValue(id) is array of tag objects {name, color}
+      const rowTags = (row.getValue(id) as { name: string }[]) || [];
+      const rowTagNames = rowTags.map((t) => t.name);
+      return value.some((val: string) => rowTagNames.includes(val));
+    },
+  },
+  {
     accessorKey: "domain",
     accessorFn: (row) => {
       const email = row.email;

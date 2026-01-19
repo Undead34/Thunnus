@@ -7,7 +7,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { MailCheck, MailOpen, MousePointerClick, ClipboardCheck, Minus } from "lucide-react";
+import {
+  MailCheck,
+  MailOpen,
+  MousePointerClick,
+  ClipboardCheck,
+  Minus,
+} from "lucide-react";
 import type { PhishingUser } from "@/types";
 import { formatDate } from "@/lib/date";
 
@@ -25,11 +31,27 @@ export function SimpleStats({ users }: Props) {
   };
 
   const variants = {
-     sent: { label: "Enviado", color: "bg-blue-100 text-blue-800", icon: MailCheck },
-     opened: { label: "Abierto", color: "bg-yellow-100 text-yellow-800", icon: MailOpen },
-     clicked: { label: "Click", color: "bg-orange-100 text-orange-800", icon: MousePointerClick },
-     submit: { label: "Datos", color: "bg-red-100 text-red-800", icon: ClipboardCheck },
-     none: { label: "-", color: "text-muted-foreground", icon: Minus },
+    sent: {
+      label: "Enviado",
+      color: "bg-blue-100 text-blue-800",
+      icon: MailCheck,
+    },
+    opened: {
+      label: "Abierto",
+      color: "bg-yellow-100 text-yellow-800",
+      icon: MailOpen,
+    },
+    clicked: {
+      label: "Click",
+      color: "bg-orange-100 text-orange-800",
+      icon: MousePointerClick,
+    },
+    submit: {
+      label: "Datos",
+      color: "bg-red-100 text-red-800",
+      icon: ClipboardCheck,
+    },
+    none: { label: "-", color: "text-muted-foreground", icon: Minus },
   };
 
   return (
@@ -48,24 +70,36 @@ export function SimpleStats({ users }: Props) {
             const state = getStatus(user.status);
             const Variant = variants[state];
             const Icon = Variant.icon;
-            
+
             // Determine last activity date
             let lastDate = null;
             if (user.status.lastClickAt) lastDate = user.status.lastClickAt;
-            else if (user.status.emailOpenedAt) lastDate = user.status.emailOpenedAt;
+            else if (user.status.emailOpenedAt)
+              lastDate = user.status.emailOpenedAt;
 
             return (
               <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name || "Sin nombre"}</TableCell>
-                <TableCell>{user.email}</TableCell>
+                <TableCell className="font-medium">
+                  {user.name || "Sin nombre"}
+                </TableCell>
                 <TableCell>
-                  <div className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${Variant.color}`}>
+                  <a
+                    href={`/dashboard/users/${user.id}`}
+                    className="hover:underline hover:text-primary"
+                  >
+                    {user.email}
+                  </a>
+                </TableCell>
+                <TableCell>
+                  <div
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${Variant.color}`}
+                  >
                     <Icon className="mr-1 h-3 w-3" />
                     {Variant.label}
                   </div>
                 </TableCell>
                 <TableCell className="text-right text-muted-foreground">
-                    {formatDate(lastDate as any)}
+                  {formatDate(lastDate as any)}
                 </TableCell>
               </TableRow>
             );

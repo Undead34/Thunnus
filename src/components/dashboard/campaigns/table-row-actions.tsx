@@ -149,10 +149,7 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem
-          onClick={handleCopyId}
-          disabled={isCopying}
-        >
+        <DropdownMenuItem onClick={handleCopyId} disabled={isCopying}>
           {isCopying ? (
             <RotateCw className="mr-2 h-4 w-4 animate-spin" />
           ) : (
@@ -163,10 +160,7 @@ export function DataTableRowActions<TData>({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          onClick={handleSendEmail}
-          disabled={isSending || user.status.emailSended}
-        >
+        <DropdownMenuItem onClick={handleSendEmail} disabled={isSending}>
           {isSending ? (
             <RotateCw className="mr-2 h-4 w-4 animate-spin" />
           ) : (

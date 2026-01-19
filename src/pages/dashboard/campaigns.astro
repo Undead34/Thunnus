@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 import { DataExport } from "@/components/dashboard/campaigns/data-export";
 import { CampaignStats } from "@/components/dashboard/campaigns/campaign-stats";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { app } from "@/firebase/server";
 import { getFirestore } from "firebase-admin/firestore";
@@ -30,30 +31,31 @@ const users: PhishingUser[] = allUsersSnapshot.docs.map((doc: any) =>
     
     <div class="grid gap-6 md:grid-cols-2">
       <section aria-labelledby="upload-heading">
-        <form id="uploadForm" class="flex flex-col gap-4">
-          <header>
-            <h3 id="upload-heading" class="text-lg font-medium mb-2">
-              Cargar usuarios
-            </h3>
-          </header>
+        <Card className="h-full">
+          <CardHeader>
+            <CardTitle>Cargar usuarios</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form id="uploadForm" class="flex flex-col gap-4">
+              <div class="space-y-4">
+                <div class="grid gap-2">
+                  <Label htmlFor="usersList">Usuarios (uno por línea)</Label>
+                  <Textarea
+                    id="usersList"
+                    name="users"
+                    rows={6}
+                    className="w-full"
+                    placeholder={"Juan Perez,juan@example.com\nMaria Lopez,maria@example.com"}
+                  />
+                </div>
 
-          <div class="space-y-4">
-            <div class="grid gap-2">
-              <Label htmlFor="usersList">Usuarios (uno por línea)</Label>
-              <Textarea
-                id="usersList"
-                name="users"
-                rows={6}
-                className="w-full"
-                placeholder={"Juan Perez,juan@example.com\nMaria Lopez,maria@example.com"}
-              />
-            </div>
-
-            <div class="mt-2">
-              <Button type="submit">Cargar usuarios</Button>
-            </div>
-          </div>
-        </form>
+                <div class="mt-2">
+                  <Button type="submit">Cargar usuarios</Button>
+                </div>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </section>
 
       <section>
