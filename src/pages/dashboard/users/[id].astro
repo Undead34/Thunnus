@@ -86,17 +86,45 @@ const allEvents = [...events, ...sessionEvents].sort((a, b) => {
             </Badge>
           </div>
           <div>
-            <Badge variant="secondary" className="flex items-center gap-1">
-              {user.status.emailOpened ? "✅" : "❌"}
-              Email Abierto
-              <PopoverEmail client:load>
-                {
-                  user.status.emailOpenedAt
-                    ? formatDate(user.status.emailOpenedAt)
-                    : "N/A"
+            {
+              (() => {
+                const status = user.status;
+                let bgClass = "bg-red-100 text-red-800 hover:bg-red-100 border-red-200";
+                let icon = "❌";
+                let label = "No Abierto";
+                let note = "El usuario no ha abierto el correo o ha bloqueado el rastreo (imágenes bloqueadas).";
+                let date = null;
+
+                if (status.emailOpened) {
+                  if (status.openedMethod === "click") {
+                    bgClass = "bg-orange-100 text-orange-800 hover:bg-orange-100 border-orange-200";
+                    icon = "⚠️";
+                    label = "Abierto (Interacción)";
+                    note = `Apertura inferida: El usuario hizo clic en el enlace. El pixel de seguimiento no cargó (imágenes bloqueadas). Fecha aprox: ${formatDate(status.firstClickAt || status.lastActivityAt)}`;
+                    date = status.firstClickAt || status.lastActivityAt;
+                  } else {
+                    bgClass = "bg-green-100 text-green-800 hover:bg-green-100 border-green-200";
+                    icon = "✅";
+                    label = "Email Abierto";
+                    note = `Confirmado por Pixel: El usuario visualizó el correo y cargó las imágenes. Fecha: ${formatDate(status.emailOpenedAt)}`;
+                    date = status.emailOpenedAt;
+                  }
                 }
-              </PopoverEmail>
-            </Badge>
+
+                return (
+                  <Badge className={`flex items-center gap-1 ${bgClass} border`}>
+                    <span className="mr-1">{icon}</span>
+                    {label}
+                    <PopoverEmail client:load>
+                      <div class="p-2 max-w-[250px]">
+                        <p class="font-semibold mb-1 text-sm">Detalle:</p>
+                        <p class="text-xs text-muted-foreground">{note}</p>
+                      </div>
+                    </PopoverEmail>
+                  </Badge>
+                );
+              })()
+            }
           </div>
           <div>
             <Badge variant="secondary">
