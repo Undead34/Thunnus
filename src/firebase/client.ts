@@ -1,10 +1,12 @@
 import { initializeApp } from "firebase/app";
 const firebaseConfig = {
-  apiKey: "AIzaSyA6Nz4MoB0Z0klFeSgr3DKjD3TiWJOy-xM",
-  authDomain: "fkp-atun.firebaseapp.com",
-  projectId: "fkp-atun",
-  storageBucket: "fkp-atun.firebasestorage.app",
-  messagingSenderId: "689285075914",
-  appId: "1:689285075914:web:4a71dca23de3c45520b533"
+  apiKey: "AIzaSyANABWYaQBB6GrTc0ENqeTX0sN6Aj9tqDM",
+  authDomain: "musical-octo-motor.firebaseapp.com",
+  projectId: "musical-octo-motor",
+  storageBucket: "musical-octo-motor.firebasestorage.app",
+  messagingSenderId: "660238526190",
+  appId: "1:660238526190:web:6cb2ee7f7dab2e57f375ff",
+  measurementId: "G-ELFBZ36SL3",
 };
+
 export const app = initializeApp(firebaseConfig);

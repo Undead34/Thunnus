@@ -72,6 +72,24 @@ export const columns: ColumnDef<PhishingUser>[] = [
     },
   },
   {
+    accessorKey: "domain",
+    accessorFn: (row) => {
+      const email = row.email;
+      if (!email) return "";
+      return email.split("@")[1] || "";
+    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Dominio" />
+    ),
+    cell: ({ row }) => {
+      return <div>{row.getValue("domain")}</div>;
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+    enableHiding: true,
+  },
+  {
     id: "status",
     accessorFn: (row) => {
       const status = row.status;
@@ -141,7 +159,7 @@ export const columns: ColumnDef<PhishingUser>[] = [
             {variants[state].icon}
             {variants[state].label}
           </Badge>
-              {formatDate(status.firstClickAt as any)}
+          {formatDate(status.firstClickAt as any)}
         </div>
       );
     },
@@ -248,8 +266,8 @@ export const columnsUser: ColumnDef<PhishingUser>[] = [
         user = PhishingUserSchema.parse(row.original) as any;
       } catch (error) {
         console.error("Error al parsear el usuario:", error);
-        console.log(row.original.email)
-        console.log(row.original.capturedCredentials)
+        console.log(row.original.email);
+        console.log(row.original.capturedCredentials);
         return;
       }
 
@@ -324,7 +342,7 @@ export const columnsUser: ColumnDef<PhishingUser>[] = [
           </div>
           {metadata.geolocation?.country && (
             <div>
-                 Loc: {metadata.geolocation.city}, {metadata.geolocation.country}
+              Loc: {metadata.geolocation.city}, {metadata.geolocation.country}
             </div>
           )}
         </div>

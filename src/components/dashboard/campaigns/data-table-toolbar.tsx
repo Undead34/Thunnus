@@ -4,6 +4,7 @@ import type { Table } from "@tanstack/react-table";
 import {
   CircleSlash,
   ClipboardCheck,
+  Globe,
   MailCheck,
   MailOpen,
   MousePointerClick,
@@ -103,6 +104,24 @@ export function DataTableToolbar<TData>({
     ? table.getSelectedRowModel().rows.length
     : table.getCoreRowModel().rows.length;
 
+  const uniqueDomains = React.useMemo(() => {
+    const domains = new Set<string>();
+    table.getPreFilteredRowModel().rows.forEach((row) => {
+      const email = (row.original as PhishingUser).email;
+      if (email) {
+        const domain = email.split("@")[1];
+        if (domain) domains.add(domain);
+      }
+    });
+    return Array.from(domains)
+      .sort()
+      .map((domain) => ({
+        label: domain,
+        value: domain,
+        icon: Globe,
+      }));
+  }, [table.getPreFilteredRowModel().rows]);
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
@@ -114,6 +133,13 @@ export function DataTableToolbar<TData>({
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
         />
+        {table.getColumn("domain") && uniqueDomains.length > 0 && (
+          <DataTableFacetedFilter
+            column={table.getColumn("domain")}
+            title="Dominio"
+            options={uniqueDomains}
+          />
+        )}
         {table.getColumn("status") && (
           <DataTableFacetedFilter
             column={table.getColumn("status")}
