@@ -91,7 +91,6 @@ const CONCURRENCY_LIMIT = 5;
 
 // Initialize Email Service removed from global scope
 
-
 async function markEmailSent(userId: string, batchId: string) {
   const userRef = db.collection("phishingUsers").doc(userId);
   await Promise.all([
@@ -110,7 +109,7 @@ async function markEmailSent(userId: string, batchId: string) {
 async function markEmailError(
   userId: string,
   batchId: string,
-  message: string
+  message: string,
 ) {
   await Promise.all([
     db.collection("phishingUsers").doc(userId).update({
@@ -174,19 +173,27 @@ async function sendMail(pkg: MailPackage) {
   try {
     const html = await container.renderToString(Template, { props });
 
+    console.log(
+      `[Batch ${batchId}] Attempting to send email to ${user.email} using template ${config.subject}`,
+    );
+
     await emailService.send({
       to: user.email,
       subject,
       html,
-      smtp: smtp // Pass SMTP config just in case provider is switched to SMTP
+      smtp: smtp, // Pass SMTP config just in case provider is switched to SMTP
     });
 
-    console.log("Email sent to", user.email);
+    console.log(`[Batch ${batchId}] Email successfully sent to ${user.email}`);
 
     await markEmailSent(user.id, batchId);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : String(error ?? "Error");
+    console.error(
+      `[Batch ${batchId}] Failed to send email to ${user.email}:`,
+      error,
+    );
     await markEmailError(user.id, batchId, message);
   }
 }
@@ -199,21 +206,21 @@ export const POST: APIRoute = async ({ request, url }) => {
         JSON.stringify({
           error: "Formato inválido: se requiere { userIds?: string[] }",
         }),
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (data.userIds && !Array.isArray(data.userIds)) {
       return new Response(
         JSON.stringify({ error: "userIds debe ser un array de strings" }),
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (data.userIds?.some((id: any) => typeof id !== "string")) {
       return new Response(
         JSON.stringify({ error: "Todos los userIds deben ser strings" }),
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -224,7 +231,7 @@ export const POST: APIRoute = async ({ request, url }) => {
       if (userIds.length > 10) {
         return new Response(
           JSON.stringify({ error: "Máximo 10 userIds por solicitud" }),
-          { status: 400 }
+          { status: 400 },
         );
       }
       usersQuery = await db
@@ -240,7 +247,7 @@ export const POST: APIRoute = async ({ request, url }) => {
     if (!users.length) {
       return new Response(
         JSON.stringify({ error: "No se encontraron usuarios" }),
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -250,11 +257,11 @@ export const POST: APIRoute = async ({ request, url }) => {
     if (!smtpDoc.exists) {
       return new Response(
         JSON.stringify({ error: "Configuración SMTP no encontrada" }),
-        { status: 500 }
+        { status: 500 },
       );
     }
     const smtp = smtpDoc.data() as SMTP;
-    const emailService = new EmailService(smtp.provider || 'microsoft');
+    const emailService = new EmailService(smtp.provider || "microsoft");
 
     const tplDoc = await db.collection("settings").doc("email-template").get();
     const selectedKey: string = tplDoc.exists
@@ -293,12 +300,14 @@ export const POST: APIRoute = async ({ request, url }) => {
                 template,
                 emailService,
               });
-            })
+            }),
           );
 
           // Wait only if there are more items in the queue
           if (queue.length > 0 && waitInterval > 0) {
-            await new Promise((resolve) => setTimeout(resolve, waitInterval * 1000));
+            await new Promise((resolve) =>
+              setTimeout(resolve, waitInterval * 1000),
+            );
           }
         }
 
@@ -324,7 +333,7 @@ export const POST: APIRoute = async ({ request, url }) => {
         message: "Procesamiento de lote iniciado",
         _links: { status: `/api/batches/${batchId}` },
       }),
-      { status: 202 }
+      { status: 202 },
     );
   } catch (err: any) {
     console.error("Error en endpoint:", err);
@@ -333,7 +342,7 @@ export const POST: APIRoute = async ({ request, url }) => {
         error: "Error procesando la solicitud",
         details: err.message,
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
