@@ -84,7 +84,10 @@ export function DataTableToolbar<TData>({
         }),
       });
 
-      if (!response.ok) throw new Error("Error en el servidor");
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Error en el servidor");
+      }
 
       toast.success(
         hasSelection
@@ -94,7 +97,7 @@ export function DataTableToolbar<TData>({
 
       table.resetRowSelection();
     } catch (error) {
-      toast.error("Error al iniciar el envío");
+      toast.error(error instanceof Error ? error.message : "Error al iniciar el envío");
     } finally {
       setIsSending(false);
     }

@@ -83,9 +83,22 @@ export function AdvancedSendDialog({
               min="0"
             />
           </div>
-          <div className="text-sm text-muted-foreground mt-2">
-            Se enviarán <strong>{batchSize}</strong> correos, luego se esperará{" "}
-            <strong>{waitInterval}</strong> segundos antes del siguiente lote.
+          <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground mt-2">
+            <p className="mb-2">
+              Se enviarán <strong>{batchSize || 0}</strong> correos, luego se esperará{" "}
+              <strong>{waitInterval || 0}</strong> segundos antes del siguiente lote.
+            </p>
+            <div className="flex items-center gap-2 font-medium text-foreground">
+              <div className="h-2 w-2 rounded-full bg-blue-500" />
+              Velocidad estimada:{" "}
+              {(() => {
+                const s = parseInt(batchSize) || 0;
+                const i = parseInt(waitInterval) || 0;
+                if (i <= 0) return "Máxima (según respuesta del servidor)";
+                const rate = s / i;
+                return `${rate.toFixed(1)} correos/segundo`;
+              })()}
+            </div>
           </div>
         </div>
         <DialogFooter>

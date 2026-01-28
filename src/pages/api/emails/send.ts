@@ -226,23 +226,40 @@ export const POST: APIRoute = async ({ request, url }) => {
 
     const { userIds } = data;
 
-    let usersQuery;
+
+    // Helper functionality for chunking array (moved inside to avoid global scope pollution if not needed elsewhere)
+    const chunkArray = <T>(array: T[], size: number): T[][] => {
+      const chunked: T[][] = [];
+      for (let i = 0; i < array.length; i += size) {
+        chunked.push(array.slice(i, i + size));
+      }
+      return chunked;
+    };
+
+    let usersQuery: PhishingUser[] = [];
     if (userIds?.length) {
-      if (userIds.length > 10) {
+      if (userIds.length > 1000) {
         return new Response(
-          JSON.stringify({ error: "Máximo 10 userIds por solicitud" }),
+          JSON.stringify({ error: "Máximo 1000 userIds por solicitud" }),
           { status: 400 },
         );
       }
-      usersQuery = await db
-        .collection("phishingUsers")
-        .where("id", "in", userIds)
-        .get();
+
+      // Chunk userIds to respect Firestore 'in' query limit of 30
+      const chunks = chunkArray(userIds, 30);
+      const promises = chunks.map(chunk =>
+        db.collection("phishingUsers").where("id", "in", chunk).get()
+      );
+
+      const snapshots = await Promise.all(promises);
+      usersQuery = snapshots.flatMap(snap => snap.docs.map(d => d.data() as PhishingUser));
+
     } else {
-      usersQuery = await db.collection("phishingUsers").get();
+      const snapshot = await db.collection("phishingUsers").get();
+      usersQuery = snapshot.docs.map((d) => d.data() as PhishingUser);
     }
 
-    const users = usersQuery.docs.map((d) => d.data() as PhishingUser);
+    const users = usersQuery;
 
     if (!users.length) {
       return new Response(
