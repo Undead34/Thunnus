@@ -1,4 +1,7 @@
+import type strict from "assert/strict";
 import type { UserRecord } from "firebase-admin/auth";
+
+type FIREBASE_SERVICE_ACCOUNT_PATH = string;
 
 interface ImportMetaEnv {
   readonly FIREBASE_TYPE: string;

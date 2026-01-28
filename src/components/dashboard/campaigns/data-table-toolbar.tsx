@@ -70,8 +70,8 @@ export function DataTableToolbar<TData>({
     try {
       const selectedIds = hasSelection
         ? table
-            .getSelectedRowModel()
-            .rows.map((row) => (row.original as PhishingUser).id)
+          .getSelectedRowModel()
+          .rows.map((row) => (row.original as PhishingUser).id)
         : undefined;
 
       const response = await fetch("/api/emails/send", {
@@ -127,9 +127,11 @@ export function DataTableToolbar<TData>({
       string,
       { label: string; value: string; color: string; count: number }
     >();
+    let noTagsCount = 0;
+
     table.getPreFilteredRowModel().rows.forEach((row) => {
       const tags = (row.original as PhishingUser).tags;
-      if (tags && Array.isArray(tags)) {
+      if (tags && Array.isArray(tags) && tags.length > 0) {
         tags.forEach((tag) => {
           if (!tagsMap.has(tag.name)) {
             tagsMap.set(tag.name, {
@@ -142,11 +144,25 @@ export function DataTableToolbar<TData>({
           const current = tagsMap.get(tag.name)!;
           current.count += 1;
         });
+      } else {
+        noTagsCount++;
       }
     });
-    return Array.from(tagsMap.values()).sort((a, b) =>
+
+    const tagsOptions = Array.from(tagsMap.values()).sort((a, b) =>
       a.label.localeCompare(b.label)
     );
+
+    if (noTagsCount > 0) {
+      tagsOptions.unshift({
+        label: "Sin Etiquetas",
+        value: "__NO_TAGS__",
+        color: "bg-gray-100 text-gray-800",
+        count: noTagsCount,
+      });
+    }
+
+    return tagsOptions;
   }, [table.getPreFilteredRowModel().rows]);
 
   return (

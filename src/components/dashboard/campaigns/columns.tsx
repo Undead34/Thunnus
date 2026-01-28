@@ -101,6 +101,12 @@ export const columns: ColumnDef<PhishingUser>[] = [
       // row.getValue(id) is array of tag objects {name, color}
       const rowTags = (row.getValue(id) as { name: string }[]) || [];
       const rowTagNames = rowTags.map((t) => t.name);
+
+      const showNoTags = value.includes("__NO_TAGS__");
+      if (showNoTags && rowTagNames.length === 0) {
+        return true;
+      }
+
       return value.some((val: string) => rowTagNames.includes(val));
     },
   },
