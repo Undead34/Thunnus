@@ -1,4 +1,5 @@
 import type { PhishingUser } from "@/types";
+import { useState } from "react";
 
 interface Props {
   users: PhishingUser[];
@@ -81,6 +82,168 @@ function buildTimeline(users: PhishingUser[], days = 14): TimelinePoint[] {
   return points;
 }
 
+interface HourPoint {
+  label: string;
+  date: Date;
+  total: number;
+}
+
+function buildHourlyTimeline(users: PhishingUser[], hours = 48): HourPoint[] {
+  const now = new Date();
+  now.setMinutes(0, 0, 0);
+  const points: HourPoint[] = [];
+  for (let i = hours - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setHours(d.getHours() - i);
+    points.push({
+      label: d.toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }),
+      date: d,
+      total: 0,
+    });
+  }
+
+  const idx = new Map<string, number>();
+  points.forEach((p, i) => idx.set(p.date.getTime(), i));
+
+  for (const user of users) {
+    const events = user.events ?? [];
+    for (const ev of events) {
+      const d = parseTs(ev.timestamp as any);
+      if (!d) continue;
+      const h = new Date(d);
+      h.setMinutes(0, 0, 0);
+      const i = idx.get(h.getTime());
+      if (i === undefined) continue;
+      points[i].total++;
+    }
+  }
+  return points;
+}
+
+// Matriz 7 días × 24 horas con el total de interacciones
+function buildHeatmap(users: PhishingUser[], days = 7): { day: string; hours: number[] }[] {
+  const dayNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+  const grid = Array.from({ length: days }, () => Array(24).fill(0) as number[]);
+  const now = new Date();
+  const nowStart = startOfDay(now);
+
+  for (const user of users) {
+    const events = user.events ?? [];
+    for (const ev of events) {
+      const d = parseTs(ev.timestamp as any);
+      if (!d) continue;
+      const start = startOfDay(d);
+      const dayDiff = Math.floor((nowStart.getTime() - start.getTime()) / 86400000);
+      if (dayDiff < 0 || dayDiff >= days) continue;
+      grid[dayDiff][d.getHours()]++;
+    }
+  }
+
+  return grid.map((hours, i) => {
+    const dayDate = new Date(nowStart);
+    dayDate.setDate(dayDate.getDate() - (days - 1 - i));
+    return { day: dayNames[dayDate.getDay()], hours };
+  });
+}
+
+function HeatmapChart({ users }: Props) {
+  const [days, setDays] = useState(7);
+  const grid = buildHeatmap(users, days);
+  const max = Math.max(...grid.flatMap((g) => g.hours), 1);
+
+  const colorFor = (v: number) => {
+    const t = v / max;
+    if (t === 0) return "var(--muted-foreground, #94a3b8)";
+    const alpha = 0.15 + t * 0.85;
+    return `rgba(239, 68, 68, ${alpha})`;
+  };
+
+  const cellW = 16;
+  const cellH = 16;
+  const gap = 3;
+  const width = 24 * (cellW + gap) - gap + 40;
+  const height = days * (cellH + gap) - gap;
+
+  return (
+    <div>
+      <div className="mb-3 flex items-center gap-2">
+        <div className="flex overflow-hidden rounded border text-xs">
+          {[7, 14, 30].map((n) => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => setDays(n)}
+              className={`px-3 py-1.5 transition-colors ${
+                days === n
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-background hover:bg-muted"
+              }`}
+            >
+              {n}d
+            </button>
+          ))}
+        </div>
+        <span className="text-xs text-muted-foreground">
+          Intensidad de interacciones por día y hora
+        </span>
+      </div>
+
+      <div className="overflow-x-auto">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          className="min-w-[360px]"
+          role="img"
+          aria-label="Heatmap de actividad por día y hora"
+        >
+          {grid.map((row, di) => (
+            <g key={di}>
+              <text
+                x={36}
+                y={di * (cellH + gap) + 12}
+                textAnchor="end"
+                fontSize="10"
+                fill="currentColor"
+                fillOpacity={0.7}
+              >
+                {row.day}
+              </text>
+              {row.hours.map((v, hi) => (
+                <rect
+                  key={hi}
+                  x={40 + hi * (cellW + gap)}
+                  y={di * (cellH + gap)}
+                  width={cellW}
+                  height={cellH}
+                  rx={3}
+                  fill={colorFor(v)}
+                >
+                  <title>{`${row.day} ${String(hi).padStart(2, "0")}:00 — ${v} interacciones`}</title>
+                </rect>
+              ))}
+            </g>
+          ))}
+        </svg>
+      </div>
+
+      <div className="mt-2 flex items-center justify-end gap-1.5 text-xs text-muted-foreground">
+        <span>Menos</span>
+        {[0, 0.25, 0.5, 0.75, 1].map((t) => (
+          <span
+            key={t}
+            className="inline-block h-3 w-3 rounded-sm"
+            style={{ backgroundColor: colorFor(t * max) }}
+          />
+        ))}
+        <span>Más</span>
+      </div>
+    </div>
+  );
+}
+
 function FunnelChart({ users }: Props) {
   const total = users.length;
   const opened = users.filter((u) => u.status?.emailOpened).length;
@@ -125,17 +288,27 @@ function FunnelChart({ users }: Props) {
 }
 
 function TimelineChart({ users }: Props) {
+  const [mode, setMode] = useState<"daily" | "hourly">("daily");
   const points = buildTimeline(users);
+  const hourly = buildHourlyTimeline(users);
+  const active = mode === "daily" ? points : hourly;
+
   const width = 560;
   const height = 180;
   const pad = { top: 12, right: 8, bottom: 24, left: 32 };
   const innerW = width - pad.left - pad.right;
   const innerH = height - pad.top - pad.bottom;
 
-  const maxVal = Math.max(...points.map((p) => p.sent + p.opened + p.clicked + p.submitted), 1);
-  const n = Math.max(points.length, 1);
+  const isDaily = mode === "daily";
+  const maxVal = Math.max(
+    ...(isDaily
+      ? active.map((p) => (p as TimelinePoint).sent + (p as TimelinePoint).opened + (p as TimelinePoint).clicked + (p as TimelinePoint).submitted)
+      : active.map((p) => (p as HourPoint).total)),
+    1
+  );
+  const n = Math.max(active.length, 1);
   const slot = innerW / n;
-  const barW = Math.max(6, slot * 0.55);
+  const barW = Math.max(2, slot * 0.6);
 
   const y = (v: number) => pad.top + innerH - (v / maxVal) * innerH;
   const series: { key: keyof TimelinePoint; color: string }[] = [
@@ -147,11 +320,43 @@ function TimelineChart({ users }: Props) {
 
   return (
     <div>
+      <div className="mb-3 flex items-center gap-2">
+        <div className="flex overflow-hidden rounded border text-xs">
+          <button
+            type="button"
+            onClick={() => setMode("daily")}
+            className={`px-3 py-1.5 transition-colors ${
+              mode === "daily"
+                ? "bg-primary text-primary-foreground"
+                : "bg-background hover:bg-muted"
+            }`}
+          >
+            Días (14)
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("hourly")}
+            className={`px-3 py-1.5 transition-colors ${
+              mode === "hourly"
+                ? "bg-primary text-primary-foreground"
+                : "bg-background hover:bg-muted"
+            }`}
+          >
+            Horas (48)
+          </button>
+        </div>
+        <span className="text-xs text-muted-foreground">
+          {isDaily
+            ? "Interacciones apiladas por día"
+            : "Total de interacciones por hora"}
+        </span>
+      </div>
+
       <svg
         viewBox={`0 0 ${width} ${height}`}
         className="w-full"
         role="img"
-        aria-label="Actividad por día"
+        aria-label="Actividad por día o por hora"
       >
         {[0, 0.25, 0.5, 0.75, 1].map((t) => {
           const yy = pad.top + innerH * t;
@@ -179,53 +384,75 @@ function TimelineChart({ users }: Props) {
           );
         })}
 
-        {points.map((p, i) => {
-          let cum = 0;
-          const bars = series.map((s) => {
-            const v = p[s.key] as number;
-            const el = (
-              <rect
-                key={s.key}
-                x={pad.left + i * slot + (slot - barW) / 2}
-                y={y(cum + v)}
-                width={barW}
-                height={Math.max(0, (v / maxVal) * innerH)}
-                fill={s.color}
-                rx={2}
-              />
-            );
-            cum += v;
-            return el;
-          });
-          return <g key={i}>{bars}</g>;
+        {active.map((p, i) => {
+          if (isDaily) {
+            let cum = 0;
+            const bars = series.map((s) => {
+              const v = (p as TimelinePoint)[s.key] as number;
+              const el = (
+                <rect
+                  key={s.key}
+                  x={pad.left + i * slot + (slot - barW) / 2}
+                  y={y(cum + v)}
+                  width={barW}
+                  height={Math.max(0, (v / maxVal) * innerH)}
+                  fill={s.color}
+                  rx={2}
+                />
+              );
+              cum += v;
+              return el;
+            });
+            return <g key={i}>{bars}</g>;
+          }
+          const v = (p as HourPoint).total;
+          return (
+            <rect
+              key={i}
+              x={pad.left + i * slot + (slot - barW) / 2}
+              y={y(v)}
+              width={barW}
+              height={Math.max(0, (v / maxVal) * innerH)}
+              fill={COLORS.opened}
+              rx={2}
+            >
+              <title>{`${p.label} — ${v} interacciones`}</title>
+            </rect>
+          );
         })}
 
-        {points.map((p, i) => (
-          <text
-            key={i}
-            x={pad.left + i * slot + slot / 2}
-            y={height - 6}
-            textAnchor="middle"
-            fontSize="9"
-            fill="currentColor"
-            fillOpacity={0.6}
-          >
-            {p.label}
-          </text>
-        ))}
+        {active.map((p, i) => {
+          const showEvery = isDaily ? 1 : Math.ceil(n / 24);
+          if (i % showEvery !== 0) return null;
+          return (
+            <text
+              key={i}
+              x={pad.left + i * slot + slot / 2}
+              y={height - 6}
+              textAnchor="middle"
+              fontSize="9"
+              fill="currentColor"
+              fillOpacity={0.6}
+            >
+              {p.label}
+            </text>
+          );
+        })}
       </svg>
 
-      <div className="mt-2 flex flex-wrap gap-3 text-xs">
-        {series.map((s) => (
-          <span key={s.key} className="flex items-center gap-1.5">
-            <span
-              className="inline-block h-2 w-2 rounded-sm"
-              style={{ backgroundColor: s.color }}
-            />
-            {s.key[0].toUpperCase() + s.key.slice(1)}
-          </span>
-        ))}
-      </div>
+      {isDaily && (
+        <div className="mt-2 flex flex-wrap gap-3 text-xs">
+          {series.map((s) => (
+            <span key={s.key} className="flex items-center gap-1.5">
+              <span
+                className="inline-block h-2 w-2 rounded-sm"
+                style={{ backgroundColor: s.color }}
+              />
+              {s.key[0].toUpperCase() + s.key.slice(1)}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -468,9 +695,15 @@ export function DashboardCharts({ users }: Props) {
         </div>
       </div>
 
-      <div className="rounded-xl border bg-card p-5 shadow-sm">
-        <h3 className="mb-4 text-sm font-medium">Actividad por día (últimos 14 días)</h3>
-        <TimelineChart users={users} />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-xl border bg-card p-5 shadow-sm">
+          <h3 className="mb-4 text-sm font-medium">Actividad por día (últimos 14 días)</h3>
+          <TimelineChart users={users} />
+        </div>
+        <div className="rounded-xl border bg-card p-5 shadow-sm">
+          <h3 className="mb-4 text-sm font-medium">Heatmap de actividad (día × hora)</h3>
+          <HeatmapChart users={users} />
+        </div>
       </div>
 
       <div className="rounded-xl border bg-card p-5 shadow-sm">
