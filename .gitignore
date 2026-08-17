@@ -27,3 +27,4 @@ service-account-key.json
 serviceAccount.json
 service-*.json
 service_*.json
+*.pem
