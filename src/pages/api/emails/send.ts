@@ -33,6 +33,9 @@ import CorteSupremaElSalvador, {
 import RamaJudicialColombia, {
   CONFIG as RamaJudicialColombiaConfig,
 } from "@/emails/RamaJudicialColombia/Template.astro";
+import ReciboPago, {
+  CONFIG as ReciboPagoConfig,
+} from "@/emails/ReciboPago/Template.astro";
 
 import type { PhishingUser, SMTP } from "@/types";
 import type { APIRoute } from "astro";
@@ -84,6 +87,7 @@ export const TemplateMapper: Record<string, TemplateEntry> = {
     component: RamaJudicialColombia,
     config: RamaJudicialColombiaConfig,
   },
+  "recibo-pago": { component: ReciboPago, config: ReciboPagoConfig },
 } as const;
 
 const db = getFirestore(app);
@@ -182,6 +186,7 @@ async function sendMail(pkg: MailPackage) {
       subject,
       html,
       smtp: smtp, // Pass SMTP config just in case provider is switched to SMTP
+      from: smtp.from,
     });
 
     console.log(`[Batch ${batchId}] Email successfully sent to ${user.email}`);

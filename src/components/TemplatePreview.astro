@@ -10,6 +10,7 @@ import PoderJudiciarioBrasilTemplate from "@/emails/PoderJudiciarioBrasil/Templa
 import FuncionJudicialEcuadorTemplate from "@/emails/FuncionJudicialEcuador/Template.astro";
 import CorteSupremaElSalvadorTemplate from "@/emails/CorteSupremaElSalvador/Template.astro";
 import RamaJudicialColombiaTemplate from "@/emails/RamaJudicialColombia/Template.astro";
+import ReciboPagoTemplate from "@/emails/ReciboPago/Template.astro";
 
 type TemplateKey =
   | "microsoft"
@@ -21,7 +22,8 @@ type TemplateKey =
   | "poder-judiciario-brasil"
   | "funcion-judicial-ecuador"
   | "corte-suprema-el-salvador"
-  | "rama-judicial-colombia";
+  | "rama-judicial-colombia"
+  | "recibo-pago";
 
 interface Props {
   selectedTemplate: string;
@@ -110,6 +112,15 @@ const templates = {
         props: { redirect_to: "http://example.com/colombia" },
       }),
     ),
+  "recibo-pago": await experimental_AstroContainer.create().then((c) =>
+    c.renderToString(ReciboPagoTemplate, {
+      props: {
+        redirect_to: "http://example.com/recibo",
+        tracking_pixel: "/api/tracking-pixel",
+        target_name: "GABRIEL ALEJANDRO MAIZO GONZÁLEZ",
+      },
+    }),
+  ),
 };
 
 const validTemplates: TemplateKey[] = [
@@ -123,6 +134,7 @@ const validTemplates: TemplateKey[] = [
   "funcion-judicial-ecuador",
   "corte-suprema-el-salvador",
   "rama-judicial-colombia",
+  "recibo-pago",
 ];
 const selected: TemplateKey = validTemplates.includes(
   selectedTemplate as TemplateKey,

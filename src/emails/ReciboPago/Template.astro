@@ -1,0 +1,83 @@
+---
+interface Props {
+    redirect_to: string;
+    tracking_pixel?: string;
+    target_name?: string;
+}
+
+const { redirect_to, tracking_pixel, target_name } = Astro.props;
+
+const recipientName = target_name || "Colaborador(a)";
+
+export const CONFIG = {
+    subject: "Recibo de pago de nómina",
+    flags: {
+        tracking_pixel: true,
+        target_name: true,
+        censored_email: false,
+        email: false,
+    },
+    defaultProps: {
+        redirect_to: "https://ejemplo.com/recibo",
+    },
+};
+---
+
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Recibo de pago de nómina</title>
+    </head>
+    <body
+        style="margin: 0; padding: 0; background-color: #ffffff; font-family: 'Segoe UI', Arial, sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;"
+    >
+        <table
+            border="0"
+            cellpadding="0"
+            cellspacing="0"
+            width="100%"
+            style="background-color: #ffffff;"
+        >
+            <tr>
+                <td align="left" style="padding: 16px 0;">
+                    <table
+                        border="0"
+                        cellpadding="0"
+                        cellspacing="0"
+                        width="100%"
+                        style="width: 100%;"
+                    >
+                        <tr>
+                            <td
+                                style="padding: 24px 16px; font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #333333;"
+                            >
+                                <p style="margin: 0 0 16px 0;">
+                                    Estimado(a): {recipientName}
+                                </p>
+                                <p style="margin: 0 0 16px 0;">
+                                    Se adjunta recibo de pago. Para descargarlo,
+                                    haga clic en el siguiente enlace:
+                                </p>
+                                <p style="margin: 0 0 16px 0;">
+                                    <a
+                                        href={redirect_to}
+                                        target="_blank"
+                                        style="color: #0563c1; text-decoration: underline;"
+                                        >Recibo de pago de nómina.pdf</a
+                                    >
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        {
+            tracking_pixel && (
+                <img src={tracking_pixel} alt="" width="5" height="5" />
+            )
+        }
+    </body>
+</html>
