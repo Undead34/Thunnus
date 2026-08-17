@@ -5,6 +5,10 @@ export interface EmailOptions {
   subject: string;
   html: string;
   smtp?: SMTP; // Optional, might be required by SMTP provider but not MS
+  from?: {
+    name?: string;
+    email?: string;
+  };
 }
 
 export interface IEmailProvider {

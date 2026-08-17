@@ -17,8 +17,11 @@ export class SmtpProvider implements IEmailProvider {
     };
     const transporter = nodemailer.createTransport(config);
 
+    const fromEmail = options.from?.email || options.smtp.auth.user;
+    const fromName = options.from?.name;
+
     const response = await transporter.sendMail({
-      from: options.smtp.auth.user,
+      from: fromName ? `"${fromName}" <${fromEmail}>` : fromEmail,
       to: options.to,
       html: options.html,
       subject: options.subject,

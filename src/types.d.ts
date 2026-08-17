@@ -82,4 +82,8 @@ export interface SMTP {
     user: string;
     pass: string;
   };
+  from?: {
+    name?: string;
+    email?: string;
+  };
 }

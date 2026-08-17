@@ -175,6 +175,35 @@ try {
               autoComplete="off"
             />
           </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="fromName">Nombre del remitente (From)</Label>
+              <Input
+                id="fromName"
+                type="text"
+                placeholder="Recursos Humanos"
+                defaultValue={smtpConfig?.from?.name || ""}
+                autoComplete="off"
+              />
+              <p class="text-[0.8rem] text-muted-foreground mt-1">
+                Nombre que aparecerá como remitente.
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="fromEmail">Correo del remitente (From)</Label>
+              <Input
+                id="fromEmail"
+                type="text"
+                placeholder="noreply@empresa.com"
+                defaultValue={smtpConfig?.from?.email || ""}
+                autoComplete="off"
+              />
+              <p class="text-[0.8rem] text-muted-foreground mt-1">
+                Dirección visible como remitente.
+              </p>
+            </div>
+          </div>
         </div>
 
         <div id="general-settings" class="space-y-4 pt-4 border-t">
@@ -297,6 +326,12 @@ try {
           user: (document.getElementById("username") as HTMLInputElement)
             ?.value,
           pass: (document.getElementById("password") as HTMLInputElement)
+            ?.value,
+        };
+        smtpData.from = {
+          name: (document.getElementById("fromName") as HTMLInputElement)
+            ?.value,
+          email: (document.getElementById("fromEmail") as HTMLInputElement)
             ?.value,
         };
       }
