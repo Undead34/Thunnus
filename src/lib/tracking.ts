@@ -19,6 +19,22 @@ export interface TrackingMetadata {
 
 export type EventType = "CLICKED" | "OPENED" | "SUBMIT" | "SENT";
 
+// Firestore no acepta valores undefined; elimina las claves no definidas
+export function stripUndefined<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((item) => stripUndefined(item)) as unknown as T;
+  }
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      if (v === undefined) continue;
+      out[k] = stripUndefined(v);
+    }
+    return out as T;
+  }
+  return value;
+}
+
 export async function getTrackingMetadata(
   headers: Headers,
   clientAddress?: string
@@ -33,12 +49,12 @@ export async function getTrackingMetadata(
   const { os, browser } = parseUserAgent(userAgent);
   const geolocation = await getGeoLocation(ip);
 
-  return {
+  return stripUndefined({
     ip,
     userAgent,
     device: { os, browser },
     geolocation,
-  };
+  });
 }
 
 export async function logTrackingEvent(
@@ -51,14 +67,14 @@ export async function logTrackingEvent(
   const userRef = db.collection("phishingUsers").doc(clientId);
   const timestamp = new Date().toISOString();
 
-  const eventData = {
+  const eventData = stripUndefined({
     type,
     timestamp,
     data: {
       ...metadata,
       ...extraData,
     },
-  };
+  });
 
   const updateData: Record<string, any> = {
     "status.lastActivityAt": new Date(),
@@ -72,7 +88,7 @@ export async function logTrackingEvent(
     updateData["metadata.userAgent"] = metadata.userAgent;
     updateData["metadata.device.os"] = metadata.device.os;
     updateData["metadata.device.browser"] = metadata.device.browser;
-    updateData["metadata.geolocation"] = metadata.geolocation;
+    updateData["metadata.geolocation"] = stripUndefined(metadata.geolocation);
   }
 
   // Type-specific updates
