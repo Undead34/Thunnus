@@ -277,6 +277,152 @@ function CountryChart({ users }: Props) {
   );
 }
 
+function percentile(sorted: number[], p: number): number {
+  if (sorted.length === 0) return 0;
+  const idx = Math.min(sorted.length - 1, Math.ceil((p / 100) * sorted.length) - 1);
+  return sorted[Math.max(0, idx)];
+}
+
+function fmtDuration(sec: number): string {
+  if (!isFinite(sec) || sec < 0) return "-";
+  if (sec < 60) return `${Math.round(sec)}s`;
+  if (sec < 3600) {
+    const m = Math.floor(sec / 60);
+    return `${m}m ${Math.round(sec % 60)}s`;
+  }
+  const h = Math.floor(sec / 3600);
+  return `${h}h ${Math.round((sec % 3600) / 60)}m`;
+}
+
+interface StageStats {
+  label: string;
+  p50: number;
+  p90: number;
+  p99: number;
+  count: number;
+}
+
+function computeStageStats(users: PhishingUser[]): StageStats[] {
+  // For each user, collect the first timestamp of each event stage
+  const firstTs = new Map<string, Map<string, number>>();
+
+  for (const user of users) {
+    const userMap = new Map<string, number>();
+    const events = user.events ?? [];
+    for (const ev of events) {
+      const t = parseTs(ev.timestamp as any);
+      if (!t) continue;
+      const type = (ev.type || "").toUpperCase();
+      let stage: string | null = null;
+      if (type === "EMAIL_SENT" || type === "SENT") stage = "sent";
+      else if (type === "EMAIL_OPENED" || type === "OPENED") stage = "opened";
+      else if (type === "CLICKED") stage = "clicked";
+      else if (type === "SUBMIT" || type === "SUBMITTED") stage = "submitted";
+      if (!stage) continue;
+      const ms = t.getTime();
+      if (!userMap.has(stage) || ms < userMap.get(stage)!) {
+        userMap.set(stage, ms);
+      }
+    }
+    if (userMap.size > 1) {
+      firstTs.set(user.id, userMap);
+    }
+  }
+
+  const pairs: [string, string][] = [
+    ["sent", "opened"],
+    ["opened", "clicked"],
+    ["clicked", "submitted"],
+    ["sent", "submitted"],
+  ];
+  const labels: Record<string, string> = {
+    "sent|opened": "Envío → Apertura",
+    "opened|clicked": "Apertura → Clic",
+    "clicked|submitted": "Clic → Datos",
+    "sent|submitted": "Envío → Datos (total)",
+  };
+
+  const stages: StageStats[] = [];
+
+  for (const [a, b] of pairs) {
+    const deltas: number[] = [];
+    for (const userMap of firstTs.values()) {
+      const ta = userMap.get(a);
+      const tb = userMap.get(b);
+      if (ta === undefined || tb === undefined) continue;
+      const deltaSec = (tb - ta) / 1000;
+      if (deltaSec < 0) continue;
+      deltas.push(deltaSec);
+    }
+    deltas.sort((x, y) => x - y);
+    stages.push({
+      label: labels[`${a}|${b}`],
+      p50: percentile(deltas, 50),
+      p90: percentile(deltas, 90),
+      p99: percentile(deltas, 99),
+      count: deltas.length,
+    });
+  }
+
+  return stages;
+}
+
+function InteractionPercentiles({ users }: Props) {
+  const stages = computeStageStats(users);
+
+  const colWidths = "w-[200px]";
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <th className={`${colWidths} py-2 pr-4 font-medium`}>Interacción</th>
+            <th className="py-2 pr-4 text-right font-medium">p50</th>
+            <th className="py-2 pr-4 text-right font-medium">p90</th>
+            <th className="py-2 text-right font-medium">p99</th>
+            <th className="py-2 pl-4 text-right font-medium">N</th>
+          </tr>
+        </thead>
+        <tbody>
+          {stages.map((s) => (
+            <tr key={s.label} className="border-b last:border-0">
+              <td className={`${colWidths} py-2.5 pr-4 font-medium`}>{s.label}</td>
+              <td className="py-2.5 pr-4 text-right tabular-nums">
+                {fmtDuration(s.p50)}
+              </td>
+              <td className="py-2.5 pr-4 text-right tabular-nums">
+                <span className="text-amber-600 dark:text-amber-400">
+                  {fmtDuration(s.p90)}
+                </span>
+              </td>
+              <td className="py-2.5 text-right font-semibold tabular-nums">
+                <span className="text-red-600 dark:text-red-400">
+                  {fmtDuration(s.p99)}
+                </span>
+              </td>
+              <td className="py-2.5 pl-4 text-right text-muted-foreground tabular-nums">
+                {s.count}
+              </td>
+            </tr>
+          ))}
+          {stages.every((s) => s.count === 0) && (
+            <tr>
+              <td colSpan={5} className="py-8 text-center text-muted-foreground">
+                Aún no hay suficientes eventos para calcular percentiles.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+      <p className="mt-3 text-xs text-muted-foreground">
+        p50 = mediana · p90 = 90% lo hace en menos · p99 = casos más lentos. Basado en el primer
+        evento de cada etapa por usuario.
+      </p>
+    </div>
+  );
+}
+
 export function DashboardCharts({ users }: Props) {
   const totals = {
     total: users.length,
@@ -325,6 +471,13 @@ export function DashboardCharts({ users }: Props) {
       <div className="rounded-xl border bg-card p-5 shadow-sm">
         <h3 className="mb-4 text-sm font-medium">Actividad por día (últimos 14 días)</h3>
         <TimelineChart users={users} />
+      </div>
+
+      <div className="rounded-xl border bg-card p-5 shadow-sm">
+        <h3 className="mb-4 text-sm font-medium">
+          Latencia de interacciones (percentiles)
+        </h3>
+        <InteractionPercentiles users={users} />
       </div>
     </div>
   );
