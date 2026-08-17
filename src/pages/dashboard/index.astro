@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/dashboard.astro";
 import TableUsers from "@/components/dashboard/campaigns/table-users";
+import { DashboardCharts } from "@/components/dashboard/campaigns/dashboard-charts";
 import { app } from "@/firebase/server";
 import { getFirestore } from "firebase-admin/firestore";
 import type { PhishingUser } from "@/types";
@@ -23,11 +24,7 @@ const filteredUsers = users.filter((user) => {
 <Layout title="Dashboard">
   <main class="space-y-6">
     <section>
-      <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-        <div class="aspect-video rounded-xl bg-muted/50"></div>
-        <div class="aspect-video rounded-xl bg-muted/50"></div>
-        <div class="aspect-video rounded-xl bg-muted/50"></div>
-      </div>
+      <DashboardCharts users={users} client:only="react" />
     </section>
 
     <Separator className="my-6" />
