@@ -273,9 +273,16 @@ export const columnsUser: ColumnDef<PhishingUser>[] = [
   {
     accessorKey: "clickCount",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Visitas al Link" />
+      <DataTableColumnHeader column={column} title="Clics" />
     ),
-    cell: ({ row }) => <div>{row.getValue("clickCount")}</div>,
+    cell: ({ row }) => <div>{row.getValue("clickCount") ?? 0}</div>,
+  },
+  {
+    accessorKey: "visitCount",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Recargas" />
+    ),
+    cell: ({ row }) => <div>{row.getValue("visitCount") ?? 0}</div>,
   },
   {
     accessorKey: "capturedCredentials",

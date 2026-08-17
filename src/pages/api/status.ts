@@ -10,7 +10,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const {
       client_id,
       status,
-    }: { client_id: string; status: "submit" | "clicked" | "opened" | "sent" } =
+    }: { client_id: string; status: "submit" | "clicked" | "opened" | "sent" | "visit" } =
       await request.json();
 
     // Map legacy status strings to EventType
@@ -18,7 +18,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       "submit": "SUBMIT",
       "clicked": "CLICKED",
       "opened": "OPENED",
-      "sent": "SENT"
+      "sent": "SENT",
+      "visit": "VISIT"
     };
 
     const eventType = statusMap[status];

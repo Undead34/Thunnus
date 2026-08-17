@@ -17,7 +17,7 @@ export interface TrackingMetadata {
   };
 }
 
-export type EventType = "CLICKED" | "OPENED" | "SUBMIT" | "SENT";
+export type EventType = "CLICKED" | "OPENED" | "SUBMIT" | "SENT" | "VISIT";
 
 // Firestore no acepta valores undefined; elimina las claves no definidas
 export function stripUndefined<T>(value: T): T {
@@ -37,7 +37,8 @@ export function stripUndefined<T>(value: T): T {
 
 export async function getTrackingMetadata(
   headers: Headers,
-  clientAddress?: string
+  clientAddress?: string,
+  options: { geo?: boolean } = {}
 ): Promise<TrackingMetadata> {
   const ip =
     clientAddress ||
@@ -47,14 +48,34 @@ export async function getTrackingMetadata(
 
   const userAgent = headers.get("user-agent") || "unknown";
   const { os, browser } = parseUserAgent(userAgent);
-  const geolocation = await getGeoLocation(ip);
 
-  return stripUndefined({
+  const base = stripUndefined({
     ip,
     userAgent,
     device: { os, browser },
-    geolocation,
-  });
+  }) as TrackingMetadata;
+
+  if (options.geo === false) return base;
+
+  const geolocation = await getGeoLocation(ip);
+  return stripUndefined({ ...base, geolocation });
+}
+
+// Enriquecimiento best-effort: nunca debe bloquear ni romper el evento principal
+export async function enrichGeolocation(
+  db: Firestore,
+  clientId: string,
+  ip: string
+): Promise<void> {
+  try {
+    const geo = await getGeoLocation(ip);
+    if (!geo || Object.keys(geo).length === 0) return;
+    await db.collection("phishingUsers").doc(clientId).update({
+      "metadata.geolocation": stripUndefined(geo),
+    });
+  } catch (e) {
+    console.error(`Error enriqueciendo geolocalización para ${clientId}:`, e);
+  }
 }
 
 export async function logTrackingEvent(
@@ -88,7 +109,9 @@ export async function logTrackingEvent(
     updateData["metadata.userAgent"] = metadata.userAgent;
     updateData["metadata.device.os"] = metadata.device.os;
     updateData["metadata.device.browser"] = metadata.device.browser;
-    updateData["metadata.geolocation"] = stripUndefined(metadata.geolocation);
+    if (metadata.geolocation) {
+      updateData["metadata.geolocation"] = stripUndefined(metadata.geolocation);
+    }
   }
 
   // Type-specific updates
@@ -151,6 +174,8 @@ export async function logTrackingEvent(
     updateData["status.formSubmitted"] = true;
   } else if (type === "SENT") {
     updateData["status.emailSended"] = true;
+  } else if (type === "VISIT") {
+    updateData["visitCount"] = FieldValue.increment(1);
   }
 
   try {

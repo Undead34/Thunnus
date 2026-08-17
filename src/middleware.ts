@@ -75,14 +75,24 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
             if (userSnapshot.exists) {
               const userData = userSnapshot.data();
+              // Evitar doble conteo: si el usuario ya clickeó, no volver a registrar CLICKED
+              if (userData?.status?.linkClicked) {
+                return;
+              }
+              // Registrar el CLICKED con datos básicos de inmediato (sin esperar a la geo)
               const metadata = await getTrackingMetadata(
                 context.request.headers,
-                context.clientAddress
+                context.clientAddress,
+                { geo: false }
               );
               await logTrackingEvent(db, client_id, "CLICKED", metadata, {
                 country: country || "unknown",
                 currentStatus: userData?.status, // Pass current status to prevent overwriting 'pixel' method
               });
+              // Enriquecer geolocalización en background (best-effort)
+              enrichGeolocation(db, client_id, metadata.ip).catch((e) =>
+                console.error("Error enriqueciendo geo en middleware:", e)
+              );
             }
           } catch (e) {
             console.error("Error logging click in middleware:", e);

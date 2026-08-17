@@ -342,12 +342,12 @@ const {
     sessionService.init();
     phishingService.init();
 
-    // Registrar visita al enlace
+    // Registrar visita a la landing (el CLICKED lo cuenta el middleware)
     if (clientId) {
       fetch("/api/status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ client_id: clientId, status: "clicked" }),
+        body: JSON.stringify({ client_id: clientId, status: "visit" }),
       });
     }
 

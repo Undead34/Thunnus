@@ -8,6 +8,7 @@ export interface PhishingUser {
   group: string;
   status: UserStatus;
   clickCount: number;
+  visitCount?: number;
   sessionsNum: number;
   capturedCredentials?: CapturedCredentials;
   metadata: UserMetadata;
