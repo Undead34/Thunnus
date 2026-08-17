@@ -1,9 +1,73 @@
 #!/bin/bash
 
 # Detener ante errores graves
-set -e
+set -euo pipefail
 
 echo "--- 🚀 INICIANDO INSTALACIÓN AUTOMÁTICA DE THUNNUS ---"
+
+# ==============================================================================
+# 0. VALIDACIONES PREVIAS Y SWAP
+# ==============================================================================
+
+MIN_SWAP_GB=2
+MIN_SWAP_KB=$((MIN_SWAP_GB * 1024 * 1024))
+MIN_RAM_KB=$((512 * 1024))
+
+echo "--- 0. Comprobando requisitos del sistema ---"
+
+# Evitar instalar nvm/pnpm como root (se rompe la ruta de PM2)
+if [ "$(id -u)" -eq 0 ]; then
+    echo "❌ ERROR: No ejecutes este script como root."
+    echo "   Usa un usuario normal (ej: ec2-user) con privilegios sudo:"
+    echo "   ./install_auto.sh"
+    exit 1
+fi
+
+# Verificar acceso sudo
+if ! sudo -n true 2>/dev/null; then
+    echo "⚠️  Este script necesita sudo. Se te pedirá la contraseña si hace falta."
+fi
+
+# Comprobar memoria RAM (swap nos protege cuando el build es pesado)
+RAM_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+if [ -n "${RAM_KB:-}" ] && [ "$RAM_KB" -lt "$MIN_RAM_KB" ]; then
+    echo "ℹ️  Poca RAM detectada ($((RAM_KB / 1024)) MB), el swap es importante aquí."
+fi
+
+# Comprobar/crear swap de al menos 2GB
+ensure_swap() {
+    TOTAL_SWAP_KB=$(free -k | awk '/^Swap:/ {print $2}')
+    if [ "${TOTAL_SWAP_KB:-0}" -ge "$MIN_SWAP_KB" ]; then
+        echo "✅ Swap suficiente: $((TOTAL_SWAP_KB / 1024)) MB"
+        return 0
+    fi
+
+    echo "⚠️  Swap actual: ${TOTAL_SWAP_KB:-0} KB — se necesita al menos ${MIN_SWAP_GB} GB."
+    SWAPFILE="/swapfile"
+
+    if swapon --show=NAME --noheadings | grep -qx "$SWAPFILE"; then
+        echo "ℹ️  $SWAPFILE está activo pero es pequeño, se desactiva para recrearlo."
+        sudo swapoff "$SWAPFILE" 2>/dev/null || true
+    fi
+
+    echo "ℹ️  Creando swap de ${MIN_SWAP_GB} GB en $SWAPFILE (puede tardar unos segundos)..."
+    sudo fallocate -l "${MIN_SWAP_GB}G" "$SWAPFILE" 2>/dev/null \
+        || sudo dd if=/dev/zero of="$SWAPFILE" bs=1M count=$((MIN_SWAP_GB * 1024)) status=progress
+    sudo chmod 600 "$SWAPFILE"
+    sudo mkswap "$SWAPFILE"
+    sudo swapon "$SWAPFILE"
+
+    # Persistir en /etc/fstab si no está ya
+    if ! sudo grep -qs "^$SWAPFILE " /etc/fstab; then
+        echo "$SWAPFILE none swap sw 0 0" | sudo tee -a /etc/fstab >/dev/null
+        echo "✅ Swap persistente añadido a /etc/fstab"
+    fi
+
+    NEW_SWAP_KB=$(free -k | awk '/^Swap:/ {print $2}')
+    echo "✅ Swap configurado: $((NEW_SWAP_KB / 1024)) MB"
+}
+
+ensure_swap
 
 # ==============================================================================
 # 1. INSTALACIÓN DE SISTEMA Y HERRAMIENTAS
@@ -13,25 +77,50 @@ sudo yum update -y
 sudo yum install git -y
 
 # Instalar NVM
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+if ! command -v nvm >/dev/null 2>&1 && [ ! -d "$HOME/.nvm" ]; then
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+else
+    echo "ℹ️  NVM ya está instalado en $HOME/.nvm"
+fi
 
-# Cargar NVM
+# Cargar NVM (siempre)
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-# Instalar Node 24
-nvm install 24
-nvm use 24
+# Instalar Node 24 (si no está)
+if ! ls -d "$NVM_DIR"/versions/node/v24.* >/dev/null 2>&1; then
+    nvm install 24
+fi
+nvm use 24 >/dev/null 2>&1 || true
 
-# Instalar PNPM y PM2
-corepack enable pnpm
-pnpm setup
-export PNPM_HOME="$HOME/.local/share/pnpm"
+if ! command -v node >/dev/null 2>&1; then
+    nvm install 24
+    nvm use 24
+fi
+node --version
+
+# Instalar PNPM (via corepack) y PM2
+export PNPM_HOME="${PNPM_HOME:-$HOME/.local/share/pnpm}"
 case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
-pnpm install -g pm2@latest
+
+corepack enable pnpm 2>/dev/null || npm install -g pnpm@latest
+
+# Asegurar que pnpm exista en PATH, si no, instalarlo vía npm
+if ! command -v pnpm >/dev/null 2>&1; then
+    echo "ℹ️  pnpm no está en PATH, instalando globalmente con npm..."
+    npm install -g pnpm@latest
+    export PATH="$(npm config get prefix)/bin:$PATH"
+fi
+pnpm --version
+
+if ! command -v pm2 >/dev/null 2>&1; then
+    pnpm install -g pm2@latest
+else
+    echo "ℹ️  PM2 ya instalado: $(pm2 --version)"
+fi
 
 # ==============================================================================
 # 2. CLONADO Y DEPENDENCIAS
@@ -42,11 +131,15 @@ if [ -d "Thunnus" ]; then
     rm -rf Thunnus
 fi
 
-git clone --depth 1 https://github.com/Undead34/Thunnus
+if ! git clone --depth 1 https://github.com/Undead34/Thunnus; then
+    echo "❌ ERROR: Falló el clonado del repositorio. Revisa la URL y tu conexión."
+    exit 1
+fi
 cd Thunnus/
 
 echo "--- Instalando paquetes (pnpm install) ---"
-pnpm install
+# NODE_OPTIONS con más memoria ayuda en instancias pequeñas
+NODE_OPTIONS="--max-old-space-size=2048" pnpm install
 
 # ==============================================================================
 # 3. CONFIGURACIÓN CLIENTE (src/firebase/client.ts)
@@ -133,7 +226,8 @@ echo ""
 echo "----------------------------------------------------------------------"
 echo "🎉 INSTALACIÓN Y CONFIGURACIÓN COMPLETADA"
 echo "----------------------------------------------------------------------"
-echo "Para iniciar el servidor, ejecuta:"
-echo "   pnpm dev   (Modo desarrollo)"
-echo "   pnpm build && pnpm start (Producción)"
+echo "Siguientes pasos:"
+echo "   1. Verifica el archivo .env (aplicará las variables al reiniciar sesión)"
+echo "   2. Ejecuta: pnpm build"
+echo "   3. Inicia con PM2: pm2 start dist/server/entry.mjs --name thunnus"
 echo "----------------------------------------------------------------------"
