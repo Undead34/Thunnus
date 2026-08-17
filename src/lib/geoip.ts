@@ -15,15 +15,17 @@ export async function getGeoLocation(ip: string): Promise<GeoLocation> {
     }
 
     try {
-        const response = await fetch(`https://api.ipapi.is?q=${ip}`);
+        const response = await fetch(`https://ipwho.is/${ip}`);
         if (!response.ok) return {};
 
         const data = await response.json();
+        if (data.success === false) return {};
+
         return {
-            country: data.location?.country,
-            city: data.location?.city,
-            lat: data.location?.latitude,
-            lon: data.location?.longitude
+            country: data.country,
+            city: data.city,
+            lat: data.latitude,
+            lon: data.longitude
         };
     } catch (e) {
         console.error("Error fetching geolocation:", e);
