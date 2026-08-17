@@ -59,29 +59,71 @@ if [ -z "$SERVER_NAME" ]; then
 fi
 
 # ==============================================================================
-# 3. GENERAR CONFIG NGINX
+# 3. GENERAR CONFIG NGINX (DNS-aware)
 # ==============================================================================
 echo "--- Generando configuración nginx ---"
 
+DOMAINS=()          # Lista de dominios que resuelven hacia nuestra IP
+CERT_DOMAINS=""     # Flags -d para certbot
+
+# Resuelve un dominio y devuelve las IPs a las que apunta
+resolve_domain() {
+    local domain="$1"
+    if command -v dig >/dev/null 2>&1; then
+        dig +short A "$domain" | grep -E '^[0-9]+\.' || true
+    elif command -v getent >/dev/null 2>&1; then
+        getent ahostsv4 "$domain" 2>/dev/null | awk '{print $1}' | sort -u
+    else
+        python3 - "$domain" <<'PY' 2>/dev/null || true
+import socket, sys
+try:
+    print(socket.gethostbyname(sys.argv[1]))
+except Exception:
+    pass
+PY
+    fi
+}
+
 if [ -n "$SERVER_NAME" ]; then
     echo "    Usando dominio: $SERVER_NAME"
-    echo "    ⚠️  Asegúrate de que $SERVER_NAME apunte a la IP $PUBLIC_IP"
-    echo "    (registro A en tu DNS) ANTES de continuar, o el certificado fallará."
-    echo ""
-    read -r -p "¿Ya está el registro A apuntando? [s/N]: " confirm
-    if [ "${confirm,,}" != "s" ]; then
-        echo "❌ Sin registro A no se puede emitir HTTPS. Ejecútalo de nuevo cuando esté listo."
-        echo "   Mientras tanto puedes usar la IP o volver a correr el script."
+    echo "    Verificando qué dominios resuelven hacia $PUBLIC_IP..."
+
+    for candidate in "$SERVER_NAME" "www.$SERVER_NAME"; do
+        IPS=$(resolve_domain "$candidate")
+        if [ -z "$IPS" ]; then
+            echo "    ⚠️  $candidate no tiene registro A (NXDOMAIN) — se omite."
+            continue
+        fi
+        MATCHES=$(echo "$IPS" | grep -qx "$PUBLIC_IP" && echo yes || echo no)
+        if [ "$MATCHES" = "yes" ]; then
+            DOMAINS+=("$candidate")
+            echo "    ✅ $candidate → $PUBLIC_IP (OK)"
+        else
+            echo "    ⚠️  $candidate apunta a [$IPS], no a $PUBLIC_IP — se omite."
+        fi
+    done
+
+    if [ "${#DOMAINS[@]}" -eq 0 ]; then
+        echo ""
+        echo "❌ Ningún dominio resuelve hacia la IP $PUBLIC_IP."
+        echo "   Crea el registro A en tu DNS apuntando a $PUBLIC_IP y vuelve a ejecutar:"
+        echo "   ./configure_nginx.sh $SERVER_NAME"
         exit 1
     fi
+
+    echo ""
+    echo "    Dominios válidos que se usarán: ${DOMAINS[*]}"
+else
+    echo "    Sin dominio — sirviendo solo por IP: $PUBLIC_IP"
 fi
 
 CONF_PATH="/etc/nginx/conf.d/thunnus.conf"
+SERVER_NAMES="${DOMAINS[*]:-}"
 SERVER_BLOCK=""
 
-if [ -n "$SERVER_NAME" ]; then
+if [ ${#DOMAINS[@]} -gt 0 ]; then
     SERVER_BLOCK="
-    server_name $SERVER_NAME www.$SERVER_NAME;
+    server_name ${DOMAINS[*]};
 "
 else
     SERVER_BLOCK="
@@ -100,7 +142,7 @@ upstream thunnus_app {
 # ====== HTTP (redirige a HTTPS si hay dominio) ======
 server {
     listen 80;
-    server_name ${SERVER_NAME:-_};
+    server_name ${SERVER_NAMES:-_};
 
     # Para permitir payloads grandes (credenciales/fotos)
     client_max_body_size 25M;
@@ -131,9 +173,9 @@ sudo systemctl enable nginx >/dev/null 2>&1 || true
 sudo systemctl restart nginx
 
 # ==============================================================================
-# 4. HTTPS CON LET'S ENCRYPT (solo si hay dominio)
+# 4. HTTPS CON LET'S ENCRYPT (solo si hay dominio válido)
 # ==============================================================================
-if [ -n "$SERVER_NAME" ]; then
+if [ "${#DOMAINS[@]}" -gt 0 ]; then
     echo ""
     echo "--- Configurando HTTPS con Let's Encrypt ---"
     if ! command -v certbot >/dev/null 2>&1; then
@@ -142,11 +184,16 @@ if [ -n "$SERVER_NAME" ]; then
 
     sudo mkdir -p /var/www/certbot
 
-    # Emitir certificado
-    if sudo certbot --nginx -d "$SERVER_NAME" -d "www.$SERVER_NAME" --non-interactive --agree-tos --redirect --register-unsafely-without-email; then
+    # Construir flags -d para cada dominio validado
+    for d in "${DOMAINS[@]}"; do
+        CERT_DOMAINS+=" -d $d"
+    done
+
+    # Emitir certificado solo para los dominios que resolvieron
+    if sudo certbot --nginx $CERT_DOMAINS --non-interactive --agree-tos --redirect --register-unsafely-without-email; then
         echo "✅ Certificado emitido y redirección HTTPS activada."
     else
-        echo "⚠️  Certbot falló. Verifica que el registro A de $SERVER_NAME apunte a $PUBLIC_IP"
+        echo "⚠️  Certbot falló. Verifica que los registros A apunten a $PUBLIC_IP"
         echo "    y que el puerto 80 esté abierto en el Security Group."
     fi
 
@@ -197,9 +244,10 @@ echo ""
 echo "----------------------------------------------------------------------"
 echo "✅ NGINX CONFIGURADO"
 echo "----------------------------------------------------------------------"
-if [ -n "$SERVER_NAME" ]; then
-    URL="https://$SERVER_NAME"
+if [ "${#DOMAINS[@]}" -gt 0 ]; then
+    URL="https://${DOMAINS[0]}"
     echo "  URL:        $URL"
+    echo "  Dominios:   ${DOMAINS[*]}"
     echo "  Redirige:   $URL -> http://127.0.0.1:$APP_PORT"
 else
     URL="http://$PUBLIC_IP"
@@ -210,7 +258,7 @@ echo ""
 echo "  IMPORTANTE — Security Group en AWS Console:"
 echo "    → Asegúrate de abrir puertos 80 (HTTP) y 443 (HTTPS) en tu instancia."
 echo ""
-echo "  Para levantar Thunnus con PM2:"
-echo "    pm2 start dist/server/entry.mjs --name thunnus --env PORT=$APP_PORT"
+echo "  Para levantar Thunnus con PM2 (dentro de la carpeta Thunnus/):"
+echo "    cd ~/Thunnus && pm2 start dist/server/entry.mjs --name thunnus --env PORT=$APP_PORT"
 echo "    pm2 save && pm2 startup"
 echo "----------------------------------------------------------------------"
